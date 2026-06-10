@@ -1,0 +1,33 @@
+{% extends 'base.html' %}
+{% block title %}{{ title }} - Seed Tracker{% endblock %}
+{% block page_title %}{{ title }}{% endblock %}
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-lg-8">
+    <div class="form-card">
+      <h5 style="font-weight:700;margin-bottom:24px;color:#1a2332"><i class="fas fa-user-plus me-2" style="color:#1a6b3c"></i>{{ title }}</h5>
+      <form method="post">
+        {% csrf_token %}
+        <div class="row g-3">
+          <div class="col-md-6"><label class="form-label">First Name *</label>{{ form.first_name }}</div>
+          <div class="col-md-6"><label class="form-label">Last Name *</label>{{ form.last_name }}</div>
+          <div class="col-md-6"><label class="form-label">Phone Number *</label>{{ form.phone_number }}</div>
+          <div class="col-md-6"><label class="form-label">National ID</label>{{ form.national_id }}</div>
+          <div class="col-md-6"><label class="form-label">Village *</label>{{ form.village }}</div>
+          <div class="col-md-6"><label class="form-label">Crop Type *</label>{{ form.crop_type }}</div>
+          <div class="col-md-8"><label class="form-label">Farm Location</label>{{ form.farm_location }}</div>
+          <div class="col-md-4"><label class="form-label">Farm Size (Acres)</label>{{ form.farm_size }}</div>
+          <div class="col-md-4"><label class="form-label">Status</label>{{ form.status }}</div>
+        </div>
+        {% if form.errors %}
+        <div class="alert alert-danger mt-3">{% for field, errs in form.errors.items %}{% for e in errs %}<div>{{ field }}: {{ e }}</div>{% endfor %}{% endfor %}</div>
+        {% endif %}
+        <div class="d-flex gap-2 mt-4">
+          <button type="submit" class="btn btn-primary"><i class="fas fa-save me-1"></i>Save Farmer</button>
+          <a href="{% url 'farmer_list' %}" class="btn btn-outline-secondary">Cancel</a>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,171 @@
+{% extends 'base.html' %}
+{% block title %}Dashboard - Seed Tracker{% endblock %}
+{% block page_title %}Dashboard{% endblock %}
+{% block content %}
+<div class="row g-3 mb-4">
+  <div class="col-sm-6 col-xl-3">
+    <div class="stat-card">
+      <div class="stat-icon" style="background:#e8f5ee;color:#1a6b3c"><i class="fas fa-users"></i></div>
+      <div class="stat-value">{{ total_farmers }}</div>
+      <div class="stat-label">Registered Farmers</div>
+    </div>
+  </div>
+  <div class="col-sm-6 col-xl-3">
+    <div class="stat-card">
+      <div class="stat-icon" style="background:#fff8e6;color:#f0a500"><i class="fas fa-boxes"></i></div>
+      <div class="stat-value">{{ total_allocations }}</div>
+      <div class="stat-label">Total Allocations</div>
+      <div class="stat-change"><span style="color:#1a6b3c">{{ approved_allocations }}</span> approved &bull; <span style="color:#f0a500">{{ pending_allocations }}</span> pending</div>
+    </div>
+  </div>
+  <div class="col-sm-6 col-xl-3">
+    <div class="stat-card">
+      <div class="stat-icon" style="background:#e3f2fd;color:#1976d2"><i class="fas fa-warehouse"></i></div>
+      <div class="stat-value">{{ total_seeds_received|floatformat:0 }}</div>
+      <div class="stat-label">Total Seeds Received (kg)</div>
+    </div>
+  </div>
+  <div class="col-sm-6 col-xl-3">
+    <div class="stat-card">
+      <div class="stat-icon" style="background:#fce4ec;color:#c62828"><i class="fas fa-truck"></i></div>
+      <div class="stat-value">{{ distributed }}</div>
+      <div class="stat-label">Seeds Distributed</div>
+      <div class="stat-change" style="color:#7a8494">{{ total_seeds_distributed|floatformat:0 }} kg total</div>
+    </div>
+  </div>
+</div>
+
+<div class="row g-3 mb-4">
+  <div class="col-lg-8">
+    <div class="chart-card h-100">
+      <div class="chart-title"><i class="fas fa-chart-line me-2" style="color:#1a6b3c"></i>Monthly Allocation Trend</div>
+      <canvas id="monthChart" height="110"></canvas>
+    </div>
+  </div>
+  <div class="col-lg-4">
+    <div class="chart-card h-100">
+      <div class="chart-title"><i class="fas fa-chart-pie me-2" style="color:#f0a500"></i>Allocation Status</div>
+      <canvas id="statusChart" height="170"></canvas>
+    </div>
+  </div>
+</div>
+
+<div class="row g-3 mb-4">
+  <div class="col-lg-6">
+    <div class="chart-card">
+      <div class="chart-title"><i class="fas fa-chart-bar me-2" style="color:#1976d2"></i>Seeds by Type (kg)</div>
+      <canvas id="seedChart" height="140"></canvas>
+    </div>
+  </div>
+  <div class="col-lg-6">
+    <div class="chart-card">
+      <div class="chart-title"><i class="fas fa-chart-donut me-2" style="color:#c62828"></i>Farmers by Crop Type</div>
+      <canvas id="cropChart" height="140"></canvas>
+    </div>
+  </div>
+</div>
+
+<div class="row g-3">
+  <div class="col-lg-7">
+    <div class="table-card">
+      <div class="table-header">
+        <h5><i class="fas fa-clock me-2" style="color:#1a6b3c"></i>Recent Allocations</h5>
+        <a href="{% url 'allocation_list' %}" class="btn btn-sm btn-outline-primary">View All</a>
+      </div>
+      <div class="table-responsive">
+        <table class="data-table">
+          <thead><tr><th>Farmer</th><th>Seed</th><th>Qty</th><th>Status</th><th>Date</th></tr></thead>
+          <tbody>
+            {% for a in recent_allocations %}
+            <tr>
+              <td>
+                <a href="{% url 'allocation_detail' a.pk %}" style="text-decoration:none;color:#1a2332;font-weight:600">{{ a.farmer.full_name }}</a>
+                <br><span class="farmer-id">{{ a.farmer.farmer_id }}</span>
+              </td>
+              <td>{{ a.seed_type.name }}</td>
+              <td>{{ a.quantity_allocated }} {{ a.seed_type.unit }}</td>
+              <td><span class="badge-status badge-{{ a.status }}">{{ a.get_status_display }}</span></td>
+              <td style="color:#7a8494">{{ a.created_at|date:"d M Y" }}</td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="5" class="text-center text-muted py-4">No allocations yet</td></tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+  <div class="col-lg-5">
+    <div class="table-card">
+      <div class="table-header">
+        <h5><i class="fas fa-history me-2" style="color:#f0a500"></i>Recent Activity</h5>
+      </div>
+      <div style="padding: 4px 0;">
+        {% for log in recent_activities %}
+        <div style="padding: 10px 20px; border-bottom: 1px solid #f4f6f9; display:flex; gap:10px; align-items:flex-start;">
+          <div style="width:32px;height:32px;border-radius:50%;background:#e8f5ee;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+            <i class="fas fa-check" style="color:#1a6b3c;font-size:12px"></i>
+          </div>
+          <div>
+            <div style="font-size:13px;color:#3a4252">{{ log.action }}</div>
+            <div style="font-size:11px;color:#9aa5b4">{{ log.user }} &bull; {{ log.created_at|timesince }} ago</div>
+          </div>
+        </div>
+        {% empty %}
+        <div class="text-center text-muted py-4">No activity yet</div>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+const GREEN = '#1a6b3c', AMBER = '#f0a500', BLUE = '#1976d2', RED = '#e53935';
+const COLORS = [GREEN,'#2d9a5a','#43c278','#78d9a2',AMBER,'#f8c842',BLUE,'#64b5f6'];
+
+// Month chart
+new Chart(document.getElementById('monthChart'), {
+  type: 'line',
+  data: {
+    labels: {{ month_labels|safe }},
+    datasets: [{ label: 'Allocations', data: {{ month_counts|safe }},
+      borderColor: GREEN, backgroundColor: 'rgba(26,107,60,.08)',
+      borderWidth: 2.5, pointBackgroundColor: GREEN, pointRadius: 4, fill: true, tension: .4 }]
+  },
+  options: { plugins: { legend: { display: false }}, scales: { y: { beginAtZero: true, grid: { color: '#f0f2f5' }}, x: { grid: { display: false }}}}
+});
+
+// Status donut
+new Chart(document.getElementById('statusChart'), {
+  type: 'doughnut',
+  data: {
+    labels: ['Pending','Approved','Rejected','Distributed'],
+    datasets: [{ data: {{ status_data|safe }}, backgroundColor: [AMBER, GREEN, RED, BLUE], borderWidth: 2, borderColor: '#fff' }]
+  },
+  options: { plugins: { legend: { position: 'bottom', labels: { font: { size: 11 }, padding: 12 }}}, cutout: '65%' }
+});
+
+// Seed type bar
+new Chart(document.getElementById('seedChart'), {
+  type: 'bar',
+  data: {
+    labels: {{ seed_alloc_labels|safe }},
+    datasets: [{ label: 'kg Allocated', data: {{ seed_alloc_data|safe }},
+      backgroundColor: COLORS, borderRadius: 6, borderSkipped: false }]
+  },
+  options: { plugins: { legend: { display: false }}, scales: { y: { beginAtZero: true, grid: { color: '#f0f2f5' }}, x: { grid: { display: false }}}}
+});
+
+// Crop type donut
+new Chart(document.getElementById('cropChart'), {
+  type: 'doughnut',
+  data: {
+    labels: {{ crop_labels|safe }},
+    datasets: [{ data: {{ crop_data|safe }}, backgroundColor: COLORS, borderWidth: 2, borderColor: '#fff' }]
+  },
+  options: { plugins: { legend: { position: 'right', labels: { font: { size: 11 }, padding: 10 }}}, cutout: '55%' }
+});
+</script>
+{% endblock %}

@@ -1,0 +1,40 @@
+{% extends 'base.html' %}
+{% block title %}SMS Logs - Seed Tracker{% endblock %}
+{% block page_title %}SMS Notifications Log{% endblock %}
+{% block content %}
+<div class="page-header">
+  <h4><i class="fas fa-sms me-2" style="color:#1a6b3c"></i>SMS Logs</h4>
+  <span class="badge" style="background:#e8f5ee;color:#1a6b3c;font-size:13px;padding:8px 14px;border-radius:20px">{{ page_obj.paginator.count }} messages</span>
+</div>
+<div class="table-card">
+  <div class="table-responsive">
+    <table class="data-table">
+      <thead><tr><th>Farmer</th><th>Phone</th><th>Message</th><th>Status</th><th>Sent At</th></tr></thead>
+      <tbody>
+        {% for log in page_obj %}
+        <tr>
+          <td style="font-weight:600">{{ log.farmer.full_name }}</td>
+          <td>{{ log.phone_number }}</td>
+          <td style="max-width:350px;font-size:13px">{{ log.message|truncatechars:100 }}</td>
+          <td>
+            {% if log.status == 'sent' %}<span class="badge-status badge-approved">Sent</span>
+            {% elif log.status == 'failed' %}<span class="badge-status badge-rejected">Failed</span>
+            {% else %}<span class="badge-status badge-pending">Pending</span>{% endif %}
+          </td>
+          <td style="color:#7a8494;font-size:12px">{{ log.sent_at|date:"d M Y H:i"|default:"-" }}</td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="5" class="text-center text-muted py-4">No SMS logs</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% if page_obj.has_other_pages %}
+  <div style="padding:16px 20px;display:flex;justify-content:center;gap:6px">
+    {% if page_obj.has_previous %}<a href="?page={{ page_obj.previous_page_number }}" class="btn btn-sm btn-outline-secondary">« Prev</a>{% endif %}
+    <span class="btn btn-sm btn-primary disabled">{{ page_obj.number }} / {{ page_obj.paginator.num_pages }}</span>
+    {% if page_obj.has_next %}<a href="?page={{ page_obj.next_page_number }}" class="btn btn-sm btn-outline-secondary">Next »</a>{% endif %}
+  </div>
+  {% endif %}
+</div>
+{% endblock %}

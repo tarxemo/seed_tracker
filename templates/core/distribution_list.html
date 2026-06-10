@@ -1,0 +1,41 @@
+{% extends 'base.html' %}
+{% block title %}Distribution - Seed Tracker{% endblock %}
+{% block page_title %}Distribution Records{% endblock %}
+{% block content %}
+<div class="page-header">
+  <h4><i class="fas fa-truck me-2" style="color:#1a6b3c"></i>Distribution Records</h4>
+  <a href="{% url 'allocation_list' %}?status=approved" class="btn btn-primary btn-sm"><i class="fas fa-plus me-1"></i>Record from Allocations</a>
+</div>
+<div class="table-card">
+  <div class="table-responsive">
+    <table class="data-table">
+      <thead><tr><th>Farmer</th><th>Seed Type</th><th>Qty Distributed</th><th>Collection Date</th><th>Confirmed By</th><th>Season</th><th>Date Recorded</th></tr></thead>
+      <tbody>
+        {% for d in page_obj %}
+        <tr>
+          <td>
+            <span style="font-weight:600">{{ d.allocation.farmer.full_name }}</span>
+            <br><span class="farmer-id">{{ d.allocation.farmer.farmer_id }}</span>
+          </td>
+          <td>{{ d.allocation.seed_type.name }}</td>
+          <td><strong>{{ d.quantity_distributed }}</strong> {{ d.allocation.seed_type.unit }}</td>
+          <td>{{ d.collection_date|date:"d M Y" }}</td>
+          <td>{{ d.confirmed_by|default:"-" }}</td>
+          <td style="font-size:12px">{{ d.allocation.season.name }}</td>
+          <td style="color:#7a8494">{{ d.created_at|date:"d M Y" }}</td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="7" class="text-center text-muted py-5">No distribution records yet</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% if page_obj.has_other_pages %}
+  <div style="padding:16px 20px;display:flex;justify-content:center;gap:6px">
+    {% if page_obj.has_previous %}<a href="?page={{ page_obj.previous_page_number }}" class="btn btn-sm btn-outline-secondary">« Prev</a>{% endif %}
+    <span class="btn btn-sm btn-primary disabled">{{ page_obj.number }} / {{ page_obj.paginator.num_pages }}</span>
+    {% if page_obj.has_next %}<a href="?page={{ page_obj.next_page_number }}" class="btn btn-sm btn-outline-secondary">Next »</a>{% endif %}
+  </div>
+  {% endif %}
+</div>
+{% endblock %}

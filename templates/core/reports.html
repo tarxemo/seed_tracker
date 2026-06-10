@@ -1,0 +1,172 @@
+{% extends 'base.html' %}
+{% block title %}Reports - Seed Tracker{% endblock %}
+{% block page_title %}Reports & Analytics{% endblock %}
+{% block extra_head %}{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
+  <h4 style="margin:0"><i class="fas fa-chart-bar me-2" style="color:#1a6b3c"></i>Reports</h4>
+  <div class="d-flex gap-2 flex-wrap">
+    <form method="get" class="d-flex gap-2">
+      <select name="season" class="form-select form-select-sm" style="width:200px">
+        <option value="">All Seasons</option>
+        {% for s in seasons %}<option value="{{ s.pk }}">{{ s.name }}</option>{% endfor %}
+      </select>
+      <button type="submit" class="btn btn-sm btn-primary">Filter</button>
+    </form>
+    <a href="{% url 'export_farmers_csv' %}" class="btn btn-sm btn-outline-success"><i class="fas fa-download me-1"></i>Farmers CSV</a>
+    <a href="{% url 'export_allocations_csv' %}" class="btn btn-sm btn-outline-success"><i class="fas fa-download me-1"></i>Allocations CSV</a>
+  </div>
+</div>
+
+<div class="row g-3 mb-4">
+  <div class="col-sm-6 col-xl-3">
+    <div class="stat-card">
+      <div class="stat-icon" style="background:#e8f5ee;color:#1a6b3c"><i class="fas fa-inbox"></i></div>
+      <div class="stat-value">{{ total_received|floatformat:0 }}</div>
+      <div class="stat-label">Total Seeds Received (kg)</div>
+    </div>
+  </div>
+  <div class="col-sm-6 col-xl-3">
+    <div class="stat-card">
+      <div class="stat-icon" style="background:#fff8e6;color:#f0a500"><i class="fas fa-truck"></i></div>
+      <div class="stat-value">{{ total_distributed|floatformat:0 }}</div>
+      <div class="stat-label">Total Distributed (kg)</div>
+    </div>
+  </div>
+  <div class="col-sm-6 col-xl-3">
+    <div class="stat-card">
+      <div class="stat-icon" style="background:#e3f2fd;color:#1976d2"><i class="fas fa-boxes"></i></div>
+      <div class="stat-value">{{ remaining_stock|floatformat:0 }}</div>
+      <div class="stat-label">Remaining Stock (kg)</div>
+    </div>
+  </div>
+  <div class="col-sm-6 col-xl-3">
+    <div class="stat-card">
+      <div class="stat-icon" style="background:#fce4ec;color:#c62828"><i class="fas fa-users"></i></div>
+      <div class="stat-value">{{ total_farmers }}</div>
+      <div class="stat-label">Total Beneficiaries</div>
+    </div>
+  </div>
+</div>
+
+<div class="row g-3 mb-4">
+  <div class="col-lg-7">
+    <div class="chart-card">
+      <div class="chart-title">Distribution by District</div>
+      <canvas id="districtChart" height="130"></canvas>
+    </div>
+  </div>
+  <div class="col-lg-5">
+    <div class="chart-card">
+      <div class="chart-title">Seed Allocation Summary</div>
+      <table class="data-table">
+        <thead><tr><th>Seed Type</th><th>Allocations</th><th>Total Qty</th></tr></thead>
+        <tbody>
+          {% for s in seed_summary %}
+          <tr>
+            <td style="font-weight:600">{{ s.seed_type__name }}</td>
+            <td>{{ s.cnt }}</td>
+            <td>{{ s.qty|floatformat:0 }} {{ s.seed_type__unit }}</td>
+          </tr>
+          {% empty %}
+          <tr><td colspan="3" class="text-muted text-center">No data</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<div class="row g-3">
+  <div class="col-lg-6">
+    <div class="table-card">
+      <div class="table-header"><h5>By Region</h5></div>
+      <table class="data-table">
+        <thead><tr><th>Region</th><th>Allocations</th><th>Total Qty (kg)</th></tr></thead>
+        <tbody>
+          {% for r in region_summary %}
+          <tr>
+            <td style="font-weight:600">{{ r.farmer__village__ward__district__region__name|default:"Unknown" }}</td>
+            <td>{{ r.cnt }}</td>
+            <td>{{ r.qty|floatformat:0 }}</td>
+          </tr>
+          {% empty %}
+          <tr><td colspan="3" class="text-muted text-center">No data</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+  <div class="col-lg-6">
+    <div class="table-card">
+      <div class="table-header"><h5>By District</h5></div>
+      <table class="data-table">
+        <thead><tr><th>District</th><th>Allocations</th><th>Total Qty (kg)</th></tr></thead>
+        <tbody>
+          {% for d in district_summary %}
+          <tr>
+            <td style="font-weight:600">{{ d.farmer__village__ward__district__name|default:"Unknown" }}</td>
+            <td>{{ d.cnt }}</td>
+            <td>{{ d.qty|floatformat:0 }}</td>
+          </tr>
+          {% empty %}
+          <tr><td colspan="3" class="text-muted text-center">No data</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+  <div class="col-lg-6">
+    <div class="table-card">
+      <div class="table-header"><h5>By Ward</h5></div>
+      <table class="data-table">
+        <thead><tr><th>Ward</th><th>Allocations</th><th>Total Qty (kg)</th></tr></thead>
+        <tbody>
+          {% for w in ward_summary %}
+          <tr>
+            <td style="font-weight:600">{{ w.farmer__village__ward__name|default:"Unknown" }}</td>
+            <td>{{ w.cnt }}</td>
+            <td>{{ w.qty|floatformat:0 }}</td>
+          </tr>
+          {% empty %}
+          <tr><td colspan="3" class="text-muted text-center">No data</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+  <div class="col-lg-6">
+    <div class="table-card">
+      <div class="table-header"><h5>By Village</h5></div>
+      <table class="data-table">
+        <thead><tr><th>Village</th><th>Allocations</th><th>Total Qty (kg)</th></tr></thead>
+        <tbody>
+          {% for v in village_summary %}
+          <tr>
+            <td style="font-weight:600">{{ v.farmer__village__name|default:"Unknown" }}</td>
+            <td>{{ v.cnt }}</td>
+            <td>{{ v.qty|floatformat:0 }}</td>
+          </tr>
+          {% empty %}
+          <tr><td colspan="3" class="text-muted text-center">No data</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+{% endblock %}
+{% block extra_js %}
+<script>
+new Chart(document.getElementById('districtChart'), {
+  type: 'bar',
+  data: {
+    labels: {{ dist_chart_labels|safe }},
+    datasets: [{ label: 'kg Allocated', data: {{ dist_chart_data|safe }},
+      backgroundColor: ['#1a6b3c','#2d9a5a','#43c278','#78d9a2','#f0a500','#f8c842','#1976d2','#64b5f6'],
+      borderRadius: 6 }]
+  },
+  options: { indexAxis: 'y', plugins: { legend: { display: false }}, scales: { x: { beginAtZero: true, grid: { color: '#f0f2f5' }}, y: { grid: { display: false }}}}
+});
+</script>
+{% endblock %}

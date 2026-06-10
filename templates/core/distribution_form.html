@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+{% block title %}Record Distribution - Seed Tracker{% endblock %}
+{% block page_title %}Record Distribution{% endblock %}
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-lg-6">
+    <div class="form-card">
+      <h5 style="font-weight:700;margin-bottom:20px"><i class="fas fa-truck me-2" style="color:#1a6b3c"></i>Record Seed Distribution</h5>
+      <div style="background:#e8f5ee;border-radius:10px;padding:14px;margin-bottom:20px">
+        <div style="font-weight:700">{{ allocation.farmer.full_name }} &mdash; <span class="farmer-id">{{ allocation.farmer.farmer_id }}</span></div>
+        <div style="color:#1a6b3c;font-size:18px;font-weight:800">{{ allocation.quantity_allocated }} {{ allocation.seed_type.unit }} of {{ allocation.seed_type.name }}</div>
+        <div style="color:#7a8494;font-size:13px">{{ allocation.season.name }}</div>
+      </div>
+      <form method="post">
+        {% csrf_token %}
+        <div class="row g-3">
+          <div class="col-md-6"><label class="form-label">Quantity Distributed *</label>{{ form.quantity_distributed }}</div>
+          <div class="col-md-6"><label class="form-label">Collection Date *</label>{{ form.collection_date }}</div>
+          <div class="col-12"><label class="form-label">Notes</label>{{ form.notes }}</div>
+        </div>
+        <div class="d-flex gap-2 mt-4">
+          <button type="submit" class="btn btn-primary"><i class="fas fa-check me-1"></i>Confirm Distribution</button>
+          <a href="{% url 'allocation_list' %}" class="btn btn-outline-secondary">Cancel</a>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}

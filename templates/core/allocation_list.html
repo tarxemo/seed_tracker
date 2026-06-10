@@ -1,0 +1,64 @@
+{% extends 'base.html' %}
+{% block title %}Allocations - Seed Tracker{% endblock %}
+{% block page_title %}Seed Allocations{% endblock %}
+{% block content %}
+<div class="page-header">
+  <h4><i class="fas fa-boxes me-2" style="color:#1a6b3c"></i>Allocations <small style="font-size:14px;color:#7a8494;font-weight:400">({{ page_obj.paginator.count }} total)</small></h4>
+  <a href="{% url 'allocation_create' %}" class="btn btn-primary btn-sm"><i class="fas fa-plus me-1"></i>New Allocation</a>
+</div>
+<div class="table-card">
+  <div class="table-header">
+    <form method="get" class="d-flex gap-2 flex-wrap">
+      <input type="text" name="q" value="{{ q }}" placeholder="Search farmer..." class="form-control form-control-sm" style="width:200px">
+      <select name="status" class="form-select form-select-sm" style="width:150px">
+        <option value="">All Status</option>
+        <option value="pending" {% if status_filter == 'pending' %}selected{% endif %}>Pending</option>
+        <option value="approved" {% if status_filter == 'approved' %}selected{% endif %}>Approved</option>
+        <option value="rejected" {% if status_filter == 'rejected' %}selected{% endif %}>Rejected</option>
+        <option value="distributed" {% if status_filter == 'distributed' %}selected{% endif %}>Distributed</option>
+      </select>
+      <button type="submit" class="btn btn-sm btn-primary"><i class="fas fa-search"></i></button>
+      {% if q or status_filter %}<a href="{% url 'allocation_list' %}" class="btn btn-sm btn-outline-secondary">Clear</a>{% endif %}
+    </form>
+  </div>
+  <div class="table-responsive">
+    <table class="data-table">
+      <thead><tr><th>Farmer</th><th>Seed Type</th><th>Season</th><th>Qty</th><th>Status</th><th>Collection Date</th><th>SMS</th><th>Actions</th></tr></thead>
+      <tbody>
+        {% for a in page_obj %}
+        <tr>
+          <td>
+            <a href="{% url 'farmer_detail' a.farmer.pk %}" style="font-weight:600;text-decoration:none;color:#1a2332">{{ a.farmer.full_name }}</a>
+            <br><span class="farmer-id">{{ a.farmer.farmer_id }}</span>
+          </td>
+          <td>{{ a.seed_type.name }}</td>
+          <td style="font-size:12px">{{ a.season.name }}</td>
+          <td><strong>{{ a.quantity_allocated }}</strong> {{ a.seed_type.unit }}</td>
+          <td><span class="badge-status badge-{{ a.status }}">{{ a.get_status_display }}</span></td>
+          <td>{% if a.collection_date %}{{ a.collection_date|date:"d M Y" }}{% else %}<span class="text-muted">-</span>{% endif %}</td>
+          <td>{% if a.sms_sent %}<i class="fas fa-check-circle text-success"></i>{% else %}<i class="fas fa-times-circle text-muted"></i>{% endif %}</td>
+          <td>
+            <a href="{% url 'allocation_detail' a.pk %}" class="btn btn-sm btn-outline-primary me-1"><i class="fas fa-eye"></i></a>
+            {% if a.status == 'pending' %}
+              <a href="{% url 'allocation_approve' a.pk %}" class="btn btn-sm btn-outline-success me-1" title="Approve/Reject"><i class="fas fa-check"></i></a>
+            {% endif %}
+            {% if a.status == 'approved' and not a.distribution %}
+              <a href="{% url 'distribution_record' a.pk %}" class="btn btn-sm btn-outline-info" title="Record Distribution"><i class="fas fa-truck"></i></a>
+            {% endif %}
+          </td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="8" class="text-center text-muted py-5">No allocations found</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% if page_obj.has_other_pages %}
+  <div style="padding:16px 20px;display:flex;justify-content:center;gap:6px">
+    {% if page_obj.has_previous %}<a href="?page={{ page_obj.previous_page_number }}&q={{ q }}&status={{ status_filter }}" class="btn btn-sm btn-outline-secondary">« Prev</a>{% endif %}
+    <span class="btn btn-sm btn-primary disabled">{{ page_obj.number }} / {{ page_obj.paginator.num_pages }}</span>
+    {% if page_obj.has_next %}<a href="?page={{ page_obj.next_page_number }}&q={{ q }}&status={{ status_filter }}" class="btn btn-sm btn-outline-secondary">Next »</a>{% endif %}
+  </div>
+  {% endif %}
+</div>
+{% endblock %}
