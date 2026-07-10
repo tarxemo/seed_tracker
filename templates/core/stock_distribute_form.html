@@ -1,0 +1,28 @@
+{% extends 'base.html' %}
+{% block title %}Distribute Stock - Seed Tracker{% endblock %}
+{% block page_title %}Distribute Stock{% endblock %}
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-lg-7">
+    <div class="form-card">
+      <h5 style="font-weight:700;margin-bottom:24px"><i class="fas fa-share me-2" style="color:#1a6b3c"></i>Distribute Stock to {{ form.fields.target.label }}</h5>
+      <form method="post">
+        {% csrf_token %}
+        <div class="row g-3">
+          <div class="col-md-6"><label class="form-label">Seed Type *</label>{{ form.seed_type }}</div>
+          <div class="col-md-6"><label class="form-label">Quantity *</label>{{ form.quantity }}</div>
+          <div class="col-12"><label class="form-label">{{ form.fields.target.label }} *</label>{{ form.target }}</div>
+          <div class="col-12"><label class="form-label">Notes</label>{{ form.notes }}</div>
+        </div>
+        {% if form.errors %}
+        <div class="alert alert-danger mt-3">{% for field, errs in form.errors.items %}{% for e in errs %}<div>{{ e }}</div>{% endfor %}{% endfor %}</div>
+        {% endif %}
+        <div class="d-flex gap-2 mt-4">
+          <button type="submit" class="btn btn-primary"><i class="fas fa-save me-1"></i>Distribute</button>
+          <a href="{% url 'stock_list' %}" class="btn btn-outline-secondary">Cancel</a>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}

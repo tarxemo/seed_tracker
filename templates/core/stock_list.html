@@ -1,0 +1,121 @@
+{% extends 'base.html' %}
+{% block title %}Stock Transfers - Seed Tracker{% endblock %}
+{% block page_title %}Stock Transfers{% endblock %}
+{% block content %}
+<div class="page-header">
+  <h4><i class="fas fa-dolly me-2" style="color:#1a6b3c"></i>Stock Transfers
+    {% if location_label %}<small style="font-size:14px;color:#7a8494;font-weight:400">({{ location_label }}: {{ location }})</small>{% endif %}
+  </h4>
+  <div class="d-flex gap-2">
+    {% if user.role == 'regional' or user.role == 'district' or user.role == 'ward' %}
+    <a href="{% url 'stock_distribute' %}" class="btn btn-primary btn-sm"><i class="fas fa-share me-1"></i>Distribute Stock</a>
+    {% endif %}
+    {% if user.role == 'district' or user.role == 'ward' or user.role == 'village' %}
+    <a href="{% url 'stock_request_create' %}" class="btn btn-outline-primary btn-sm"><i class="fas fa-hand-holding me-1"></i>Request Stock</a>
+    {% endif %}
+  </div>
+</div>
+
+{% if balances %}
+<div class="row g-3 mb-4">
+  {% for b in balances %}
+  <div class="col-md-3 col-sm-6">
+    <div class="stat-card">
+      <div class="stat-icon" style="background:#e8f5ee;color:#1a6b3c"><i class="fas fa-seedling"></i></div>
+      <div class="stat-value">{{ b.quantity }}</div>
+      <div class="stat-label">{{ b.seed_type.name }} ({{ b.seed_type.unit }}) in stock</div>
+    </div>
+  </div>
+  {% endfor %}
+</div>
+{% elif location_label %}
+<div class="alert alert-warning">No stock currently held at your {{ location_label|lower }}. {% if user.role != 'regional' %}Use "Request Stock" above to ask your parent officer.{% endif %}</div>
+{% endif %}
+
+{% if incoming_requests %}
+<div class="table-card mb-4">
+  <div class="table-header"><h5><i class="fas fa-inbox me-2"></i>Requests From Your Team</h5></div>
+  <div class="table-responsive">
+    <table class="data-table">
+      <thead><tr><th>Requested By</th><th>Seed Type</th><th>Qty</th><th>Status</th><th>Date</th><th>Actions</th></tr></thead>
+      <tbody>
+        {% for t in incoming_requests %}
+        <tr>
+          <td>{{ t.initiated_by.get_full_name|default:t.initiated_by.username }} <br><span class="text-muted" style="font-size:12px">{{ t.to_location }}</span></td>
+          <td>{{ t.seed_type.name }}</td>
+          <td><strong>{{ t.quantity }}</strong> {{ t.seed_type.unit }}</td>
+          <td><span class="badge-status badge-{{ t.status }}">{{ t.get_status_display }}</span></td>
+          <td style="font-size:12px">{{ t.created_at|date:"d M Y H:i" }}</td>
+          <td>
+            {% if t.status == 'pending' %}
+            <a href="{% url 'stock_request_respond' t.pk %}" class="btn btn-sm btn-outline-success"><i class="fas fa-reply"></i> Respond</a>
+            {% else %}<span class="text-muted">-</span>{% endif %}
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endif %}
+
+<div class="row g-4">
+  {% if sent %}
+  <div class="col-lg-6">
+    <div class="table-card">
+      <div class="table-header"><h5><i class="fas fa-share me-2"></i>Distributed by You</h5></div>
+      <div class="table-responsive">
+        <table class="data-table">
+          <thead><tr><th>To</th><th>Seed Type</th><th>Qty</th><th>Date</th></tr></thead>
+          <tbody>
+            {% for t in sent %}
+            <tr><td>{{ t.to_location }}</td><td>{{ t.seed_type.name }}</td><td><strong>{{ t.quantity }}</strong> {{ t.seed_type.unit }}</td><td style="font-size:12px">{{ t.created_at|date:"d M Y" }}</td></tr>
+            {% empty %}<tr><td colspan="4" class="text-center text-muted py-4">No distributions yet</td></tr>{% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+  {% endif %}
+
+  {% if received %}
+  <div class="col-lg-6">
+    <div class="table-card">
+      <div class="table-header"><h5><i class="fas fa-inbox me-2"></i>Received</h5></div>
+      <div class="table-responsive">
+        <table class="data-table">
+          <thead><tr><th>From</th><th>Seed Type</th><th>Qty</th><th>Date</th></tr></thead>
+          <tbody>
+            {% for t in received %}
+            <tr><td>{{ t.from_location }}</td><td>{{ t.seed_type.name }}</td><td><strong>{{ t.quantity }}</strong> {{ t.seed_type.unit }}</td><td style="font-size:12px">{{ t.created_at|date:"d M Y" }}</td></tr>
+            {% empty %}<tr><td colspan="4" class="text-center text-muted py-4">Nothing received yet</td></tr>{% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+  {% endif %}
+
+  {% if my_requests %}
+  <div class="col-lg-6">
+    <div class="table-card">
+      <div class="table-header"><h5><i class="fas fa-hand-holding me-2"></i>Your Requests</h5></div>
+      <div class="table-responsive">
+        <table class="data-table">
+          <thead><tr><th>Seed Type</th><th>Qty</th><th>Status</th><th>Date</th></tr></thead>
+          <tbody>
+            {% for t in my_requests %}
+            <tr>
+              <td>{{ t.seed_type.name }}</td><td><strong>{{ t.quantity }}</strong> {{ t.seed_type.unit }}</td>
+              <td><span class="badge-status badge-{{ t.status }}">{{ t.get_status_display }}</span>{% if t.status == 'rejected' and t.rejection_reason %}<br><span class="text-muted" style="font-size:11px">{{ t.rejection_reason }}</span>{% endif %}</td>
+              <td style="font-size:12px">{{ t.created_at|date:"d M Y" }}</td>
+            </tr>
+            {% empty %}<tr><td colspan="4" class="text-center text-muted py-4">No requests yet</td></tr>{% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+  {% endif %}
+</div>
+{% endblock %}

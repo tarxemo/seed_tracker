@@ -12,6 +12,7 @@ from .models import *
 from .forms import *
 from .decorators import role_required
 from .utils import send_allocation_sms
+from .stock import balance_for_user, location_for_user, village_balance
 
 def login_view(request):
     if request.user.is_authenticated:
@@ -159,7 +160,7 @@ def inventory_list(request):
     return render(request, 'core/inventory_list.html', {'page_obj': page, 'summary': summary})
 
 @login_required
-@role_required('admin','regional')
+@role_required('regional')
 def inventory_create(request):
     form = SeedInventoryForm(request.POST or None)
     if request.method == 'POST' and form.is_valid():
@@ -201,6 +202,11 @@ def allocation_create(request):
         if SeedAllocation.objects.filter(farmer=a.farmer, seed_type=a.seed_type, season=a.season).exists():
             messages.error(request, 'This farmer already has an allocation for this seed type in this season.')
             return render(request, 'core/allocation_form.html', {'form': form, 'title': 'New Allocation'})
+        # Check village has enough received stock
+        available = village_balance(a.seed_type, a.farmer.village)
+        if a.quantity_allocated > available:
+            messages.error(request, f'Insufficient village stock for {a.seed_type.name}. Available: {available} {a.seed_type.unit}. Request more stock from your Ward Officer.')
+            return render(request, 'core/allocation_form.html', {'form': form, 'title': 'New Seed Allocation'})
         a.save()
         ActivityLog.objects.create(user=user, action=f'Created allocation for {a.farmer}')
         messages.success(request, 'Allocation request submitted.')
@@ -463,3 +469,141 @@ def activity_logs(request):
     paginator = Paginator(logs, 30)
     page = paginator.get_page(request.GET.get('page'))
     return render(request, 'core/activity_logs.html', {'page_obj': page})
+
+# =================== STOCK TRANSFERS ===================
+@login_required
+def stock_list(request):
+    user = request.user
+    location_label, location = location_for_user(user)
+
+    balances = []
+    if location:
+        for st in SeedType.objects.all():
+            qty = balance_for_user(st, user)
+            if qty:
+                balances.append({'seed_type': st, 'quantity': qty})
+
+    sent = StockTransfer.objects.none()
+    incoming_requests = StockTransfer.objects.none()
+    received = StockTransfer.objects.none()
+    my_requests = StockTransfer.objects.none()
+
+    if user.role == 'regional' and user.region:
+        sent = StockTransfer.objects.filter(level='region_to_district', from_region=user.region, kind='distribution')
+        incoming_requests = StockTransfer.objects.filter(level='region_to_district', from_region=user.region, kind='request')
+    elif user.role == 'district' and user.district:
+        sent = StockTransfer.objects.filter(level='district_to_ward', from_district=user.district, kind='distribution')
+        incoming_requests = StockTransfer.objects.filter(level='district_to_ward', from_district=user.district, kind='request')
+        received = StockTransfer.objects.filter(level='region_to_district', to_district=user.district, status='approved')
+        my_requests = StockTransfer.objects.filter(level='region_to_district', to_district=user.district, kind='request')
+    elif user.role == 'ward' and user.ward:
+        sent = StockTransfer.objects.filter(level='ward_to_village', from_ward=user.ward, kind='distribution')
+        incoming_requests = StockTransfer.objects.filter(level='ward_to_village', from_ward=user.ward, kind='request')
+        received = StockTransfer.objects.filter(level='district_to_ward', to_ward=user.ward, status='approved')
+        my_requests = StockTransfer.objects.filter(level='district_to_ward', to_ward=user.ward, kind='request')
+    elif user.role == 'village' and user.village:
+        received = StockTransfer.objects.filter(level='ward_to_village', to_village=user.village, status='approved')
+        my_requests = StockTransfer.objects.filter(level='ward_to_village', to_village=user.village, kind='request')
+    elif user.role == 'admin':
+        sent = StockTransfer.objects.filter(kind='distribution')
+        incoming_requests = StockTransfer.objects.filter(kind='request')
+
+    ctx = {
+        'location_label': location_label,
+        'location': location,
+        'balances': balances,
+        'sent': sent.select_related('seed_type','initiated_by').order_by('-created_at')[:50],
+        'incoming_requests': incoming_requests.select_related('seed_type','initiated_by').order_by('status','-created_at')[:50],
+        'received': received.select_related('seed_type','initiated_by','responded_by').order_by('-created_at')[:50],
+        'my_requests': my_requests.select_related('seed_type','responded_by').order_by('-created_at')[:50],
+    }
+    return render(request, 'core/stock_list.html', ctx)
+
+@login_required
+@role_required('regional','district','ward')
+def stock_distribute(request):
+    user = request.user
+    form = StockDistributeForm(request.POST or None, user=user)
+    if request.method == 'POST' and form.is_valid():
+        seed_type = form.cleaned_data['seed_type']
+        quantity = form.cleaned_data['quantity']
+        target = form.cleaned_data['target']
+        available = balance_for_user(seed_type, user)
+        if quantity > available:
+            form.add_error('quantity', f'Insufficient balance. Available: {available} {seed_type.unit}.')
+        else:
+            transfer = StockTransfer(
+                seed_type=seed_type, quantity=quantity, kind='distribution', status='approved',
+                initiated_by=user, responded_by=user, notes=form.cleaned_data.get('notes','')
+            )
+            if user.role == 'regional':
+                transfer.level = 'region_to_district'; transfer.from_region = user.region; transfer.to_district = target
+            elif user.role == 'district':
+                transfer.level = 'district_to_ward'; transfer.from_district = user.district; transfer.to_ward = target
+            elif user.role == 'ward':
+                transfer.level = 'ward_to_village'; transfer.from_ward = user.ward; transfer.to_village = target
+            transfer.save()
+            ActivityLog.objects.create(user=user, action=f'Distributed {quantity} {seed_type.unit} of {seed_type.name} to {target}')
+            messages.success(request, f'{quantity} {seed_type.unit} of {seed_type.name} distributed to {target}.')
+            return redirect('stock_list')
+    return render(request, 'core/stock_distribute_form.html', {'form': form})
+
+@login_required
+@role_required('district','ward','village')
+def stock_request_create(request):
+    user = request.user
+    form = StockRequestForm(request.POST or None)
+    if request.method == 'POST' and form.is_valid():
+        seed_type = form.cleaned_data['seed_type']
+        quantity = form.cleaned_data['quantity']
+        transfer = StockTransfer(
+            seed_type=seed_type, quantity=quantity, kind='request', status='pending',
+            initiated_by=user, notes=form.cleaned_data.get('notes','')
+        )
+        if user.role == 'district':
+            transfer.level = 'region_to_district'; transfer.from_region = user.region; transfer.to_district = user.district
+        elif user.role == 'ward':
+            transfer.level = 'district_to_ward'; transfer.from_district = user.district; transfer.to_ward = user.ward
+        elif user.role == 'village':
+            transfer.level = 'ward_to_village'; transfer.from_ward = user.ward; transfer.to_village = user.village
+        transfer.save()
+        ActivityLog.objects.create(user=user, action=f'Requested {quantity} {seed_type.unit} of {seed_type.name}')
+        messages.success(request, 'Stock request submitted.')
+        return redirect('stock_list')
+    return render(request, 'core/stock_request_form.html', {'form': form})
+
+@login_required
+@role_required('regional','district','ward')
+def stock_request_respond(request, pk):
+    user = request.user
+    transfer = get_object_or_404(StockTransfer, pk=pk, kind='request', status='pending')
+    authorized = (
+        (user.role == 'regional' and transfer.level == 'region_to_district' and transfer.from_region_id == user.region_id) or
+        (user.role == 'district' and transfer.level == 'district_to_ward' and transfer.from_district_id == user.district_id) or
+        (user.role == 'ward' and transfer.level == 'ward_to_village' and transfer.from_ward_id == user.ward_id)
+    )
+    if not authorized:
+        messages.error(request, 'You are not authorized to respond to this request.')
+        return redirect('stock_list')
+    form = StockRespondForm(request.POST or None)
+    available = balance_for_user(transfer.seed_type, user)
+    if request.method == 'POST':
+        if 'approve' in request.POST:
+            if transfer.quantity > available:
+                messages.error(request, f'Insufficient balance to approve. Available: {available} {transfer.seed_type.unit}.')
+            else:
+                transfer.status = 'approved'
+                transfer.responded_by = user
+                transfer.save()
+                ActivityLog.objects.create(user=user, action=f'Approved stock request from {transfer.initiated_by}')
+                messages.success(request, 'Request approved and stock transferred.')
+                return redirect('stock_list')
+        elif 'reject' in request.POST and form.is_valid():
+            transfer.status = 'rejected'
+            transfer.responded_by = user
+            transfer.rejection_reason = form.cleaned_data.get('rejection_reason','')
+            transfer.save()
+            ActivityLog.objects.create(user=user, action=f'Rejected stock request from {transfer.initiated_by}')
+            messages.warning(request, 'Request rejected.')
+            return redirect('stock_list')
+    return render(request, 'core/stock_request_respond.html', {'transfer': transfer, 'form': form, 'available': available})

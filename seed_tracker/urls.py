@@ -40,6 +40,11 @@ urlpatterns = [
     path('settings/seasons/', views.season_list, name='season_list'),
     path('settings/seasons/new/', views.season_create, name='season_create'),
     path('settings/locations/', views.location_manage, name='location_manage'),
+    # Stock transfers
+    path('stock/', views.stock_list, name='stock_list'),
+    path('stock/distribute/', views.stock_distribute, name='stock_distribute'),
+    path('stock/request/', views.stock_request_create, name='stock_request_create'),
+    path('stock/requests/<int:pk>/respond/', views.stock_request_respond, name='stock_request_respond'),
     # Logs
     path('sms-logs/', views.sms_logs, name='sms_logs'),
     path('activity-logs/', views.activity_logs, name='activity_logs'),

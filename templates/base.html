@@ -173,6 +173,9 @@
     <a href="{% url 'distribution_list' %}" class="nav-link {% if 'distribution' in request.resolver_match.url_name %}active{% endif %}">
       <i class="fas fa-truck"></i> Distribution
     </a>
+    <a href="{% url 'stock_list' %}" class="nav-link {% if 'stock' in request.resolver_match.url_name %}active{% endif %}">
+      <i class="fas fa-dolly"></i> Stock Transfers
+    </a>
 
     <div class="nav-section-label">Analytics</div>
     <a href="{% url 'reports' %}" class="nav-link {% if 'report' in request.resolver_match.url_name %}active{% endif %}">

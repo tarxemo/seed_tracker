@@ -2,6 +2,12 @@ from django import forms
 from django.contrib.auth.forms import AuthenticationForm
 from .models import *
 
+TARGET_MODEL_BY_ROLE = {
+    'regional': (District, 'region', 'District'),
+    'district': (Ward, 'district', 'Ward'),
+    'ward': (Village, 'ward', 'Village'),
+}
+
 class LoginForm(AuthenticationForm):
     username = forms.CharField(widget=forms.TextInput(attrs={'class':'form-control','placeholder':'Username'}))
     password = forms.CharField(widget=forms.PasswordInput(attrs={'class':'form-control','placeholder':'Password'}))
@@ -174,3 +180,26 @@ class VillageForm(forms.ModelForm):
         for f in self.fields.values():
             f.widget.attrs.setdefault('class','form-control')
         self.fields['ward'].widget.attrs['class'] = 'form-select'
+
+class StockDistributeForm(forms.Form):
+    seed_type = forms.ModelChoiceField(queryset=SeedType.objects.all(), widget=forms.Select(attrs={'class':'form-select'}))
+    quantity = forms.DecimalField(max_digits=12, decimal_places=2, min_value=0.01, widget=forms.NumberInput(attrs={'class':'form-control'}))
+    target = forms.ModelChoiceField(queryset=District.objects.none(), widget=forms.Select(attrs={'class':'form-select'}))
+    notes = forms.CharField(required=False, widget=forms.Textarea(attrs={'class':'form-control','rows':3}))
+
+    def __init__(self, *args, user=None, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.user = user
+        model, parent_attr, label = TARGET_MODEL_BY_ROLE.get(user.role, (District.objects.none().model, None, 'Target'))
+        self.fields['target'].label = label
+        if parent_attr:
+            parent_value = getattr(user, parent_attr)
+            self.fields['target'].queryset = model.objects.filter(**{parent_attr: parent_value}) if parent_value else model.objects.none()
+
+class StockRequestForm(forms.Form):
+    seed_type = forms.ModelChoiceField(queryset=SeedType.objects.all(), widget=forms.Select(attrs={'class':'form-select'}))
+    quantity = forms.DecimalField(max_digits=12, decimal_places=2, min_value=0.01, widget=forms.NumberInput(attrs={'class':'form-control'}))
+    notes = forms.CharField(required=False, widget=forms.Textarea(attrs={'class':'form-control','rows':3}))
+
+class StockRespondForm(forms.Form):
+    rejection_reason = forms.CharField(required=False, widget=forms.Textarea(attrs={'class':'form-control','rows':3}))

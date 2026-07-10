@@ -17,5 +17,10 @@ admin.site.register(FarmingSeasons)
 admin.site.register(Farmer)
 admin.site.register(SeedAllocation)
 admin.site.register(Distribution)
+
+@admin.register(StockTransfer)
+class StockTransferAdmin(admin.ModelAdmin):
+    list_display = ['seed_type','quantity','level','kind','status','initiated_by','responded_by','created_at']
+    list_filter = ['level','kind','status','seed_type']
 admin.site.register(SMSLog)
 admin.site.register(ActivityLog)

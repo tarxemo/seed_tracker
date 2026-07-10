@@ -166,6 +166,46 @@ class SMSLog(models.Model):
 
     def __str__(self): return f"SMS to {self.phone_number} - {self.status}"
 
+TRANSFER_LEVEL_CHOICES = [
+    ('region_to_district', 'Region → District'),
+    ('district_to_ward', 'District → Ward'),
+    ('ward_to_village', 'Ward → Village'),
+]
+
+class StockTransfer(models.Model):
+    KIND_CHOICES = [('distribution', 'Distribution'), ('request', 'Request')]
+    STATUS_CHOICES = [('pending', 'Pending'), ('approved', 'Approved'), ('rejected', 'Rejected')]
+
+    seed_type = models.ForeignKey(SeedType, on_delete=models.CASCADE, related_name='transfers')
+    quantity = models.DecimalField(max_digits=12, decimal_places=2)
+    level = models.CharField(max_length=20, choices=TRANSFER_LEVEL_CHOICES)
+    kind = models.CharField(max_length=20, choices=KIND_CHOICES)
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='pending')
+
+    # Exactly one of each triple is populated, matching `level`
+    from_region = models.ForeignKey(Region, null=True, blank=True, on_delete=models.CASCADE, related_name='stock_transfers_out')
+    from_district = models.ForeignKey(District, null=True, blank=True, on_delete=models.CASCADE, related_name='stock_transfers_out')
+    from_ward = models.ForeignKey(Ward, null=True, blank=True, on_delete=models.CASCADE, related_name='stock_transfers_out')
+
+    to_district = models.ForeignKey(District, null=True, blank=True, on_delete=models.CASCADE, related_name='stock_transfers_in')
+    to_ward = models.ForeignKey(Ward, null=True, blank=True, on_delete=models.CASCADE, related_name='stock_transfers_in')
+    to_village = models.ForeignKey(Village, null=True, blank=True, on_delete=models.CASCADE, related_name='stock_transfers_in')
+
+    initiated_by = models.ForeignKey(CustomUser, on_delete=models.SET_NULL, null=True, related_name='initiated_transfers')
+    responded_by = models.ForeignKey(CustomUser, on_delete=models.SET_NULL, null=True, blank=True, related_name='responded_transfers')
+    rejection_reason = models.TextField(blank=True)
+    notes = models.TextField(blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    @property
+    def from_location(self): return self.from_region or self.from_district or self.from_ward
+
+    @property
+    def to_location(self): return self.to_district or self.to_ward or self.to_village
+
+    def __str__(self): return f"{self.get_kind_display()}: {self.quantity} {self.seed_type.unit} {self.from_location} → {self.to_location} ({self.status})"
+
 class ActivityLog(models.Model):
     user = models.ForeignKey(CustomUser, on_delete=models.SET_NULL, null=True)
     action = models.CharField(max_length=200)
