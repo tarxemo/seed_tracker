@@ -164,9 +164,11 @@
     <a href="{% url 'farmer_list' %}" class="nav-link {% if 'farmer' in request.resolver_match.url_name %}active{% endif %}">
       <i class="fas fa-users"></i> Farmers
     </a>
+    {% if user.role == 'regional' or user.role == 'admin' %}
     <a href="{% url 'inventory_list' %}" class="nav-link {% if 'inventory' in request.resolver_match.url_name %}active{% endif %}">
       <i class="fas fa-warehouse"></i> Seed Inventory
     </a>
+    {% endif %}
     <a href="{% url 'allocation_list' %}" class="nav-link {% if 'allocation' in request.resolver_match.url_name %}active{% endif %}">
       <i class="fas fa-boxes"></i> Allocations
     </a>

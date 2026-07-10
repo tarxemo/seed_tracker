@@ -15,6 +15,19 @@ def role_required(*roles):
         return wrapper
     return decorator
 
+def user_can_access_farmer(user, farmer):
+    if user.is_superuser or user.role == 'admin':
+        return True
+    if user.role == 'village':
+        return farmer.village_id == user.village_id
+    if user.role == 'ward':
+        return farmer.village.ward_id == user.ward_id
+    if user.role == 'district':
+        return farmer.district.id == user.district_id
+    if user.role == 'regional':
+        return farmer.region.id == user.region_id
+    return False
+
 def log_activity(action, model_name=''):
     def decorator(view_func):
         @wraps(view_func)

@@ -63,24 +63,7 @@ class SeedAllocationForm(forms.ModelForm):
                 f.widget.attrs.setdefault('class','form-control')
         if user and user.role == 'village':
             self.fields['farmer'].queryset = Farmer.objects.filter(village=user.village)
-        elif user and user.role == 'ward':
-            self.fields['farmer'].queryset = Farmer.objects.filter(village__ward=user.ward)
-        elif user and user.role == 'district':
-            self.fields['farmer'].queryset = Farmer.objects.filter(village__ward__district=user.district)
         self.fields['season'].queryset = FarmingSeasons.objects.filter(is_active=True)
-
-class AllocationApproveForm(forms.ModelForm):
-    class Meta:
-        model = SeedAllocation
-        fields = ['collection_date','collection_location','notes']
-        widgets = {'collection_date': forms.DateInput(attrs={'type':'date','class':'form-control'})}
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        for f in self.fields.values():
-            if not isinstance(f.widget, forms.Textarea):
-                f.widget.attrs.setdefault('class','form-control')
-            else:
-                f.widget.attrs.setdefault('class','form-control')
 
 class DistributionForm(forms.ModelForm):
     class Meta:

@@ -10,9 +10,9 @@ import json, csv
 from datetime import timedelta
 from .models import *
 from .forms import *
-from .decorators import role_required
+from .decorators import role_required, user_can_access_farmer
 from .utils import send_allocation_sms
-from .stock import balance_for_user, location_for_user, village_balance
+from .stock import balance_for_user, location_for_user, village_balance, total_balance_for_user, total_received_for_user
 
 def login_view(request):
     if request.user.is_authenticated:
@@ -44,22 +44,32 @@ def dashboard(request):
     if user.role == 'village':
         farmers_qs = farmers_qs.filter(village=user.village)
         alloc_qs = alloc_qs.filter(farmer__village=user.village)
+        dist_qs = dist_qs.filter(allocation__farmer__village=user.village)
     elif user.role == 'ward':
         farmers_qs = farmers_qs.filter(village__ward=user.ward)
         alloc_qs = alloc_qs.filter(farmer__village__ward=user.ward)
+        dist_qs = dist_qs.filter(allocation__farmer__village__ward=user.ward)
     elif user.role == 'district':
         farmers_qs = farmers_qs.filter(village__ward__district=user.district)
         alloc_qs = alloc_qs.filter(farmer__village__ward__district=user.district)
+        dist_qs = dist_qs.filter(allocation__farmer__village__ward__district=user.district)
     elif user.role == 'regional':
         farmers_qs = farmers_qs.filter(village__ward__district__region=user.region)
         alloc_qs = alloc_qs.filter(farmer__village__ward__district__region=user.region)
+        dist_qs = dist_qs.filter(allocation__farmer__village__ward__district__region=user.region)
+        inv_qs = inv_qs.filter(region=user.region)
 
     ctx['total_farmers'] = farmers_qs.count()
     ctx['total_allocations'] = alloc_qs.count()
     ctx['approved_allocations'] = alloc_qs.filter(status='approved').count()
     ctx['pending_allocations'] = alloc_qs.filter(status='pending').count()
     ctx['distributed'] = dist_qs.count()
-    ctx['total_seeds_received'] = inv_qs.aggregate(t=Sum('quantity'))['t'] or 0
+    if user.role in ('district', 'ward', 'village'):
+        ctx['total_seeds_received'] = total_balance_for_user(user)
+        ctx['stock_label'] = 'Current Stock Balance (kg)'
+    else:
+        ctx['total_seeds_received'] = inv_qs.aggregate(t=Sum('quantity'))['t'] or 0
+        ctx['stock_label'] = 'Total Seeds Received (kg)'
     ctx['total_seeds_distributed'] = dist_qs.aggregate(t=Sum('quantity_distributed'))['t'] or 0
 
     # Chart: allocations by seed type
@@ -136,7 +146,11 @@ def farmer_create(request):
 @login_required
 def farmer_edit(request, pk):
     farmer = get_object_or_404(Farmer, pk=pk)
-    form = FarmerForm(request.POST or None, instance=farmer, user=request.user)
+    user = request.user
+    if user.role not in ['admin','village','ward','district'] or not user_can_access_farmer(user, farmer):
+        messages.error(request, 'You do not have permission to edit this farmer.')
+        return redirect('farmer_list')
+    form = FarmerForm(request.POST or None, instance=farmer, user=user)
     if request.method == 'POST' and form.is_valid():
         form.save()
         messages.success(request, 'Farmer updated.')
@@ -146,17 +160,26 @@ def farmer_edit(request, pk):
 @login_required
 def farmer_detail(request, pk):
     farmer = get_object_or_404(Farmer, pk=pk)
+    if not user_can_access_farmer(request.user, farmer):
+        messages.error(request, 'You do not have permission to view this farmer.')
+        return redirect('farmer_list')
     allocs = farmer.allocations.select_related('seed_type','season').order_by('-created_at')
     return render(request, 'core/farmer_detail.html', {'farmer': farmer, 'allocations': allocs})
 
 # =================== INVENTORY ===================
 @login_required
+@role_required('regional')
 def inventory_list(request):
+    user = request.user
     qs = SeedInventory.objects.select_related('seed_type','region','added_by').order_by('-date_received')
+    summary_qs = SeedInventory.objects.all()
+    if user.role == 'regional':
+        qs = qs.filter(region=user.region)
+        summary_qs = summary_qs.filter(region=user.region)
     paginator = Paginator(qs, 20)
     page = paginator.get_page(request.GET.get('page'))
     # Summary by seed type
-    summary = SeedInventory.objects.values('seed_type__name','seed_type__unit').annotate(total=Sum('quantity')).order_by('-total')
+    summary = summary_qs.values('seed_type__name','seed_type__unit').annotate(total=Sum('quantity')).order_by('-total')
     return render(request, 'core/inventory_list.html', {'page_obj': page, 'summary': summary})
 
 @login_required
@@ -192,6 +215,7 @@ def allocation_list(request):
     return render(request, 'core/allocation_list.html', {'page_obj': page, 'status_filter': status_filter, 'q': q})
 
 @login_required
+@role_required('village')
 def allocation_create(request):
     user = request.user
     form = SeedAllocationForm(request.POST or None, user=user)
@@ -207,42 +231,22 @@ def allocation_create(request):
         if a.quantity_allocated > available:
             messages.error(request, f'Insufficient village stock for {a.seed_type.name}. Available: {available} {a.seed_type.unit}. Request more stock from your Ward Officer.')
             return render(request, 'core/allocation_form.html', {'form': form, 'title': 'New Seed Allocation'})
+        # Village officer is the sole authority over their farmers - approved immediately
+        a.status = 'approved'
+        a.approved_by = user
         a.save()
-        ActivityLog.objects.create(user=user, action=f'Created allocation for {a.farmer}')
-        messages.success(request, 'Allocation request submitted.')
+        send_allocation_sms(a)
+        ActivityLog.objects.create(user=user, action=f'Allocated {a.quantity_allocated} {a.seed_type.unit} of {a.seed_type.name} to {a.farmer.full_name}')
+        messages.success(request, f'Allocation recorded and SMS sent to {a.farmer.phone_number}.')
         return redirect('allocation_list')
     return render(request, 'core/allocation_form.html', {'form': form, 'title': 'New Seed Allocation'})
 
 @login_required
-@role_required('admin','district','regional')
-def allocation_approve(request, pk):
-    allocation = get_object_or_404(SeedAllocation, pk=pk)
-    if allocation.status != 'pending':
-        messages.warning(request, 'This allocation is not pending.')
-        return redirect('allocation_list')
-    form = AllocationApproveForm(request.POST or None, instance=allocation)
-    if request.method == 'POST':
-        if 'approve' in request.POST and form.is_valid():
-            a = form.save(commit=False)
-            a.status = 'approved'
-            a.approved_by = request.user
-            a.save()
-            send_allocation_sms(a)
-            ActivityLog.objects.create(user=request.user, action=f'Approved allocation for {a.farmer}')
-            messages.success(request, f'Allocation approved and SMS sent to {a.farmer.phone_number}.')
-        elif 'reject' in request.POST:
-            allocation.status = 'rejected'
-            allocation.rejection_reason = request.POST.get('rejection_reason','')
-            allocation.approved_by = request.user
-            allocation.save()
-            ActivityLog.objects.create(user=request.user, action=f'Rejected allocation for {allocation.farmer}')
-            messages.warning(request, 'Allocation rejected.')
-        return redirect('allocation_list')
-    return render(request, 'core/allocation_approve.html', {'allocation': allocation, 'form': form})
-
-@login_required
 def allocation_detail(request, pk):
     allocation = get_object_or_404(SeedAllocation, pk=pk)
+    if not user_can_access_farmer(request.user, allocation.farmer):
+        messages.error(request, 'You do not have permission to view this allocation.')
+        return redirect('allocation_list')
     return render(request, 'core/allocation_detail.html', {'allocation': allocation})
 
 # =================== DISTRIBUTION ===================
@@ -259,8 +263,12 @@ def distribution_list(request):
     return render(request, 'core/distribution_list.html', {'page_obj': page})
 
 @login_required
+@role_required('village')
 def distribution_record(request, allocation_pk):
     allocation = get_object_or_404(SeedAllocation, pk=allocation_pk, status='approved')
+    if not user_can_access_farmer(request.user, allocation.farmer):
+        messages.error(request, 'You can only record distributions for farmers in your own village.')
+        return redirect('distribution_list')
     if hasattr(allocation, 'distribution'):
         messages.warning(request, 'Distribution already recorded.')
         return redirect('distribution_list')
@@ -279,6 +287,13 @@ def distribution_record(request, allocation_pk):
     return render(request, 'core/distribution_form.html', {'form': form, 'allocation': allocation})
 
 # =================== REPORTS ===================
+REPORT_BREAKDOWN_BY_ROLE = {
+    'admin': ('farmer__village__ward__district__region__name', 'Region'),
+    'regional': ('farmer__village__ward__district__name', 'District'),
+    'district': ('farmer__village__ward__name', 'Ward'),
+    'ward': ('farmer__village__name', 'Village'),
+}
+
 @login_required
 def reports(request):
     user = request.user
@@ -291,6 +306,7 @@ def reports(request):
         alloc_qs = alloc_qs.filter(farmer__village__ward__district__region=user.region)
         dist_qs = dist_qs.filter(allocation__farmer__village__ward__district__region=user.region)
         farmers_qs = farmers_qs.filter(village__ward__district__region=user.region)
+        inv_qs = inv_qs.filter(region=user.region)
     elif user.role == 'district':
         alloc_qs = alloc_qs.filter(farmer__village__ward__district=user.district)
         dist_qs = dist_qs.filter(allocation__farmer__village__ward__district=user.district)
@@ -299,31 +315,55 @@ def reports(request):
         alloc_qs = alloc_qs.filter(farmer__village__ward=user.ward)
         dist_qs = dist_qs.filter(allocation__farmer__village__ward=user.ward)
         farmers_qs = farmers_qs.filter(village__ward=user.ward)
+    elif user.role == 'village':
+        alloc_qs = alloc_qs.filter(farmer__village=user.village)
+        dist_qs = dist_qs.filter(allocation__farmer__village=user.village)
+        farmers_qs = farmers_qs.filter(village=user.village)
+
+    # Season filter applies to every allocation-derived figure on the page
+    season_id = request.GET.get('season','')
+    if season_id:
+        alloc_qs = alloc_qs.filter(season_id=season_id)
+
+    if user.role in ('district','ward','village'):
+        total_received = total_received_for_user(user)
+        remaining_stock = total_balance_for_user(user)
+        received_label = 'Total Seeds Received via Transfers (kg)'
+    else:
+        total_received = inv_qs.aggregate(t=Sum('quantity'))['t'] or 0
+        remaining_stock = total_received - (dist_qs.aggregate(t=Sum('quantity_distributed'))['t'] or 0)
+        received_label = 'Total Seeds Received (kg)'
+
+    completed_qs = alloc_qs.filter(status__in=['approved','distributed'])
 
     ctx = {
-        'total_received': inv_qs.aggregate(t=Sum('quantity'))['t'] or 0,
+        'total_received': total_received,
         'total_distributed': dist_qs.aggregate(t=Sum('quantity_distributed'))['t'] or 0,
         'total_farmers': farmers_qs.count(),
         'total_allocations': alloc_qs.count(),
         'approved_allocations': alloc_qs.filter(status='approved').count(),
         'distributed_allocations': alloc_qs.filter(status='distributed').count(),
-        'seed_summary': alloc_qs.filter(status__in=['approved','distributed']).values('seed_type__name','seed_type__unit').annotate(qty=Sum('quantity_allocated'), cnt=Count('id')).order_by('-qty'),
-        'region_summary': alloc_qs.values('farmer__village__ward__district__region__name').annotate(cnt=Count('id'), qty=Sum('quantity_allocated')).order_by('-qty'),
-        'district_summary': alloc_qs.values('farmer__village__ward__district__name').annotate(cnt=Count('id'), qty=Sum('quantity_allocated')).order_by('-qty')[:10],
-        'ward_summary': alloc_qs.values('farmer__village__ward__name').annotate(cnt=Count('id'), qty=Sum('quantity_allocated')).order_by('-qty')[:10],
-        'village_summary': alloc_qs.values('farmer__village__name').annotate(cnt=Count('id'), qty=Sum('quantity_allocated')).order_by('-qty')[:10],
-        'remaining_stock': (inv_qs.aggregate(t=Sum('quantity'))['t'] or 0) - (dist_qs.aggregate(t=Sum('quantity_distributed'))['t'] or 0),
+        'seed_summary': completed_qs.values('seed_type__name','seed_type__unit').annotate(qty=Sum('quantity_allocated'), cnt=Count('id')).order_by('-qty'),
+        'remaining_stock': remaining_stock,
+        'received_label': received_label,
         'seasons': FarmingSeasons.objects.all(),
+        'selected_season': season_id,
     }
-    # Season filter
-    season_id = request.GET.get('season','')
-    if season_id:
-        alloc_qs2 = alloc_qs.filter(season_id=season_id)
-        ctx['seed_summary'] = alloc_qs2.filter(status__in=['approved','distributed']).values('seed_type__name','seed_type__unit').annotate(qty=Sum('quantity_allocated'), cnt=Count('id')).order_by('-qty')
-    # Chart: distribution by district
-    dist_chart = alloc_qs.filter(status__in=['approved','distributed']).values('farmer__village__ward__district__name').annotate(qty=Sum('quantity_allocated')).order_by('-qty')[:8]
-    ctx['dist_chart_labels'] = json.dumps([x['farmer__village__ward__district__name'] or 'Unknown' for x in dist_chart])
-    ctx['dist_chart_data'] = json.dumps([float(x['qty'] or 0) for x in dist_chart])
+
+    # Breakdown one organizational level below the viewer (village officers see per-farmer)
+    if user.role == 'village':
+        breakdown_label = 'Farmer'
+        raw = completed_qs.values('farmer__farmer_id','farmer__first_name','farmer__last_name').annotate(cnt=Count('id'), qty=Sum('quantity_allocated')).order_by('-qty')
+        breakdown = [{'label': f"{r['farmer__first_name']} {r['farmer__last_name']} ({r['farmer__farmer_id']})", 'cnt': r['cnt'], 'qty': r['qty']} for r in raw]
+    else:
+        field, breakdown_label = REPORT_BREAKDOWN_BY_ROLE.get(user.role, REPORT_BREAKDOWN_BY_ROLE['admin'])
+        raw = completed_qs.values(field).annotate(cnt=Count('id'), qty=Sum('quantity_allocated')).order_by('-qty')
+        breakdown = [{'label': r[field] or 'Unknown', 'cnt': r['cnt'], 'qty': r['qty']} for r in raw]
+
+    ctx['breakdown_label'] = breakdown_label
+    ctx['breakdown'] = breakdown
+    ctx['chart_labels'] = json.dumps([b['label'] for b in breakdown[:8]])
+    ctx['chart_data'] = json.dumps([float(b['qty'] or 0) for b in breakdown[:8]])
 
     return render(request, 'core/reports.html', ctx)
 

@@ -7,7 +7,6 @@
     <div class="form-card">
       <h6 style="font-weight:700;margin-bottom:16px;color:#1a6b3c"><i class="fas fa-globe-africa me-2"></i>Add Region</h6>
       <form method="post">{% csrf_token %}<input type="hidden" name="action" value="add_region">
-        <div class="mb-2"><label class="form-label">Region Name</label>{{ region_form.region-name }}</div>
         {% for f in region_form %}
         <div class="mb-2"><label class="form-label">{{ f.label }}</label>{{ f }}</div>
         {% endfor %}

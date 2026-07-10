@@ -74,6 +74,30 @@ class Command(BaseCommand):
             'district':mbeya_dc,'ward':ward_objs['Iyunga Ward'],'village':village_objs['Iyunga Village']
         })
         if c: vill_user.set_password('pass1234'); vill_user.save()
+
+        # Give the demo Iyunga chain (the only villages/wards with real officer logins) real stock,
+        # so village_officer can immediately try creating new allocations through the UI.
+        if not StockTransfer.objects.exists():
+            iyunga_ward = ward_objs['Iyunga Ward']
+            iyunga_village = village_objs['Iyunga Village']
+            for sname, unit in seed_types_data:
+                st = seed_objs[sname]
+                StockTransfer.objects.create(
+                    seed_type=st, quantity=1200, level='region_to_district', kind='distribution', status='approved',
+                    from_region=mbeya, to_district=mbeya_dc, initiated_by=reg_user, responded_by=reg_user,
+                    notes='Initial regional distribution'
+                )
+                StockTransfer.objects.create(
+                    seed_type=st, quantity=600, level='district_to_ward', kind='distribution', status='approved',
+                    from_district=mbeya_dc, to_ward=iyunga_ward, initiated_by=dist_user, responded_by=dist_user,
+                    notes='Initial district distribution'
+                )
+                StockTransfer.objects.create(
+                    seed_type=st, quantity=300, level='ward_to_village', kind='distribution', status='approved',
+                    from_ward=iyunga_ward, to_village=iyunga_village, initiated_by=ward_user, responded_by=ward_user,
+                    notes='Initial ward distribution'
+                )
+
         farmers_data = [
             ('Abedi','Luvanda','0754100001','Iyunga Village','maize'),
             ('Fatuma','Mwambene','0756200002','Iyunga Village','rice'),
@@ -97,20 +121,20 @@ class Command(BaseCommand):
             for i, farmer in enumerate(farmer_objs):
                 sn = seed_map.get(farmer.crop_type, 'Maize SC403')
                 st = seed_objs[sn]
-                status = ['pending','approved','distributed','rejected','approved'][i % 5]
+                # Village officers allocate + approve their own farmers now - no pending/rejected states
+                status = ['approved','distributed'][i % 2]
                 a = SeedAllocation.objects.create(
                     farmer=farmer, seed_type=st, season=season, quantity_allocated=25,
                     status=status, collection_date=date(2025,3,15),
-                    collection_location='District Agricultural Office, Mbeya', requested_by=vill_user,
+                    collection_location=f'{farmer.village.name} Collection Point',
+                    requested_by=vill_user, approved_by=vill_user, sms_sent=True,
                 )
-                if status in ['approved','distributed']:
-                    a.approved_by = dist_user; a.sms_sent = True; a.save()
-                    from core.models import SMSLog
-                    SMSLog.objects.create(farmer=farmer, phone_number=farmer.phone_number,
-                        message=f"Dear {farmer.full_name}, your {st.name} allocation of 25kg is approved. Collect at District Agricultural Office on 15 Mar 2025.",
-                        status='sent', allocation=a)
+                from core.models import SMSLog
+                SMSLog.objects.create(farmer=farmer, phone_number=farmer.phone_number,
+                    message=f"Dear {farmer.full_name}, your {st.name} allocation of 25kg is approved. Collect at {a.collection_location} on 15 Mar 2025.",
+                    status='sent', allocation=a)
                 if status == 'distributed':
-                    Distribution.objects.create(allocation=a, quantity_distributed=25, collection_date=date(2025,3,16), confirmed_by=dist_user)
+                    Distribution.objects.create(allocation=a, quantity_distributed=25, collection_date=date(2025,3,16), confirmed_by=vill_user)
         self.stdout.write(self.style.SUCCESS('\n✓ Demo data seeded!\n'))
         self.stdout.write('LOGIN CREDENTIALS:')
         self.stdout.write('  admin           / admin123')

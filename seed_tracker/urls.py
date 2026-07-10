@@ -22,7 +22,6 @@ urlpatterns = [
     path('allocations/', views.allocation_list, name='allocation_list'),
     path('allocations/new/', views.allocation_create, name='allocation_create'),
     path('allocations/<int:pk>/', views.allocation_detail, name='allocation_detail'),
-    path('allocations/<int:pk>/approve/', views.allocation_approve, name='allocation_approve'),
     # Distribution
     path('distributions/', views.distribution_list, name='distribution_list'),
     path('distributions/record/<int:allocation_pk>/', views.distribution_record, name='distribution_record'),
