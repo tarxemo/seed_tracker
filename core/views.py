@@ -6,13 +6,14 @@ from django.db.models import Sum, Count, Q
 from django.http import JsonResponse, HttpResponse
 from django.utils import timezone
 from django.core.paginator import Paginator
+from django.db import transaction
 import json, csv
 from datetime import timedelta
 from .models import *
 from .forms import *
 from .decorators import role_required, user_can_access_farmer, farmer_required
 from .utils import send_allocation_sms
-from .stock import balance_for_user, location_for_user, village_balance, total_balance_for_user, total_received_for_user
+from .stock import balance_for_user, location_for_user, village_balance, total_balance_for_user, total_received_for_user, lock_user_location
 
 def login_view(request):
     if request.user.is_authenticated:
@@ -47,6 +48,7 @@ def dashboard(request):
         farmers_qs = farmers_qs.filter(village=user.village)
         alloc_qs = alloc_qs.filter(farmer__village=user.village)
         dist_qs = dist_qs.filter(allocation__farmer__village=user.village)
+        ctx['pending_fulfillments'] = SeedRequest.objects.filter(farmer__village=user.village, status='verified').count()
     elif user.role in ('ward', 'extension'):
         farmers_qs = farmers_qs.filter(village__ward=user.ward)
         alloc_qs = alloc_qs.filter(farmer__village__ward=user.ward)
@@ -204,16 +206,18 @@ def inventory_create(request):
 def create_farmer_allocation(farmer, seed_type, season, quantity, collection_date, collection_location, notes, actor):
     """Shared by direct officer creation (allocation_create) and SeedRequest fulfillment.
     Returns (allocation, error_message) - exactly one will be None."""
-    if SeedAllocation.objects.filter(farmer=farmer, seed_type=seed_type, season=season).exists():
-        return None, 'This farmer already has an allocation for this seed type in this season.'
-    available = village_balance(seed_type, farmer.village)
-    if quantity > available:
-        return None, f'Insufficient village stock for {seed_type.name}. Available: {available} {seed_type.unit}. Request more stock from your Ward Officer.'
-    a = SeedAllocation.objects.create(
-        farmer=farmer, seed_type=seed_type, season=season, quantity_allocated=quantity,
-        collection_date=collection_date, collection_location=collection_location, notes=notes,
-        requested_by=actor, status='approved', approved_by=actor,
-    )
+    with transaction.atomic():
+        Village.objects.select_for_update().get(pk=farmer.village_id)
+        if SeedAllocation.objects.filter(farmer=farmer, seed_type=seed_type, season=season).exists():
+            return None, 'This farmer already has an allocation for this seed type in this season.'
+        available = village_balance(seed_type, farmer.village)
+        if quantity > available:
+            return None, f'Insufficient village stock for {seed_type.name}. Available: {available} {seed_type.unit}. Request more stock from your Ward Officer.'
+        a = SeedAllocation.objects.create(
+            farmer=farmer, seed_type=seed_type, season=season, quantity_allocated=quantity,
+            collection_date=collection_date, collection_location=collection_location, notes=notes,
+            requested_by=actor, status='approved', approved_by=actor,
+        )
     send_allocation_sms(a)
     ActivityLog.objects.create(user=actor, action=f'Allocated {a.quantity_allocated} {a.seed_type.unit} of {a.seed_type.name} to {a.farmer.full_name}')
     return a, None
@@ -594,21 +598,25 @@ def stock_distribute(request):
         seed_type = form.cleaned_data['seed_type']
         quantity = form.cleaned_data['quantity']
         target = form.cleaned_data['target']
-        available = balance_for_user(seed_type, user)
-        if quantity > available:
-            form.add_error('quantity', f'Insufficient balance. Available: {available} {seed_type.unit}.')
-        else:
-            transfer = StockTransfer(
-                seed_type=seed_type, quantity=quantity, kind='distribution', status='approved',
-                initiated_by=user, responded_by=user, notes=form.cleaned_data.get('notes','')
-            )
-            if user.role == 'regional':
-                transfer.level = 'region_to_district'; transfer.from_region = user.region; transfer.to_district = target
-            elif user.role == 'district':
-                transfer.level = 'district_to_ward'; transfer.from_district = user.district; transfer.to_ward = target
-            elif user.role == 'ward':
-                transfer.level = 'ward_to_village'; transfer.from_ward = user.ward; transfer.to_village = target
-            transfer.save()
+        with transaction.atomic():
+            lock_user_location(user)
+            available = balance_for_user(seed_type, user)
+            if quantity > available:
+                form.add_error('quantity', f'Insufficient balance. Available: {available} {seed_type.unit}.')
+                transfer = None
+            else:
+                transfer = StockTransfer(
+                    seed_type=seed_type, quantity=quantity, kind='distribution', status='approved',
+                    initiated_by=user, responded_by=user, notes=form.cleaned_data.get('notes','')
+                )
+                if user.role == 'regional':
+                    transfer.level = 'region_to_district'; transfer.from_region = user.region; transfer.to_district = target
+                elif user.role == 'district':
+                    transfer.level = 'district_to_ward'; transfer.from_district = user.district; transfer.to_ward = target
+                elif user.role == 'ward':
+                    transfer.level = 'ward_to_village'; transfer.from_ward = user.ward; transfer.to_village = target
+                transfer.save()
+        if transfer is not None:
             ActivityLog.objects.create(user=user, action=f'Distributed {quantity} {seed_type.unit} of {seed_type.name} to {target}')
             messages.success(request, f'{quantity} {seed_type.unit} of {seed_type.name} distributed to {target}.')
             return redirect('stock_list')
@@ -655,12 +663,18 @@ def stock_request_respond(request, pk):
     available = balance_for_user(transfer.seed_type, user)
     if request.method == 'POST':
         if 'approve' in request.POST:
-            if transfer.quantity > available:
-                messages.error(request, f'Insufficient balance to approve. Available: {available} {transfer.seed_type.unit}.')
-            else:
-                transfer.status = 'approved'
-                transfer.responded_by = user
-                transfer.save()
+            with transaction.atomic():
+                lock_user_location(user)
+                current_available = balance_for_user(transfer.seed_type, user)
+                if transfer.quantity > current_available:
+                    messages.error(request, f'Insufficient balance to approve. Available: {current_available} {transfer.seed_type.unit}.')
+                    approved = False
+                else:
+                    transfer.status = 'approved'
+                    transfer.responded_by = user
+                    transfer.save()
+                    approved = True
+            if approved:
                 ActivityLog.objects.create(user=user, action=f'Approved stock request from {transfer.initiated_by}')
                 messages.success(request, 'Request approved and stock transferred.')
                 return redirect('stock_list')

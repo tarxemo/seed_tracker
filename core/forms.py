@@ -1,5 +1,6 @@
 from django import forms
 from django.contrib.auth.forms import AuthenticationForm
+from django.contrib.auth.password_validation import validate_password
 from .models import *
 
 TARGET_MODEL_BY_ROLE = {
@@ -93,8 +94,17 @@ class UserCreateForm(forms.ModelForm):
                 f.widget.attrs.setdefault('class','form-select')
     def clean(self):
         cleaned_data = super().clean()
-        if cleaned_data.get('password1') != cleaned_data.get('password2'):
+        password1 = cleaned_data.get('password1')
+        password2 = cleaned_data.get('password2')
+        if password1 != password2:
             raise forms.ValidationError("Passwords do not match.")
+        if password1:
+            temp_user = CustomUser(username=cleaned_data.get('username',''), first_name=cleaned_data.get('first_name',''),
+                                    last_name=cleaned_data.get('last_name',''), email=cleaned_data.get('email',''))
+            try:
+                validate_password(password1, user=temp_user)
+            except forms.ValidationError as e:
+                self.add_error('password1', e)
         return cleaned_data
     def save(self, commit=True):
         user = super().save(commit=False)
@@ -206,10 +216,25 @@ class FarmerRegisterForm(forms.Form):
             raise forms.ValidationError('This username is already taken.')
         return username
 
+    def clean_phone_number(self):
+        phone_number = self.cleaned_data['phone_number']
+        if Farmer.objects.filter(phone_number=phone_number).exists():
+            raise forms.ValidationError('A farmer with this phone number is already registered. If this is you, please contact your Village Officer for help accessing your account.')
+        return phone_number
+
     def clean(self):
         cleaned_data = super().clean()
-        if cleaned_data.get('password1') != cleaned_data.get('password2'):
+        password1 = cleaned_data.get('password1')
+        password2 = cleaned_data.get('password2')
+        if password1 != password2:
             raise forms.ValidationError('Passwords do not match.')
+        if password1:
+            temp_user = CustomUser(username=cleaned_data.get('username',''), first_name=cleaned_data.get('first_name',''),
+                                    last_name=cleaned_data.get('last_name',''))
+            try:
+                validate_password(password1, user=temp_user)
+            except forms.ValidationError as e:
+                self.add_error('password1', e)
         return cleaned_data
 
     def save(self):

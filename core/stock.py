@@ -109,3 +109,12 @@ def location_for_user(user):
         return None, None
     label, attr = entry
     return label, getattr(user, attr)
+
+
+def lock_user_location(user):
+    """Locks the officer's own location row for the duration of the enclosing transaction.atomic()
+    block, so concurrent balance-check-then-write operations on that location serialize.
+    Must be called inside transaction.atomic(). No-op if the role has no fixed location."""
+    _, location = location_for_user(user)
+    if location is not None:
+        type(location).objects.select_for_update().get(pk=location.pk)

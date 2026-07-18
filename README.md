@@ -59,13 +59,16 @@ Visit: http://127.0.0.1:8000
 
 ## Production Deployment
 
-1. Set `DEBUG = False` in settings.py
-2. Set a strong `SECRET_KEY`
-3. Configure a production database (PostgreSQL recommended)
-4. Set `ALLOWED_HOSTS` to your domain
+Config now reads from environment variables (falling back to today's dev defaults if unset), so no code edits are needed:
+
+1. Set `SECRET_KEY` to a strong, unique value
+2. Set `DEBUG=False`
+3. Set `ALLOWED_HOSTS` to your domain(s), comma-separated
+4. Configure a production database (PostgreSQL recommended) in `settings.py`
 5. Run `python manage.py collectstatic`
 6. Use gunicorn + nginx
-7. For SMS: integrate Africa's Talking API in `core/utils.py`
+7. For real SMS: set `AFRICASTALKING_USERNAME` and `AFRICASTALKING_API_KEY` (optionally `AFRICASTALKING_SENDER_ID`) - `core/utils.py` sends real SMS once these are set, and keeps simulating (today's behavior) when they're absent
+8. Run `python manage.py test` before deploying to catch regressions
 
 ## Tech Stack
 
