@@ -9,7 +9,21 @@ urlpatterns = [
     path('', views.dashboard, name='dashboard'),
     path('login/', views.login_view, name='login'),
     path('logout/', views.logout_view, name='logout'),
+    path('register/', views.farmer_register, name='farmer_register'),
     path('dashboard/', views.dashboard, name='dashboard'),
+    # Farmer self-service (Mkulima)
+    path('my/', views.farmer_dashboard, name='farmer_dashboard'),
+    path('my/profile/', views.farmer_profile_edit, name='farmer_profile_edit'),
+    path('my/distributions/<int:pk>/confirm/', views.farmer_confirm_receipt, name='farmer_confirm_receipt'),
+    path('my/feedback/new/', views.feedback_create, name='feedback_create'),
+    # Seed requests (Farmer -> Extension Officer -> Village Officer)
+    path('requests/', views.seed_request_list, name='seed_request_list'),
+    path('requests/new/', views.seed_request_create, name='seed_request_create'),
+    path('requests/<int:pk>/verify/', views.seed_request_verify, name='seed_request_verify'),
+    path('requests/<int:pk>/fulfill/', views.seed_request_fulfill, name='seed_request_fulfill'),
+    # Feedback / Complaints
+    path('complaints/', views.feedback_list, name='feedback_list'),
+    path('complaints/<int:pk>/resolve/', views.feedback_resolve, name='feedback_resolve'),
     # Farmers
     path('farmers/', views.farmer_list, name='farmer_list'),
     path('farmers/new/', views.farmer_create, name='farmer_create'),

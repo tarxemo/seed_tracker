@@ -74,6 +74,11 @@ class Command(BaseCommand):
             'district':mbeya_dc,'ward':ward_objs['Iyunga Ward'],'village':village_objs['Iyunga Village']
         })
         if c: vill_user.set_password('pass1234'); vill_user.save()
+        ext_user, c = CustomUser.objects.get_or_create(username='extension_officer', defaults={
+            'first_name':'Amos','last_name':'Kalimba','role':'extension','region':mbeya,
+            'district':mbeya_dc,'ward':ward_objs['Iyunga Ward']
+        })
+        if c: ext_user.set_password('pass1234'); ext_user.save()
 
         # Give the demo Iyunga chain (the only villages/wards with real officer logins) real stock,
         # so village_officer can immediately try creating new allocations through the UI.
@@ -116,6 +121,17 @@ class Command(BaseCommand):
                 'first_name':fn,'last_name':ln,'village':village_objs[vname],'crop_type':crop,'registered_by':vill_user
             })
             farmer_objs.append(f)
+
+        # Give one demo farmer (Abedi, in the Iyunga chain) a login account
+        abedi = farmer_objs[0]
+        if not abedi.user:
+            farmer_user, c = CustomUser.objects.get_or_create(username='mkulima_demo', defaults={
+                'first_name': abedi.first_name, 'last_name': abedi.last_name, 'role': 'farmer', 'phone': abedi.phone_number,
+            })
+            if c: farmer_user.set_password('pass1234'); farmer_user.save()
+            abedi.user = farmer_user
+            abedi.save(update_fields=['user'])
+
         seed_map = {'maize': 'Maize SC403','rice': 'Rice Supa','beans': 'Beans Jesca','sunflower': 'Sunflower Hysun','sorghum': 'Sorghum Serena'}
         if not SeedAllocation.objects.exists():
             for i, farmer in enumerate(farmer_objs):
@@ -141,4 +157,6 @@ class Command(BaseCommand):
         self.stdout.write('  regional_officer / pass1234')
         self.stdout.write('  district_officer / pass1234')
         self.stdout.write('  ward_officer     / pass1234')
+        self.stdout.write('  extension_officer / pass1234')
+        self.stdout.write('  mkulima_demo     / pass1234  (farmer login)')
         self.stdout.write('  village_officer  / pass1234')

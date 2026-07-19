@@ -1,0 +1,34 @@
+{% extends 'base.html' %}
+{% block title %}Fulfill Request - Seed Tracker{% endblock %}
+{% block page_title %}Fulfill Seed Request{% endblock %}
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-lg-7">
+    <div class="form-card">
+      <h5 style="font-weight:700;margin-bottom:4px">Verified Request</h5>
+      <p class="text-muted" style="margin-bottom:20px">
+        Farmer: <strong>{{ request_obj.farmer.full_name }}</strong>
+        &bull; Seed: <strong>{{ request_obj.seed_type.name }}</strong>
+        &bull; Qty: <strong>{{ request_obj.quantity_requested }} {{ request_obj.seed_type.unit }}</strong>
+        &bull; Verified by: <strong>{{ request_obj.verified_by.get_full_name|default:request_obj.verified_by.username }}</strong>
+      </p>
+
+      <form method="post">
+        {% csrf_token %}
+        <div class="row g-3">
+          <div class="col-md-6"><label class="form-label">Collection Date *</label>{{ form.collection_date }}</div>
+          <div class="col-md-6"><label class="form-label">Collection Location *</label>{{ form.collection_location }}</div>
+          <div class="col-12"><label class="form-label">Notes</label>{{ form.notes }}</div>
+        </div>
+        {% if form.errors %}
+        <div class="alert alert-danger mt-3">{% for field, errs in form.errors.items %}{% for e in errs %}<div>{{ e }}</div>{% endfor %}{% endfor %}</div>
+        {% endif %}
+        <div class="d-flex gap-2 mt-4">
+          <button type="submit" class="btn btn-primary"><i class="fas fa-boxes me-1"></i>Fulfill & Send SMS</button>
+          <a href="{% url 'seed_request_list' %}" class="btn btn-outline-secondary">Cancel</a>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}

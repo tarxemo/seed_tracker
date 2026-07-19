@@ -1,0 +1,32 @@
+{% extends 'base.html' %}
+{% block title %}Verify Request - Seed Tracker{% endblock %}
+{% block page_title %}Verify Seed Request{% endblock %}
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-lg-7">
+    <div class="form-card">
+      <h5 style="font-weight:700;margin-bottom:4px">Seed Request</h5>
+      <p class="text-muted" style="margin-bottom:20px">
+        Farmer: <strong>{{ request_obj.farmer.full_name }}</strong> ({{ request_obj.farmer.village.name }})
+        &bull; Seed: <strong>{{ request_obj.seed_type.name }}</strong>
+        &bull; Qty: <strong>{{ request_obj.quantity_requested }} {{ request_obj.seed_type.unit }}</strong>
+        &bull; Season: <strong>{{ request_obj.season.name }}</strong>
+      </p>
+      {% if request_obj.notes %}<p class="text-muted" style="margin-bottom:20px"><em>"{{ request_obj.notes }}"</em></p>{% endif %}
+
+      <form method="post">
+        {% csrf_token %}
+        <div style="background:#f8f9fb;border-radius:10px;padding:16px;margin-bottom:16px">
+          <label class="form-label">Rejection Reason (if rejecting)</label>
+          {{ form.rejection_reason }}
+        </div>
+        <div class="d-flex gap-2">
+          <button type="submit" name="verify" class="btn btn-success"><i class="fas fa-check-double me-1"></i>Verify & Forward to Village Officer</button>
+          <button type="submit" name="reject" class="btn btn-danger" onclick="return confirm('Reject this request?')"><i class="fas fa-times me-1"></i>Reject</button>
+          <a href="{% url 'seed_request_list' %}" class="btn btn-outline-secondary">Cancel</a>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}

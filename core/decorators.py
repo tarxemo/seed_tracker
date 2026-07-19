@@ -18,15 +18,28 @@ def role_required(*roles):
 def user_can_access_farmer(user, farmer):
     if user.is_superuser or user.role == 'admin':
         return True
+    if user.role == 'farmer':
+        return hasattr(user, 'farmer_profile') and user.farmer_profile.id == farmer.id
     if user.role == 'village':
         return farmer.village_id == user.village_id
-    if user.role == 'ward':
+    if user.role in ('ward', 'extension'):
         return farmer.village.ward_id == user.ward_id
     if user.role == 'district':
         return farmer.district.id == user.district_id
     if user.role == 'regional':
         return farmer.region.id == user.region_id
     return False
+
+def farmer_required(view_func):
+    @wraps(view_func)
+    def wrapper(request, *args, **kwargs):
+        if not request.user.is_authenticated:
+            return redirect('login')
+        if request.user.role != 'farmer' or not hasattr(request.user, 'farmer_profile'):
+            messages.error(request, 'This page is only available to farmer accounts.')
+            return redirect('dashboard')
+        return view_func(request, *args, **kwargs)
+    return wrapper
 
 def log_activity(action, model_name=''):
     def decorator(view_func):

@@ -32,6 +32,8 @@ class CustomUser(AbstractUser):
         ('district', 'District Officer'),
         ('ward', 'Ward Officer'),
         ('village', 'Village Officer'),
+        ('extension', 'Agricultural Extension Officer (Bwana Shamba)'),
+        ('farmer', 'Farmer (Mkulima)'),
     ]
     role = models.CharField(max_length=20, choices=ROLE_CHOICES, default='village')
     region = models.ForeignKey(Region, on_delete=models.SET_NULL, null=True, blank=True)
@@ -94,6 +96,7 @@ class Farmer(models.Model):
     national_id = models.CharField(max_length=30, blank=True)
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='active')
     registered_by = models.ForeignKey(CustomUser, on_delete=models.SET_NULL, null=True, related_name='registered_farmers')
+    user = models.OneToOneField(CustomUser, on_delete=models.CASCADE, null=True, blank=True, related_name='farmer_profile')
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
@@ -148,10 +151,47 @@ class Distribution(models.Model):
     collection_date = models.DateField(default=timezone.now)
     collection_confirmed = models.BooleanField(default=False)
     confirmed_by = models.ForeignKey(CustomUser, on_delete=models.SET_NULL, null=True, blank=True, related_name='confirmations')
+    farmer_confirmed = models.BooleanField(default=False)
+    farmer_confirmed_at = models.DateTimeField(null=True, blank=True)
     notes = models.TextField(blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self): return f"Distribution: {self.allocation}"
+
+class SeedRequest(models.Model):
+    STATUS_CHOICES = [
+        ('submitted','Submitted'),('verified','Verified'),
+        ('rejected','Rejected'),('fulfilled','Fulfilled'),
+    ]
+    farmer = models.ForeignKey(Farmer, on_delete=models.CASCADE, related_name='seed_requests')
+    seed_type = models.ForeignKey(SeedType, on_delete=models.CASCADE)
+    season = models.ForeignKey(FarmingSeasons, on_delete=models.CASCADE)
+    quantity_requested = models.DecimalField(max_digits=10, decimal_places=2)
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='submitted')
+    notes = models.TextField(blank=True)
+    submitted_by = models.ForeignKey(CustomUser, on_delete=models.SET_NULL, null=True, related_name='submitted_seed_requests')
+    verified_by = models.ForeignKey(CustomUser, on_delete=models.SET_NULL, null=True, blank=True, related_name='verified_seed_requests')
+    rejection_reason = models.TextField(blank=True)
+    resulting_allocation = models.OneToOneField(SeedAllocation, on_delete=models.SET_NULL, null=True, blank=True, related_name='source_request')
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self): return f"{self.farmer} - {self.seed_type} ({self.status})"
+
+class Feedback(models.Model):
+    CATEGORY_CHOICES = [('suggestion','Suggestion'),('complaint','Complaint'),('feedback','General Feedback')]
+    STATUS_CHOICES = [('open','Open'),('resolved','Resolved')]
+    farmer = models.ForeignKey(Farmer, on_delete=models.CASCADE, related_name='feedback_items')
+    category = models.CharField(max_length=20, choices=CATEGORY_CHOICES, default='feedback')
+    message = models.TextField()
+    related_allocation = models.ForeignKey(SeedAllocation, on_delete=models.SET_NULL, null=True, blank=True)
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='open')
+    response = models.TextField(blank=True)
+    resolved_by = models.ForeignKey(CustomUser, on_delete=models.SET_NULL, null=True, blank=True, related_name='resolved_feedback')
+    resolved_at = models.DateTimeField(null=True, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self): return f"{self.get_category_display()} from {self.farmer} ({self.status})"
 
 class SMSLog(models.Model):
     STATUS_CHOICES = [('sent','Sent'),('failed','Failed'),('pending','Pending')]

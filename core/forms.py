@@ -186,3 +186,88 @@ class StockRequestForm(forms.Form):
 
 class StockRespondForm(forms.Form):
     rejection_reason = forms.CharField(required=False, widget=forms.Textarea(attrs={'class':'form-control','rows':3}))
+
+class FarmerRegisterForm(forms.Form):
+    username = forms.CharField(max_length=150, widget=forms.TextInput(attrs={'class':'form-control'}))
+    password1 = forms.CharField(label='Password', widget=forms.PasswordInput(attrs={'class':'form-control'}))
+    password2 = forms.CharField(label='Confirm Password', widget=forms.PasswordInput(attrs={'class':'form-control'}))
+    first_name = forms.CharField(max_length=100, widget=forms.TextInput(attrs={'class':'form-control'}))
+    last_name = forms.CharField(max_length=100, widget=forms.TextInput(attrs={'class':'form-control'}))
+    phone_number = forms.CharField(max_length=20, widget=forms.TextInput(attrs={'class':'form-control'}))
+    village = forms.ModelChoiceField(queryset=Village.objects.select_related('ward__district__region').order_by('name'), widget=forms.Select(attrs={'class':'form-select'}))
+    farm_location = forms.CharField(max_length=200, required=False, widget=forms.TextInput(attrs={'class':'form-control'}))
+    farm_size = forms.DecimalField(max_digits=8, decimal_places=2, required=False, widget=forms.NumberInput(attrs={'class':'form-control'}))
+    crop_type = forms.ChoiceField(choices=CROP_CHOICES, widget=forms.Select(attrs={'class':'form-select'}))
+    national_id = forms.CharField(max_length=30, required=False, widget=forms.TextInput(attrs={'class':'form-control'}))
+
+    def clean_username(self):
+        username = self.cleaned_data['username']
+        if CustomUser.objects.filter(username=username).exists():
+            raise forms.ValidationError('This username is already taken.')
+        return username
+
+    def clean(self):
+        cleaned_data = super().clean()
+        if cleaned_data.get('password1') != cleaned_data.get('password2'):
+            raise forms.ValidationError('Passwords do not match.')
+        return cleaned_data
+
+    def save(self):
+        cd = self.cleaned_data
+        user = CustomUser(username=cd['username'], first_name=cd['first_name'], last_name=cd['last_name'], phone=cd['phone_number'], role='farmer')
+        user.set_password(cd['password1'])
+        user.save()
+        farmer = Farmer.objects.create(
+            first_name=cd['first_name'], last_name=cd['last_name'], phone_number=cd['phone_number'],
+            village=cd['village'], farm_location=cd.get('farm_location',''), farm_size=cd.get('farm_size'),
+            crop_type=cd['crop_type'], national_id=cd.get('national_id',''), user=user,
+        )
+        return user, farmer
+
+class FarmerSelfUpdateForm(forms.ModelForm):
+    class Meta:
+        model = Farmer
+        fields = ['phone_number','farm_location','farm_size','crop_type','national_id']
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        for f in self.fields.values():
+            if not isinstance(f.widget, forms.Select):
+                f.widget.attrs.setdefault('class','form-control')
+            else:
+                f.widget.attrs.setdefault('class','form-select')
+
+class SeedRequestForm(forms.Form):
+    farmer = forms.ModelChoiceField(queryset=Farmer.objects.none(), required=False, widget=forms.Select(attrs={'class':'form-select'}))
+    seed_type = forms.ModelChoiceField(queryset=SeedType.objects.all(), widget=forms.Select(attrs={'class':'form-select'}))
+    season = forms.ModelChoiceField(queryset=FarmingSeasons.objects.filter(is_active=True), widget=forms.Select(attrs={'class':'form-select'}))
+    quantity_requested = forms.DecimalField(max_digits=10, decimal_places=2, min_value=0.01, widget=forms.NumberInput(attrs={'class':'form-control'}))
+    notes = forms.CharField(required=False, widget=forms.Textarea(attrs={'class':'form-control','rows':3}))
+
+    def __init__(self, *args, user=None, **kwargs):
+        super().__init__(*args, **kwargs)
+        if user and user.role == 'extension':
+            self.fields['farmer'].queryset = Farmer.objects.filter(village__ward=user.ward)
+            self.fields['farmer'].required = True
+        else:
+            del self.fields['farmer']
+
+class SeedRequestVerifyForm(forms.Form):
+    rejection_reason = forms.CharField(required=False, widget=forms.Textarea(attrs={'class':'form-control','rows':3}))
+
+class SeedRequestFulfillForm(forms.Form):
+    collection_date = forms.DateField(widget=forms.DateInput(attrs={'type':'date','class':'form-control'}))
+    collection_location = forms.CharField(max_length=200, widget=forms.TextInput(attrs={'class':'form-control'}))
+    notes = forms.CharField(required=False, widget=forms.Textarea(attrs={'class':'form-control','rows':3}))
+
+class FeedbackForm(forms.Form):
+    category = forms.ChoiceField(choices=Feedback.CATEGORY_CHOICES, widget=forms.Select(attrs={'class':'form-select'}))
+    related_allocation = forms.ModelChoiceField(queryset=SeedAllocation.objects.none(), required=False, label='Related Allocation (optional)', widget=forms.Select(attrs={'class':'form-select'}))
+    message = forms.CharField(widget=forms.Textarea(attrs={'class':'form-control','rows':4}))
+
+    def __init__(self, *args, farmer=None, **kwargs):
+        super().__init__(*args, **kwargs)
+        if farmer:
+            self.fields['related_allocation'].queryset = farmer.allocations.all()
+
+class FeedbackResolveForm(forms.Form):
+    response = forms.CharField(widget=forms.Textarea(attrs={'class':'form-control','rows':3}))

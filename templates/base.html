@@ -106,6 +106,11 @@
   .badge-distributed { background: #cff4fc; color: #055160; }
   .badge-active { background: #d1e7dd; color: #0a5c36; }
   .badge-inactive { background: #e2e3e5; color: #41464b; }
+  .badge-submitted { background: #fff3cd; color: #856404; }
+  .badge-verified { background: #cff4fc; color: #055160; }
+  .badge-fulfilled { background: #d1e7dd; color: #0a5c36; }
+  .badge-open { background: #fff3cd; color: #856404; }
+  .badge-resolved { background: #d1e7dd; color: #0a5c36; }
   /* Form */
   .form-card { background: #fff; border-radius: 14px; padding: 28px; box-shadow: 0 2px 8px rgba(0,0,0,.06); border: 1px solid #eef0f3; }
   .form-label { font-size: 13px; font-weight: 600; color: #4a5568; margin-bottom: 6px; }
@@ -155,6 +160,27 @@
     </div>
   </div>
   <nav class="sidebar-nav">
+    {% if user.role == 'farmer' %}
+    <div class="nav-section-label">Mkulima</div>
+    <a href="{% url 'farmer_dashboard' %}" class="nav-link {% if request.resolver_match.url_name == 'farmer_dashboard' %}active{% endif %}">
+      <i class="fas fa-tachometer-alt"></i> Dashboard
+    </a>
+    <a href="{% url 'farmer_profile_edit' %}" class="nav-link {% if 'profile' in request.resolver_match.url_name %}active{% endif %}">
+      <i class="fas fa-tractor"></i> My Farm Info
+    </a>
+    <a href="{% url 'seed_request_create' %}" class="nav-link {% if request.resolver_match.url_name == 'seed_request_create' %}active{% endif %}">
+      <i class="fas fa-hand-holding-heart"></i> Omba Mbegu
+    </a>
+    <a href="{% url 'seed_request_list' %}" class="nav-link {% if request.resolver_match.url_name == 'seed_request_list' %}active{% endif %}">
+      <i class="fas fa-hand-holding"></i> My Requests
+    </a>
+    <a href="{% url 'allocation_list' %}" class="nav-link {% if 'allocation' in request.resolver_match.url_name %}active{% endif %}">
+      <i class="fas fa-boxes"></i> My Allocations
+    </a>
+    <a href="{% url 'feedback_list' %}" class="nav-link {% if 'feedback' in request.resolver_match.url_name %}active{% endif %}">
+      <i class="fas fa-comment-dots"></i> Maoni / Feedback
+    </a>
+    {% else %}
     <div class="nav-section-label">Main</div>
     <a href="{% url 'dashboard' %}" class="nav-link {% if request.resolver_match.url_name == 'dashboard' %}active{% endif %}">
       <i class="fas fa-tachometer-alt"></i> Dashboard
@@ -172,12 +198,20 @@
     <a href="{% url 'allocation_list' %}" class="nav-link {% if 'allocation' in request.resolver_match.url_name %}active{% endif %}">
       <i class="fas fa-boxes"></i> Allocations
     </a>
+    <a href="{% url 'seed_request_list' %}" class="nav-link {% if 'seed_request' in request.resolver_match.url_name %}active{% endif %}">
+      <i class="fas fa-hand-holding"></i> Seed Requests
+    </a>
     <a href="{% url 'distribution_list' %}" class="nav-link {% if 'distribution' in request.resolver_match.url_name %}active{% endif %}">
       <i class="fas fa-truck"></i> Distribution
     </a>
+    <a href="{% url 'feedback_list' %}" class="nav-link {% if 'feedback' in request.resolver_match.url_name %}active{% endif %}">
+      <i class="fas fa-comment-dots"></i> Complaints
+    </a>
+    {% if user.role != 'extension' %}
     <a href="{% url 'stock_list' %}" class="nav-link {% if 'stock' in request.resolver_match.url_name %}active{% endif %}">
       <i class="fas fa-dolly"></i> Stock Transfers
     </a>
+    {% endif %}
 
     <div class="nav-section-label">Analytics</div>
     <a href="{% url 'reports' %}" class="nav-link {% if 'report' in request.resolver_match.url_name %}active{% endif %}">
@@ -204,6 +238,7 @@
     <a href="{% url 'activity_logs' %}" class="nav-link {% if 'activity' in request.resolver_match.url_name %}active{% endif %}">
       <i class="fas fa-history"></i> Activity Logs
     </a>
+    {% endif %}
     {% endif %}
   </nav>
   <div class="sidebar-user">

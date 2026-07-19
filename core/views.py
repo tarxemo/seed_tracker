@@ -10,7 +10,7 @@ import json, csv
 from datetime import timedelta
 from .models import *
 from .forms import *
-from .decorators import role_required, user_can_access_farmer
+from .decorators import role_required, user_can_access_farmer, farmer_required
 from .utils import send_allocation_sms
 from .stock import balance_for_user, location_for_user, village_balance, total_balance_for_user, total_received_for_user
 
@@ -34,6 +34,8 @@ def logout_view(request):
 @login_required
 def dashboard(request):
     user = request.user
+    if user.role == 'farmer':
+        return redirect('farmer_dashboard')
     ctx = {}
     # Stats scoped by role
     farmers_qs = Farmer.objects.all()
@@ -45,7 +47,7 @@ def dashboard(request):
         farmers_qs = farmers_qs.filter(village=user.village)
         alloc_qs = alloc_qs.filter(farmer__village=user.village)
         dist_qs = dist_qs.filter(allocation__farmer__village=user.village)
-    elif user.role == 'ward':
+    elif user.role in ('ward', 'extension'):
         farmers_qs = farmers_qs.filter(village__ward=user.ward)
         alloc_qs = alloc_qs.filter(farmer__village__ward=user.ward)
         dist_qs = dist_qs.filter(allocation__farmer__village__ward=user.ward)
@@ -67,6 +69,9 @@ def dashboard(request):
     if user.role in ('district', 'ward', 'village'):
         ctx['total_seeds_received'] = total_balance_for_user(user)
         ctx['stock_label'] = 'Current Stock Balance (kg)'
+    elif user.role == 'extension':
+        ctx['total_seeds_received'] = SeedRequest.objects.filter(farmer__village__ward=user.ward, status='submitted').count()
+        ctx['stock_label'] = 'Pending Seed Requests'
     else:
         ctx['total_seeds_received'] = inv_qs.aggregate(t=Sum('quantity'))['t'] or 0
         ctx['stock_label'] = 'Total Seeds Received (kg)'
@@ -114,7 +119,7 @@ def farmer_list(request):
     user = request.user
     qs = Farmer.objects.select_related('village__ward__district__region')
     if user.role == 'village': qs = qs.filter(village=user.village)
-    elif user.role == 'ward': qs = qs.filter(village__ward=user.ward)
+    elif user.role in ('ward','extension'): qs = qs.filter(village__ward=user.ward)
     elif user.role == 'district': qs = qs.filter(village__ward__district=user.district)
     elif user.role == 'regional': qs = qs.filter(village__ward__district__region=user.region)
 
@@ -196,14 +201,32 @@ def inventory_create(request):
     return render(request, 'core/inventory_form.html', {'form': form, 'title': 'Add Seed Inventory'})
 
 # =================== ALLOCATIONS ===================
+def create_farmer_allocation(farmer, seed_type, season, quantity, collection_date, collection_location, notes, actor):
+    """Shared by direct officer creation (allocation_create) and SeedRequest fulfillment.
+    Returns (allocation, error_message) - exactly one will be None."""
+    if SeedAllocation.objects.filter(farmer=farmer, seed_type=seed_type, season=season).exists():
+        return None, 'This farmer already has an allocation for this seed type in this season.'
+    available = village_balance(seed_type, farmer.village)
+    if quantity > available:
+        return None, f'Insufficient village stock for {seed_type.name}. Available: {available} {seed_type.unit}. Request more stock from your Ward Officer.'
+    a = SeedAllocation.objects.create(
+        farmer=farmer, seed_type=seed_type, season=season, quantity_allocated=quantity,
+        collection_date=collection_date, collection_location=collection_location, notes=notes,
+        requested_by=actor, status='approved', approved_by=actor,
+    )
+    send_allocation_sms(a)
+    ActivityLog.objects.create(user=actor, action=f'Allocated {a.quantity_allocated} {a.seed_type.unit} of {a.seed_type.name} to {a.farmer.full_name}')
+    return a, None
+
 @login_required
 def allocation_list(request):
     user = request.user
     qs = SeedAllocation.objects.select_related('farmer','seed_type','season','requested_by')
     if user.role == 'village': qs = qs.filter(farmer__village=user.village)
-    elif user.role == 'ward': qs = qs.filter(farmer__village__ward=user.ward)
+    elif user.role in ('ward','extension'): qs = qs.filter(farmer__village__ward=user.ward)
     elif user.role == 'district': qs = qs.filter(farmer__village__ward__district=user.district)
     elif user.role == 'regional': qs = qs.filter(farmer__village__ward__district__region=user.region)
+    elif user.role == 'farmer' and hasattr(user, 'farmer_profile'): qs = qs.filter(farmer=user.farmer_profile)
 
     status_filter = request.GET.get('status','')
     if status_filter: qs = qs.filter(status=status_filter)
@@ -220,23 +243,15 @@ def allocation_create(request):
     user = request.user
     form = SeedAllocationForm(request.POST or None, user=user)
     if request.method == 'POST' and form.is_valid():
-        a = form.save(commit=False)
-        a.requested_by = user
-        # Check duplicate
-        if SeedAllocation.objects.filter(farmer=a.farmer, seed_type=a.seed_type, season=a.season).exists():
-            messages.error(request, 'This farmer already has an allocation for this seed type in this season.')
-            return render(request, 'core/allocation_form.html', {'form': form, 'title': 'New Allocation'})
-        # Check village has enough received stock
-        available = village_balance(a.seed_type, a.farmer.village)
-        if a.quantity_allocated > available:
-            messages.error(request, f'Insufficient village stock for {a.seed_type.name}. Available: {available} {a.seed_type.unit}. Request more stock from your Ward Officer.')
+        cd = form.cleaned_data
+        a, error = create_farmer_allocation(
+            farmer=cd['farmer'], seed_type=cd['seed_type'], season=cd['season'],
+            quantity=cd['quantity_allocated'], collection_date=cd['collection_date'],
+            collection_location=cd['collection_location'], notes=cd.get('notes',''), actor=user,
+        )
+        if error:
+            messages.error(request, error)
             return render(request, 'core/allocation_form.html', {'form': form, 'title': 'New Seed Allocation'})
-        # Village officer is the sole authority over their farmers - approved immediately
-        a.status = 'approved'
-        a.approved_by = user
-        a.save()
-        send_allocation_sms(a)
-        ActivityLog.objects.create(user=user, action=f'Allocated {a.quantity_allocated} {a.seed_type.unit} of {a.seed_type.name} to {a.farmer.full_name}')
         messages.success(request, f'Allocation recorded and SMS sent to {a.farmer.phone_number}.')
         return redirect('allocation_list')
     return render(request, 'core/allocation_form.html', {'form': form, 'title': 'New Seed Allocation'})
@@ -255,9 +270,10 @@ def distribution_list(request):
     user = request.user
     qs = Distribution.objects.select_related('allocation__farmer','allocation__seed_type')
     if user.role == 'village': qs = qs.filter(allocation__farmer__village=user.village)
-    elif user.role == 'ward': qs = qs.filter(allocation__farmer__village__ward=user.ward)
+    elif user.role in ('ward','extension'): qs = qs.filter(allocation__farmer__village__ward=user.ward)
     elif user.role == 'district': qs = qs.filter(allocation__farmer__village__ward__district=user.district)
     elif user.role == 'regional': qs = qs.filter(allocation__farmer__village__ward__district__region=user.region)
+    elif user.role == 'farmer' and hasattr(user, 'farmer_profile'): qs = qs.filter(allocation__farmer=user.farmer_profile)
     paginator = Paginator(qs.order_by('-created_at'), 20)
     page = paginator.get_page(request.GET.get('page'))
     return render(request, 'core/distribution_list.html', {'page_obj': page})
@@ -292,6 +308,7 @@ REPORT_BREAKDOWN_BY_ROLE = {
     'regional': ('farmer__village__ward__district__name', 'District'),
     'district': ('farmer__village__ward__name', 'Ward'),
     'ward': ('farmer__village__name', 'Village'),
+    'extension': ('farmer__village__name', 'Village'),
 }
 
 @login_required
@@ -311,7 +328,7 @@ def reports(request):
         alloc_qs = alloc_qs.filter(farmer__village__ward__district=user.district)
         dist_qs = dist_qs.filter(allocation__farmer__village__ward__district=user.district)
         farmers_qs = farmers_qs.filter(village__ward__district=user.district)
-    elif user.role == 'ward':
+    elif user.role in ('ward', 'extension'):
         alloc_qs = alloc_qs.filter(farmer__village__ward=user.ward)
         dist_qs = dist_qs.filter(allocation__farmer__village__ward=user.ward)
         farmers_qs = farmers_qs.filter(village__ward=user.ward)
@@ -329,10 +346,18 @@ def reports(request):
         total_received = total_received_for_user(user)
         remaining_stock = total_balance_for_user(user)
         received_label = 'Total Seeds Received via Transfers (kg)'
+        remaining_label = 'Remaining Stock (kg)'
+    elif user.role == 'extension':
+        ward_requests = SeedRequest.objects.filter(farmer__village__ward=user.ward)
+        total_received = ward_requests.filter(status='submitted').count()
+        remaining_stock = ward_requests.filter(status='verified').count()
+        received_label = 'Seed Requests Submitted'
+        remaining_label = 'Awaiting Fulfillment'
     else:
         total_received = inv_qs.aggregate(t=Sum('quantity'))['t'] or 0
         remaining_stock = total_received - (dist_qs.aggregate(t=Sum('quantity_distributed'))['t'] or 0)
         received_label = 'Total Seeds Received (kg)'
+        remaining_label = 'Remaining Stock (kg)'
 
     completed_qs = alloc_qs.filter(status__in=['approved','distributed'])
 
@@ -346,6 +371,7 @@ def reports(request):
         'seed_summary': completed_qs.values('seed_type__name','seed_type__unit').annotate(qty=Sum('quantity_allocated'), cnt=Count('id')).order_by('-qty'),
         'remaining_stock': remaining_stock,
         'received_label': received_label,
+        'remaining_label': remaining_label,
         'seasons': FarmingSeasons.objects.all(),
         'selected_season': season_id,
     }
@@ -647,3 +673,233 @@ def stock_request_respond(request, pk):
             messages.warning(request, 'Request rejected.')
             return redirect('stock_list')
     return render(request, 'core/stock_request_respond.html', {'transfer': transfer, 'form': form, 'available': available})
+
+# =================== FARMER SELF-SERVICE (Mkulima) ===================
+def farmer_register(request):
+    if request.user.is_authenticated:
+        return redirect('dashboard')
+    form = FarmerRegisterForm(request.POST or None)
+    if request.method == 'POST' and form.is_valid():
+        user, farmer = form.save()
+        login(request, user)
+        ActivityLog.objects.create(user=user, action=f'Farmer self-registered: {farmer.full_name}', model_name='Farmer', object_id=farmer.id)
+        messages.success(request, f'Welcome, {farmer.full_name}! Your farmer ID is {farmer.farmer_id}.')
+        return redirect('farmer_dashboard')
+    return render(request, 'registration/farmer_register.html', {'form': form})
+
+@farmer_required
+def farmer_dashboard(request):
+    farmer = request.user.farmer_profile
+    requests_qs = farmer.seed_requests.select_related('seed_type','season').order_by('-created_at')
+    allocations_qs = farmer.allocations.select_related('seed_type','season').order_by('-created_at')
+    ctx = {
+        'farmer': farmer,
+        'requests': requests_qs[:10],
+        'allocations': allocations_qs[:10],
+        'pending_requests': requests_qs.filter(status__in=['submitted','verified']).count(),
+        'total_requests': requests_qs.count(),
+        'total_allocations': allocations_qs.count(),
+        'sms_logs': farmer.sms_logs.order_by('-created_at')[:5],
+        'open_feedback': farmer.feedback_items.filter(status='open').count(),
+    }
+    return render(request, 'core/farmer_dashboard.html', ctx)
+
+@farmer_required
+def farmer_profile_edit(request):
+    farmer = request.user.farmer_profile
+    form = FarmerSelfUpdateForm(request.POST or None, instance=farmer)
+    if request.method == 'POST' and form.is_valid():
+        form.save()
+        messages.success(request, 'Your farm information has been updated.')
+        return redirect('farmer_dashboard')
+    return render(request, 'core/farmer_profile_form.html', {'form': form, 'farmer': farmer})
+
+@farmer_required
+def farmer_confirm_receipt(request, pk):
+    farmer = request.user.farmer_profile
+    distribution = get_object_or_404(Distribution, pk=pk, allocation__farmer=farmer)
+    if request.method == 'POST':
+        distribution.farmer_confirmed = True
+        distribution.farmer_confirmed_at = timezone.now()
+        distribution.save()
+        messages.success(request, 'Thank you for confirming receipt of your seeds.')
+        return redirect('farmer_dashboard')
+    return render(request, 'core/farmer_confirm_receipt.html', {'distribution': distribution})
+
+# =================== SEED REQUESTS (Farmer -> Extension -> Village Officer) ===================
+@login_required
+def seed_request_create(request):
+    user = request.user
+    if user.role not in ('farmer', 'extension'):
+        messages.error(request, 'You do not have permission to submit seed requests.')
+        return redirect('dashboard')
+    if user.role == 'farmer' and not hasattr(user, 'farmer_profile'):
+        messages.error(request, 'No farmer profile found for this account.')
+        return redirect('dashboard')
+    form = SeedRequestForm(request.POST or None, user=user)
+    if request.method == 'POST' and form.is_valid():
+        farmer = user.farmer_profile if user.role == 'farmer' else form.cleaned_data['farmer']
+        seed_type = form.cleaned_data['seed_type']
+        season = form.cleaned_data['season']
+        if SeedRequest.objects.filter(farmer=farmer, seed_type=seed_type, season=season, status__in=['submitted','verified']).exists():
+            messages.error(request, 'There is already an open request for this farmer, seed type and season.')
+        else:
+            SeedRequest.objects.create(
+                farmer=farmer, seed_type=seed_type, season=season,
+                quantity_requested=form.cleaned_data['quantity_requested'],
+                notes=form.cleaned_data.get('notes',''), submitted_by=user,
+            )
+            ActivityLog.objects.create(user=user, action=f'Submitted seed request for {farmer.full_name} ({seed_type.name})')
+            messages.success(request, 'Seed request submitted.')
+            return redirect('seed_request_list')
+    redirect_target = 'farmer_dashboard' if user.role == 'farmer' else 'seed_request_list'
+    return render(request, 'core/seed_request_form.html', {'form': form, 'redirect_target': redirect_target})
+
+@login_required
+def seed_request_list(request):
+    user = request.user
+    qs = SeedRequest.objects.select_related('farmer','seed_type','season','submitted_by','verified_by')
+    can_fulfill = False
+    can_verify = False
+    if user.role == 'farmer':
+        if not hasattr(user, 'farmer_profile'):
+            messages.error(request, 'No farmer profile found for this account.')
+            return redirect('dashboard')
+        qs = qs.filter(farmer=user.farmer_profile)
+    elif user.role == 'extension':
+        qs = qs.filter(farmer__village__ward=user.ward)
+        can_verify = True
+    elif user.role == 'village':
+        qs = qs.filter(farmer__village=user.village)
+        can_fulfill = True
+    elif user.role == 'ward':
+        qs = qs.filter(farmer__village__ward=user.ward)
+    elif user.role == 'district':
+        qs = qs.filter(farmer__village__ward__district=user.district)
+    elif user.role == 'regional':
+        qs = qs.filter(farmer__village__ward__district__region=user.region)
+
+    status_filter = request.GET.get('status','')
+    if status_filter:
+        qs = qs.filter(status=status_filter)
+    paginator = Paginator(qs.order_by('-created_at'), 20)
+    page = paginator.get_page(request.GET.get('page'))
+    return render(request, 'core/seed_request_list.html', {
+        'page_obj': page, 'status_filter': status_filter, 'can_fulfill': can_fulfill, 'can_verify': can_verify,
+    })
+
+@login_required
+@role_required('extension')
+def seed_request_verify(request, pk):
+    user = request.user
+    sr = get_object_or_404(SeedRequest, pk=pk, status='submitted')
+    if sr.farmer.village.ward_id != user.ward_id:
+        messages.error(request, 'You can only verify requests from farmers in your own ward.')
+        return redirect('seed_request_list')
+    form = SeedRequestVerifyForm(request.POST or None)
+    if request.method == 'POST':
+        if 'verify' in request.POST:
+            sr.status = 'verified'
+            sr.verified_by = user
+            sr.save()
+            ActivityLog.objects.create(user=user, action=f'Verified seed request for {sr.farmer.full_name}')
+            messages.success(request, 'Request verified and forwarded to the Village Officer.')
+            return redirect('seed_request_list')
+        elif 'reject' in request.POST and form.is_valid():
+            sr.status = 'rejected'
+            sr.verified_by = user
+            sr.rejection_reason = form.cleaned_data.get('rejection_reason','')
+            sr.save()
+            ActivityLog.objects.create(user=user, action=f'Rejected seed request for {sr.farmer.full_name}')
+            messages.warning(request, 'Request rejected.')
+            return redirect('seed_request_list')
+    return render(request, 'core/seed_request_verify.html', {'request_obj': sr, 'form': form})
+
+@login_required
+@role_required('village')
+def seed_request_fulfill(request, pk):
+    user = request.user
+    sr = get_object_or_404(SeedRequest, pk=pk, status='verified')
+    if sr.farmer.village_id != user.village_id:
+        messages.error(request, 'You can only fulfill requests for farmers in your own village.')
+        return redirect('seed_request_list')
+    form = SeedRequestFulfillForm(request.POST or None)
+    if request.method == 'POST' and form.is_valid():
+        a, error = create_farmer_allocation(
+            farmer=sr.farmer, seed_type=sr.seed_type, season=sr.season,
+            quantity=sr.quantity_requested, collection_date=form.cleaned_data['collection_date'],
+            collection_location=form.cleaned_data['collection_location'], notes=form.cleaned_data.get('notes',''),
+            actor=user,
+        )
+        if error:
+            messages.error(request, error)
+        else:
+            sr.status = 'fulfilled'
+            sr.resulting_allocation = a
+            sr.save()
+            messages.success(request, f'Request fulfilled and SMS sent to {a.farmer.phone_number}.')
+            return redirect('seed_request_list')
+    return render(request, 'core/seed_request_fulfill.html', {'request_obj': sr, 'form': form})
+
+# =================== FEEDBACK / COMPLAINTS ===================
+@farmer_required
+def feedback_create(request):
+    farmer = request.user.farmer_profile
+    form = FeedbackForm(request.POST or None, farmer=farmer)
+    if request.method == 'POST' and form.is_valid():
+        Feedback.objects.create(
+            farmer=farmer, category=form.cleaned_data['category'],
+            message=form.cleaned_data['message'], related_allocation=form.cleaned_data.get('related_allocation'),
+        )
+        messages.success(request, 'Thank you - your feedback has been submitted.')
+        return redirect('feedback_list')
+    return render(request, 'core/feedback_form.html', {'form': form})
+
+@login_required
+def feedback_list(request):
+    user = request.user
+    qs = Feedback.objects.select_related('farmer','related_allocation','resolved_by')
+    can_resolve = False
+    if user.role == 'farmer':
+        if not hasattr(user, 'farmer_profile'):
+            messages.error(request, 'No farmer profile found for this account.')
+            return redirect('dashboard')
+        qs = qs.filter(farmer=user.farmer_profile)
+    elif user.role == 'extension':
+        qs = qs.filter(farmer__village__ward=user.ward)
+        can_resolve = True
+    elif user.role == 'village':
+        qs = qs.filter(farmer__village=user.village)
+    elif user.role == 'ward':
+        qs = qs.filter(farmer__village__ward=user.ward)
+    elif user.role == 'district':
+        qs = qs.filter(farmer__village__ward__district=user.district)
+    elif user.role == 'regional':
+        qs = qs.filter(farmer__village__ward__district__region=user.region)
+
+    status_filter = request.GET.get('status','')
+    if status_filter:
+        qs = qs.filter(status=status_filter)
+    paginator = Paginator(qs.order_by('-created_at'), 20)
+    page = paginator.get_page(request.GET.get('page'))
+    return render(request, 'core/feedback_list.html', {'page_obj': page, 'status_filter': status_filter, 'can_resolve': can_resolve})
+
+@login_required
+@role_required('extension')
+def feedback_resolve(request, pk):
+    user = request.user
+    fb = get_object_or_404(Feedback, pk=pk, status='open')
+    if fb.farmer.village.ward_id != user.ward_id:
+        messages.error(request, 'You can only resolve feedback from farmers in your own ward.')
+        return redirect('feedback_list')
+    form = FeedbackResolveForm(request.POST or None)
+    if request.method == 'POST' and form.is_valid():
+        fb.status = 'resolved'
+        fb.response = form.cleaned_data['response']
+        fb.resolved_by = user
+        fb.resolved_at = timezone.now()
+        fb.save()
+        ActivityLog.objects.create(user=user, action=f'Resolved feedback from {fb.farmer.full_name}')
+        messages.success(request, 'Feedback resolved.')
+        return redirect('feedback_list')
+    return render(request, 'core/feedback_resolve.html', {'feedback': fb, 'form': form})
