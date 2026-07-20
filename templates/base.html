@@ -247,6 +247,7 @@
       <div class="user-name">{{ user.get_full_name|default:user.username }}</div>
       <div class="user-role">{{ user.get_role_display }}</div>
     </div>
+    <a href="{% url 'change_password' %}" title="Change Password" style="color:rgba(255,255,255,.6)"><i class="fas fa-key"></i></a>
     <a href="{% url 'logout' %}" title="Logout" style="color:rgba(255,255,255,.6)"><i class="fas fa-sign-out-alt"></i></a>
   </div>
 </div>

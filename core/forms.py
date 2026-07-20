@@ -1,5 +1,5 @@
 from django import forms
-from django.contrib.auth.forms import AuthenticationForm
+from django.contrib.auth.forms import AuthenticationForm, PasswordChangeForm as DjangoPasswordChangeForm
 from django.contrib.auth.password_validation import validate_password
 from .models import *
 
@@ -92,25 +92,50 @@ class UserCreateForm(forms.ModelForm):
                 f.widget.attrs.setdefault('class','form-control')
             else:
                 f.widget.attrs.setdefault('class','form-select')
+        if self.instance.pk:
+            # Editing an existing user - password is self-service only (see ChangePasswordForm), never admin-set here.
+            del self.fields['password1']
+            del self.fields['password2']
     def clean(self):
         cleaned_data = super().clean()
         password1 = cleaned_data.get('password1')
         password2 = cleaned_data.get('password2')
-        if password1 != password2:
-            raise forms.ValidationError("Passwords do not match.")
-        if password1:
-            temp_user = CustomUser(username=cleaned_data.get('username',''), first_name=cleaned_data.get('first_name',''),
-                                    last_name=cleaned_data.get('last_name',''), email=cleaned_data.get('email',''))
-            try:
-                validate_password(password1, user=temp_user)
-            except forms.ValidationError as e:
-                self.add_error('password1', e)
+        if not self.instance.pk:
+            if not password1:
+                self.add_error('password1', 'This field is required.')
+            if password1 != password2:
+                raise forms.ValidationError("Passwords do not match.")
+            if password1:
+                temp_user = CustomUser(username=cleaned_data.get('username',''), first_name=cleaned_data.get('first_name',''),
+                                        last_name=cleaned_data.get('last_name',''), email=cleaned_data.get('email',''))
+                try:
+                    validate_password(password1, user=temp_user)
+                except forms.ValidationError as e:
+                    self.add_error('password1', e)
+        region = cleaned_data.get('region')
+        district = cleaned_data.get('district')
+        ward = cleaned_data.get('ward')
+        village = cleaned_data.get('village')
+        if district and region and district.region_id != region.id:
+            self.add_error('district', 'This district is not in the selected region.')
+        if ward and district and ward.district_id != district.id:
+            self.add_error('ward', 'This ward is not in the selected district.')
+        if village and ward and village.ward_id != ward.id:
+            self.add_error('village', 'This village is not in the selected ward.')
         return cleaned_data
     def save(self, commit=True):
         user = super().save(commit=False)
-        user.set_password(self.cleaned_data['password1'])
+        if self.cleaned_data.get('password1'):
+            user.set_password(self.cleaned_data['password1'])
         if commit: user.save()
         return user
+
+class ChangePasswordForm(DjangoPasswordChangeForm):
+    """Self-service password change - old password required, strength-validated via AUTH_PASSWORD_VALIDATORS."""
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        for f in self.fields.values():
+            f.widget.attrs.setdefault('class', 'form-control')
 
 class SeedTypeForm(forms.ModelForm):
     class Meta:

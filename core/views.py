@@ -1,5 +1,5 @@
 from django.shortcuts import render, redirect, get_object_or_404
-from django.contrib.auth import login, logout, authenticate
+from django.contrib.auth import login, logout, authenticate, update_session_auth_hash
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.db.models import Sum, Count, Q
@@ -31,6 +31,17 @@ def logout_view(request):
     ActivityLog.objects.create(user=request.user, action='User logged out', ip_address=request.META.get('REMOTE_ADDR'))
     logout(request)
     return redirect('login')
+
+@login_required
+def change_password(request):
+    form = ChangePasswordForm(request.user, request.POST or None)
+    if request.method == 'POST' and form.is_valid():
+        user = form.save()
+        update_session_auth_hash(request, user)
+        ActivityLog.objects.create(user=user, action='Changed their own password')
+        messages.success(request, 'Your password has been changed.')
+        return redirect('dashboard')
+    return render(request, 'registration/change_password.html', {'form': form})
 
 @login_required
 def dashboard(request):
@@ -426,6 +437,14 @@ def user_list(request):
     users = CustomUser.objects.all().order_by('role','username')
     return render(request, 'core/user_list.html', {'users': users})
 
+def location_tree_json():
+    """Full region/district/ward/village hierarchy, for cascading dropdown JS."""
+    return json.dumps({
+        'districts': list(District.objects.values('id','name','region_id')),
+        'wards': list(Ward.objects.values('id','name','district_id')),
+        'villages': list(Village.objects.values('id','name','ward_id')),
+    })
+
 @login_required
 @role_required('admin')
 def user_create(request):
@@ -435,7 +454,7 @@ def user_create(request):
         ActivityLog.objects.create(user=request.user, action=f'Created user {user.username}')
         messages.success(request, f'User {user.username} created.')
         return redirect('user_list')
-    return render(request, 'core/user_form.html', {'form': form, 'title': 'Create User'})
+    return render(request, 'core/user_form.html', {'form': form, 'title': 'Create User', 'location_tree': location_tree_json()})
 
 @login_required
 @role_required('admin')
@@ -446,7 +465,7 @@ def user_edit(request, pk):
         form.save()
         messages.success(request, 'User updated.')
         return redirect('user_list')
-    return render(request, 'core/user_form.html', {'form': form, 'title': 'Edit User', 'edit_user': u})
+    return render(request, 'core/user_form.html', {'form': form, 'title': 'Edit User', 'edit_user': u, 'location_tree': location_tree_json()})
 
 # =================== SETTINGS / ADMIN ===================
 @login_required

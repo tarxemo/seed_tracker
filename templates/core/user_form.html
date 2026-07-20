@@ -19,11 +19,14 @@
           <div class="col-md-6"><label class="form-label">District</label>{{ form.district }}</div>
           <div class="col-md-6"><label class="form-label">Ward</label>{{ form.ward }}</div>
           <div class="col-md-6"><label class="form-label">Village</label>{{ form.village }}</div>
-          {% if not edit_user %}
-          <div class="col-md-6"><label class="form-label">Password *</label>{{ form.password1 }}</div>
-          <div class="col-md-6"><label class="form-label">Confirm Password *</label>{{ form.password2 }}</div>
+          {% if form.password1 %}
+          <div class="col-md-6"><label class="form-label">{{ form.password1.label }}</label>{{ form.password1 }}</div>
+          <div class="col-md-6"><label class="form-label">{{ form.password2.label }}</label>{{ form.password2 }}</div>
           {% endif %}
         </div>
+        {% if edit_user %}
+        <p class="text-muted mt-3" style="font-size:13px"><i class="fas fa-info-circle me-1"></i>Password is managed by the user themselves via "Change Password" in their sidebar. To reset a forgotten password, use the Django admin site.</p>
+        {% endif %}
         {% if form.errors %}
         <div class="alert alert-danger mt-3">{% for field, errs in form.errors.items %}{% for e in errs %}<div>{{ field }}: {{ e }}</div>{% endfor %}{% endfor %}</div>
         {% endif %}
@@ -35,4 +38,57 @@
     </div>
   </div>
 </div>
+{% endblock %}
+{% block extra_js %}
+<script>
+const LOCATION_TREE = {{ location_tree|safe }};
+
+function populateSelect(selectEl, items, keepValue) {
+  const currentValue = keepValue !== undefined ? String(keepValue) : selectEl.value;
+  selectEl.innerHTML = '<option value="">---------</option>';
+  items.forEach(function(item) {
+    const opt = document.createElement('option');
+    opt.value = item.id;
+    opt.textContent = item.name;
+    if (String(item.id) === currentValue) opt.selected = true;
+    selectEl.appendChild(opt);
+  });
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+  const regionSelect = document.getElementById('id_region');
+  const districtSelect = document.getElementById('id_district');
+  const wardSelect = document.getElementById('id_ward');
+  const villageSelect = document.getElementById('id_village');
+  if (!regionSelect || !districtSelect || !wardSelect || !villageSelect) return;
+
+  function refreshDistricts(keepValue) {
+    const regionId = regionSelect.value;
+    const items = regionId ? LOCATION_TREE.districts.filter(function(d) { return String(d.region_id) === regionId; }) : [];
+    populateSelect(districtSelect, items, keepValue);
+  }
+  function refreshWards(keepValue) {
+    const districtId = districtSelect.value;
+    const items = districtId ? LOCATION_TREE.wards.filter(function(w) { return String(w.district_id) === districtId; }) : [];
+    populateSelect(wardSelect, items, keepValue);
+  }
+  function refreshVillages(keepValue) {
+    const wardId = wardSelect.value;
+    const items = wardId ? LOCATION_TREE.villages.filter(function(v) { return String(v.ward_id) === wardId; }) : [];
+    populateSelect(villageSelect, items, keepValue);
+  }
+
+  // Preserve whatever was pre-selected (edit page) on first load, then cascade downward.
+  const initialDistrict = districtSelect.value;
+  const initialWard = wardSelect.value;
+  const initialVillage = villageSelect.value;
+  refreshDistricts(initialDistrict);
+  refreshWards(initialWard);
+  refreshVillages(initialVillage);
+
+  regionSelect.addEventListener('change', function() { refreshDistricts(); refreshWards(); refreshVillages(); });
+  districtSelect.addEventListener('change', function() { refreshWards(); refreshVillages(); });
+  wardSelect.addEventListener('change', function() { refreshVillages(); });
+});
+</script>
 {% endblock %}
