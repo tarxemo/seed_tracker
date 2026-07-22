@@ -83,8 +83,8 @@ AUTH_USER_MODEL = 'core.CustomUser'
 
 # Transactional email API (see core/utils.py:send_email) - set real values via env vars in production.
 EMAIL_API_URL = os.environ.get('EMAIL_API_URL', 'https://emailbackend.tarxemo.com/api/v1/send-email/')
-EMAIL_API_KEY = os.environ.get('EMAIL_API_KEY', 'eak_demoDemoDemoKey123')
-EMAIL_API_SECRET = os.environ.get('EMAIL_API_SECRET', 'demo-secret-change-me')
+EMAIL_API_KEY = os.environ.get('EMAIL_API_KEY', 'eak_fgnHH1a4Antt1iWVZOyfZLXjx12YLxwRpSSWwUEj73I')
+EMAIL_API_SECRET = os.environ.get('EMAIL_API_SECRET', 'eas_TPtFF9inUGvTRWorxDrQo8--HW2HXgJHk8BImjiFmwAKeXtxyFOsVxBiTxY8tivF')
 
 # Where contact-form submissions are emailed to (optional - message is always saved to the DB regardless).
-CONTACT_EMAIL = os.environ.get('CONTACT_EMAIL', '')
+CONTACT_EMAIL = os.environ.get('CONTACT_EMAIL', 'code@tarxemo.com')
