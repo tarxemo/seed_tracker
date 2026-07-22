@@ -74,10 +74,8 @@ msgstr ""
 msgid "Related Allocation (optional)"
 msgstr "Mgao Unaohusiana (hiari)"
 
-#, fuzzy
-#| msgid "Thank you - your feedback has been submitted."
 msgid "Thank you - your message has been sent. We will respond soon."
-msgstr "Asante - maoni yako yamewasilishwa."
+msgstr "Asante - ujumbe wako umetumwa. Tutajibu hivi karibuni."
 
 msgid "System Administrator"
 msgstr "Msimamizi wa Mfumo"
@@ -1228,22 +1226,22 @@ msgid "Never"
 msgstr "Kamwe"
 
 msgid "About"
-msgstr ""
+msgstr "Kuhusu"
 
 msgid "About the Programme"
-msgstr ""
+msgstr "Kuhusu Mpango Huu"
 
 msgid "Digitizing Seed Distribution in Mbeya"
-msgstr ""
+msgstr "Kudijitisha Usambazaji wa Mbegu Mkoani Mbeya"
 
 msgid ""
 "Mbeya Seed Tracker exists to make government seed distribution transparent, "
 "accountable and fast — from the moment seed stock arrives in the region to "
 "the moment a farmer confirms it in their own hands."
-msgstr ""
+msgstr "Mbeya Seed Tracker ipo kuhakikisha usambazaji wa mbegu za serikali unakuwa wazi, wenye uwajibikaji na wa haraka — kuanzia mbegu zinapofika mkoani hadi mkulima anapothibitisha kuzipokea mikononi mwake."
 
 msgid "Our Purpose"
-msgstr ""
+msgstr "Lengo Letu"
 
 msgid ""
 "Smallholder farmers depend on receiving the right seed, in the right "
@@ -1252,100 +1250,94 @@ msgid ""
 "farmers are left waiting without answers. This system replaces that paper "
 "trail with a single, auditable record that every level of the chain can see "
 "- scoped strictly to their own territory."
-msgstr ""
+msgstr "Wakulima wadogo hutegemea kupata mbegu sahihi, kwa kiasi sahihi, kwa wakati sahihi. Usambazaji unapofuatiliwa kwa karatasi katika ngazi tano za utawala, kumbukumbu hupotea, kiasi huhojiwa, na wakulima hubaki wakisubiri bila majibu. Mfumo huu unabadilisha mfumo huo wa karatasi na kumbukumbu moja inayoweza kukaguliwa ambayo kila ngazi ya mnyororo inaweza kuiona - ikiwa imefungwa kwa eneo lake tu."
 
 msgid "How the System is Organized"
-msgstr ""
+msgstr "Jinsi Mfumo Ulivyopangwa"
 
 msgid ""
 "Every account belongs to one of these roles, each scoped to their own part "
 "of the region:"
-msgstr ""
+msgstr "Kila akaunti ni ya mojawapo ya majukumu haya, kila moja likiwa limefungwa kwenye sehemu yake ya mkoa:"
 
 msgid ""
 "Alongside this chain, an Agricultural Extension Officer (Bwana Shamba) works "
 "at ward level - verifying farmer requests and helping farmers use the "
 "system, without handling bulk stock themselves."
-msgstr ""
+msgstr "Sambamba na mnyororo huu, Afisa Ugani wa Kilimo (Bwana Shamba) hufanya kazi ngazi ya kata - akithibitisha maombi ya wakulima na kuwasaidia wakulima kutumia mfumo, bila yeye mwenyewe kushughulikia hifadhi kubwa ya mbegu."
 
 msgid "What the System Tracks"
-msgstr ""
+msgstr "Mfumo Unafuatilia Nini"
 
 msgid ""
 "Seed stock received at regional level, and every hand-off down to village "
 "level"
-msgstr ""
+msgstr "Hifadhi ya mbegu inayopokelewa ngazi ya mkoa, na kila makabidhiano hadi ngazi ya kijiji"
 
 msgid "Every farmer request, who verified it, and who fulfilled it"
-msgstr ""
+msgstr "Kila ombi la mkulima, aliyelithibitisha, na aliyelitimiza"
 
 msgid "Actual confirmed collection by the farmer - not just a paper signature"
-msgstr ""
+msgstr "Uchukuaji halisi uliothibitishwa na mkulima - si sahihi ya karatasi tu"
 
 msgid "A full activity log for accountability at every level"
-msgstr ""
+msgstr "Kumbukumbu kamili ya shughuli kwa ajili ya uwajibikaji katika kila ngazi"
 
 msgid "Want to see it in action?"
-msgstr ""
+msgstr "Unataka kuona ikifanya kazi?"
 
 msgid "See How It Works"
-msgstr ""
+msgstr "Ona Jinsi Inavyofanya Kazi"
 
 msgid "Contact Us"
-msgstr ""
+msgstr "Wasiliana Nasi"
 
 msgid ""
 "Digital seed distribution and tracking for smallholder farmers in Mbeya "
 "Region, Tanzania."
-msgstr ""
+msgstr "Usambazaji na ufuatiliaji wa kidijitali wa mbegu kwa wakulima wadogo Mkoa wa Mbeya, Tanzania."
 
 msgid "Home"
-msgstr ""
+msgstr "Nyumbani"
 
 msgid "How It Works"
-msgstr ""
+msgstr "Jinsi Inavyofanya Kazi"
 
 msgid "FAQ"
-msgstr ""
+msgstr "Maswali Yanayoulizwa Mara kwa Mara"
 
 msgid "Contact"
-msgstr ""
+msgstr "Wasiliana"
 
-#, fuzzy
-#| msgid "Back to Dashboard"
 msgid "Go to Dashboard"
-msgstr "Rudi kwenye Dashibodi"
+msgstr "Nenda kwenye Dashibodi"
 
 msgid "Sign In"
 msgstr "Ingia"
 
 msgid "Jisajili"
-msgstr ""
+msgstr "Jisajili"
 
 msgid ""
 "Digitizing seed distribution from Regional Officers all the way to "
 "smallholder farmers."
-msgstr ""
+msgstr "Kudijitisha usambazaji wa mbegu kuanzia Maafisa wa Mkoa hadi kwa wakulima wadogo."
 
 msgid "Mbeya Seed Tracker. Built for the Mbeya Region agricultural community."
-msgstr ""
+msgstr "Mbeya Seed Tracker. Imejengwa kwa ajili ya jamii ya kilimo ya Mkoa wa Mbeya."
 
 msgid "Get in Touch"
-msgstr ""
+msgstr "Wasiliana Nasi"
 
 msgid ""
 "Questions, feedback, or need an officer account? Send us a message below."
-msgstr ""
+msgstr "Una maswali, maoni, au unahitaji akaunti ya afisa? Tutumie ujumbe hapa chini."
 
-#, fuzzy
-#| msgid "Reject"
 msgid "Subject"
-msgstr "Kataa"
+msgstr "Somo"
 
-#, fuzzy
-#| msgid "Message"
 msgid "Send Message"
-msgstr "Ujumbe"
+msgstr "Tuma Ujumbe"
 
 msgid "Already have an account?"
 msgstr "Una akaunti tayari?"
@@ -1353,346 +1345,306 @@ msgstr "Una akaunti tayari?"
 msgid ""
 "Farmers can submit feedback or complaints directly from their dashboard for "
 "a faster response from their Extension Officer."
-msgstr ""
+msgstr "Wakulima wanaweza kutuma maoni au malalamiko moja kwa moja kutoka dashibodi yao kwa majibu ya haraka zaidi kutoka kwa Afisa wao wa Ugani."
 
 msgid "Have a quick question?"
-msgstr ""
+msgstr "Una swali la haraka?"
 
 msgid ""
 "Check the FAQ - it covers registration, requests, passwords and language "
 "settings."
-msgstr ""
+msgstr "Angalia Maswali Yanayoulizwa Mara kwa Mara - yanahusu usajili, maombi, nywila na mipangilio ya lugha."
 
-#, fuzzy
-#| msgid "View All"
 msgid "View FAQ"
-msgstr "Angalia Zote"
+msgstr "Angalia Maswali Yanayoulizwa Mara kwa Mara"
 
 msgid "Frequently Asked Questions"
-msgstr ""
+msgstr "Maswali Yanayoulizwa Mara kwa Mara"
 
 msgid "Everything you need to know to get started."
-msgstr ""
+msgstr "Kila unachohitaji kujua ili kuanza."
 
-#, fuzzy
-#| msgid "Jisajili - Register as a Farmer"
 msgid "How do I register as a farmer?"
-msgstr "Jisajili - Sajili kama Mkulima"
+msgstr "Ninawezaje kujisajili kama mkulima?"
 
 msgid ""
 "Click \"Jisajili\" on the home page or login screen. You'll choose a "
 "username and password, enter your details and your village, and you're in - "
 "no officer visit required."
-msgstr ""
+msgstr "Bofya \"Jisajili\" kwenye ukurasa wa mwanzo au wa kuingia. Utachagua jina la mtumiaji na nywila, kuweka taarifa zako na kijiji chako, na utakuwa umeingia - bila kuhitaji ziara ya afisa."
 
-#, fuzzy
-#| msgid "Request Seeds"
 msgid "How do I request seeds?"
-msgstr "Omba Mbegu"
+msgstr "Ninawezaje kuomba mbegu?"
 
 msgid ""
 "Once logged in, use \"Request Seeds\" on your dashboard. Choose the seed "
 "type, season and quantity. Your ward's Extension Officer will verify it, "
 "then your Village Officer will fulfill it."
-msgstr ""
+msgstr "Baada ya kuingia, tumia \"Omba Mbegu\" kwenye dashibodi yako. Chagua aina ya mbegu, msimu na kiasi. Afisa Ugani wa kata yako atathibitisha, kisha Afisa wa Kijiji atatimiza ombi lako."
 
 msgid "Why hasn't my request been verified yet?"
-msgstr ""
+msgstr "Kwa nini ombi langu bado halijathibitishwa?"
 
 msgid ""
 "If you have an earlier seed delivery you haven't confirmed receiving yet, "
 "new requests are held until you confirm it. Check \"My Allocations\" on your "
 "dashboard for anything awaiting your confirmation."
-msgstr ""
+msgstr "Kama una mgao wa awali wa mbegu ambao bado hujathibitisha kuupokea, maombi mapya husitishwa hadi utakapouthibitisha. Angalia \"Mgao Wangu\" kwenye dashibodi yako kwa chochote kinachosubiri uthibitisho wako."
 
 msgid "Can I request the same seed type twice in one season?"
-msgstr ""
+msgstr "Je, ninaweza kuomba aina ile ile ya mbegu mara mbili katika msimu mmoja?"
 
 msgid ""
 "No - one active or fulfilled request per seed type per season. If an earlier "
 "request was rejected, you're free to submit a new one."
-msgstr ""
+msgstr "Hapana - ombi moja tu linaloendelea au lililotimizwa kwa kila aina ya mbegu kwa kila msimu. Iwapo ombi la awali lilikataliwa, uko huru kutuma ombi jipya."
 
 msgid "I forgot my password. What do I do?"
-msgstr ""
+msgstr "Nimesahau nywila yangu. Nifanye nini?"
 
 msgid ""
 "Use \"Forgot password?\" on the sign-in page. If you added an email when you "
 "registered, you'll receive a reset link. No email on file? Contact your "
 "Village Officer for help."
-msgstr ""
+msgstr "Tumia \"Umesahau nywila?\" kwenye ukurasa wa kuingia. Kama uliweka barua pepe wakati wa usajili, utapokea kiungo cha kubadilisha nywila. Huna barua pepe iliyosajiliwa? Wasiliana na Afisa wako wa Kijiji kwa msaada."
 
 msgid "Can I use the system in Swahili?"
-msgstr ""
+msgstr "Je, ninaweza kutumia mfumo kwa Kiswahili?"
 
 msgid ""
 "Yes - use the language switcher in the top menu to change between English "
 "and Kiswahili at any time."
-msgstr ""
+msgstr "Ndiyo - tumia kibadilishaji lugha kwenye menyu ya juu kubadili kati ya Kiingereza na Kiswahili wakati wowote."
 
 msgid "How do I report a problem or give feedback?"
-msgstr ""
+msgstr "Ninawezaje kutoa taarifa ya tatizo au maoni?"
 
 msgid ""
 "Farmers can submit a suggestion or complaint from their dashboard, "
 "optionally linked to a specific request. Your Extension Officer will follow "
 "up directly."
-msgstr ""
+msgstr "Wakulima wanaweza kutuma pendekezo au malalamiko kutoka dashibodi yao, ikiwa na hiari ya kuambatanisha na ombi mahususi. Afisa wako wa Ugani atafuatilia moja kwa moja."
 
 msgid "I'm an officer, not a farmer - how do I get an account?"
-msgstr ""
+msgstr "Mimi ni afisa, si mkulima - nifanyeje kupata akaunti?"
 
 msgid ""
 "Officer accounts (Regional, District, Ward, Village, Extension) are created "
 "by a System Administrator. Use the Contact page below to get in touch."
-msgstr ""
+msgstr "Akaunti za maafisa (Mkoa, Wilaya, Kata, Kijiji, Ugani) huundwa na Msimamizi wa Mfumo. Tumia ukurasa wa Mawasiliano hapa chini kuwasiliana nasi."
 
 msgid "Still have a question?"
-msgstr ""
+msgstr "Bado una swali?"
 
 msgid "The Full Picture"
-msgstr ""
+msgstr "Mtazamo Kamili"
 
 msgid ""
 "Two flows run through the system: bulk stock moving down the chain, and "
 "individual farmer requests moving up for approval."
-msgstr ""
+msgstr "Mifumo miwili inapita ndani ya mfumo: hifadhi kubwa ya mbegu ikishuka chini kwenye mnyororo, na maombi binafsi ya wakulima yakipanda juu kwa ajili ya kuthibitishwa."
 
 msgid "1. Stock Flows Down the Chain"
-msgstr ""
+msgstr "1. Hifadhi ya Mbegu Inashuka Chini ya Mnyororo"
 
 msgid ""
 "Only a Regional Officer adds new seed stock into the system. From there, "
 "each level distributes to the one directly below it, strictly within their "
 "own territory:"
-msgstr ""
+msgstr "Ni Afisa wa Mkoa pekee anayeongeza hifadhi mpya ya mbegu kwenye mfumo. Kutoka hapo, kila ngazi husambaza kwa ngazi iliyo chini yake moja kwa moja, ndani ya eneo lake tu:"
 
 msgid ""
 "Adds seed stock received for their region, then distributes it to districts."
-msgstr ""
+msgstr "Huongeza hifadhi ya mbegu iliyopokelewa kwa mkoa wake, kisha huisambaza kwa wilaya."
 
 msgid ""
 "Receives from the region, distributes to wards within their own district."
-msgstr ""
+msgstr "Hupokea kutoka mkoani, husambaza kwa kata ndani ya wilaya yake."
 
 msgid ""
 "Receives from the district, distributes to villages within their own ward."
-msgstr ""
+msgstr "Hupokea kutoka wilayani, husambaza kwa vijiji ndani ya kata yake."
 
 msgid ""
 "Receives from the ward - this becomes the real stock used to fulfill farmer "
 "requests."
-msgstr ""
+msgstr "Hupokea kutoka kata - hii ndiyo inakuwa hifadhi halisi inayotumika kutimiza maombi ya wakulima."
 
 msgid ""
 "At any level, an officer can also request stock from the level above instead "
 "of waiting - their parent officer approves or rejects it."
-msgstr ""
+msgstr "Katika ngazi yoyote, afisa anaweza pia kuomba hifadhi kutoka ngazi iliyo juu badala ya kusubiri - afisa wa ngazi ya juu huthibitisha au kukataa ombi hilo."
 
 msgid "2. A Farmer's Request Moves Up for Approval"
-msgstr ""
+msgstr "2. Ombi la Mkulima Linapanda Juu kwa Uthibitisho"
 
-#, fuzzy
-#| msgid "Farmer Registry"
 msgid "Farmer requests"
-msgstr "Orodha ya Wakulima"
+msgstr "Mkulima anaomba"
 
 msgid ""
 "The farmer logs in and requests a seed type and quantity for the current "
 "season."
-msgstr ""
+msgstr "Mkulima huingia na kuomba aina ya mbegu na kiasi kwa msimu wa sasa."
 
 msgid "Extension Officer verifies"
-msgstr ""
+msgstr "Afisa Ugani athibitisha"
 
 msgid ""
 "The ward's Extension Officer reviews and verifies the request before it can "
 "proceed."
-msgstr ""
+msgstr "Afisa Ugani wa kata hukagua na kuthibitisha ombi kabla halijaendelea."
 
-#, fuzzy
-#| msgid "Village Officer"
 msgid "Village Officer fulfills"
-msgstr "Afisa wa Kijiji"
+msgstr "Afisa wa Kijiji atimiza"
 
 msgid ""
 "The Village Officer fulfills it against their real, current stock balance - "
 "never more than what's actually available."
-msgstr ""
+msgstr "Afisa wa Kijiji hutimiza ombi kulingana na salio halisi la hifadhi ya sasa - kamwe si zaidi ya kilichopo kwa uhalisia."
 
-#, fuzzy
-#| msgid "Confirm Receipt"
 msgid "Farmer confirms receipt"
-msgstr "Thibitisha Kupokea"
+msgstr "Mkulima athibitisha kupokea"
 
 msgid ""
 "Once collected, the farmer confirms it themselves from their own account, "
 "closing the loop."
-msgstr ""
+msgstr "Baada ya kuchukua, mkulima mwenyewe huthibitisha kutoka akaunti yake, akikamilisha mzunguko."
 
 msgid ""
 "A farmer can only have one active request per seed type per season, and an "
 "SMS notification is sent the moment it's ready for collection."
-msgstr ""
+msgstr "Mkulima anaweza kuwa na ombi moja tu linaloendelea kwa kila aina ya mbegu kwa msimu, na ujumbe wa SMS hutumwa mara ombi linapokuwa tayari kuchukuliwa."
 
-#, fuzzy
-#| msgid "Feedback"
 msgid "3. Feedback Loop"
-msgstr "Maoni"
+msgstr "3. Mzunguko wa Maoni"
 
 msgid ""
 "At any point, a farmer can raise a suggestion or complaint - optionally tied "
 "to a specific request - and their Extension Officer resolves it directly."
-msgstr ""
+msgstr "Wakati wowote, mkulima anaweza kutoa pendekezo au malalamiko - kwa hiari ikiambatanishwa na ombi mahususi - na Afisa wake wa Ugani hutatua moja kwa moja."
 
 msgid "See it for yourself"
-msgstr ""
+msgstr "Jionee mwenyewe"
 
 msgid "Jisajili - Register as a Farmer"
 msgstr "Jisajili - Sajili kama Mkulima"
 
 msgid "Read the FAQ"
-msgstr ""
+msgstr "Soma Maswali Yanayoulizwa Mara kwa Mara"
 
 msgid "Digital Seed Distribution for Every Farmer"
-msgstr ""
+msgstr "Usambazaji wa Kidijitali wa Mbegu kwa Kila Mkulima"
 
 msgid "Mbeya Region, Tanzania"
 msgstr "Mkoa wa Mbeya, Tanzania"
 
 msgid "From Government Store to Farmer's Hand —"
-msgstr ""
+msgstr "Kutoka Ghala la Serikali Hadi Mkononi mwa Mkulima —"
 
 msgid "Every Seed, Tracked."
-msgstr ""
+msgstr "Kila Mbegu, Inafuatiliwa."
 
 msgid ""
 "A digital pipeline connecting Regional Officers, District Officers, Ward "
 "Officers, Village Officers, Extension Officers and Farmers — so every seed "
 "distributed reaches the right hands, on record, every season."
-msgstr ""
+msgstr "Mfumo wa kidijitali unaounganisha Maafisa wa Mkoa, Maafisa wa Wilaya, Maafisa wa Kata, Maafisa wa Kijiji, Maafisa wa Ugani na Wakulima — ili kila mbegu inayosambazwa ifikie mikono sahihi, ikiwa na kumbukumbu, kila msimu."
 
-#, fuzzy
-#| msgid "Sign In"
 msgid "Officer Sign In"
-msgstr "Ingia"
+msgstr "Kuingia kwa Afisa"
 
-#, fuzzy
-#| msgid "Farmer Registry"
 msgid "Farmers Registered"
-msgstr "Orodha ya Wakulima"
+msgstr "Wakulima Waliosajiliwa"
 
-#, fuzzy
-#| msgid "Villages"
 msgid "Villages Covered"
-msgstr "Vijiji"
+msgstr "Vijiji Vinavyofikiwa"
 
-#, fuzzy
-#| msgid "District"
 msgid "Districts"
 msgstr "Wilaya"
 
-#, fuzzy
-#| msgid "Seed Details"
 msgid "Seed Varieties"
-msgstr "Maelezo ya Mbegu"
+msgstr "Aina za Mbegu"
 
-#, fuzzy
-#| msgid "Distributed"
 msgid "kg Distributed"
-msgstr "Imesambazwa"
+msgstr "kg Zilizosambazwa"
 
 msgid "The Journey of a Seed"
-msgstr ""
+msgstr "Safari ya Mbegu"
 
 msgid "One clear pipeline, from request to receipt."
-msgstr ""
+msgstr "Njia moja wazi, kuanzia ombi hadi upokeaji."
 
-#, fuzzy
-#| msgid "Registered"
 msgid "Register"
-msgstr "Amesajiliwa"
+msgstr "Jisajili"
 
 msgid "A farmer registers themselves, or their Village Officer registers them."
-msgstr ""
+msgstr "Mkulima hujisajili mwenyewe, au Afisa wake wa Kijiji humsajili."
 
 msgid ""
 "The farmer requests a seed type for the season, straight from their own "
 "login."
-msgstr ""
+msgstr "Mkulima huomba aina ya mbegu kwa msimu, moja kwa moja kutoka akaunti yake mwenyewe."
 
 msgid "Their Extension Officer verifies the request before it moves forward."
-msgstr ""
+msgstr "Afisa wake wa Ugani huthibitisha ombi kabla halijaendelea."
 
-#, fuzzy
-#| msgid "Received"
 msgid "Receive"
-msgstr "Zilizopokelewa"
+msgstr "Pokea"
 
 msgid ""
 "The Village Officer fulfills it from real stock, and the farmer confirms "
 "receipt."
-msgstr ""
+msgstr "Afisa wa Kijiji hutimiza kutoka hifadhi halisi, na mkulima huthibitisha kupokea."
 
 msgid "See the Full Picture"
-msgstr ""
+msgstr "Ona Mtazamo Kamili"
 
 msgid "Built for Everyone in the Chain"
-msgstr ""
+msgstr "Imejengwa kwa Kila Mtu Ndani ya Mnyororo"
 
 msgid "One System, Every Role"
-msgstr ""
+msgstr "Mfumo Mmoja, Kila Jukumu"
 
 msgid ""
 "Register, request seeds, track status, confirm receipt and give feedback - "
 "all from one account."
-msgstr ""
+msgstr "Jisajili, omba mbegu, fuatilia hali, thibitisha upokeaji na toa maoni - yote kutoka akaunti moja."
 
-#, fuzzy
-#| msgid "Regional Officer"
 msgid "Extension Officers"
-msgstr "Afisa wa Mkoa"
+msgstr "Maafisa wa Ugani"
 
 msgid ""
 "Verify farmer requests, help farmers use the system, and resolve complaints "
 "in their ward."
-msgstr ""
+msgstr "Thibitisha maombi ya wakulima, saidia wakulima kutumia mfumo, na tatua malalamiko katika kata yao."
 
-#, fuzzy
-#| msgid "Village Officer"
 msgid "Village & Ward Officers"
-msgstr "Afisa wa Kijiji"
+msgstr "Maafisa wa Kijiji na Kata"
 
 msgid ""
 "Move real stock down the chain and fulfill farmer requests against actual "
 "balances."
-msgstr ""
+msgstr "Sogeza hifadhi halisi chini ya mnyororo na timiza maombi ya wakulima kulingana na salio halisi."
 
-#, fuzzy
-#| msgid "Regional Officer"
 msgid "District & Regional Officers"
-msgstr "Afisa wa Mkoa"
+msgstr "Maafisa wa Wilaya na Mkoa"
 
 msgid ""
 "Reports scoped to your own territory, downloadable as PDF, with full audit "
 "trails."
-msgstr ""
+msgstr "Ripoti zilizofungwa kwenye eneo lako, zinazopakuliwa kama PDF, zenye kumbukumbu kamili za ukaguzi."
 
 msgid "Ready to get started?"
-msgstr ""
+msgstr "Uko tayari kuanza?"
 
 msgid "Join the Mbeya Seed Tracker today - it takes less than two minutes."
-msgstr ""
+msgstr "Jiunge na Mbeya Seed Tracker leo - inachukua chini ya dakika mbili."
 
-#, fuzzy
-#| msgid "Jisajili / Register"
 msgid "Jisajili Sasa"
-msgstr "Jisajili"
+msgstr "Jisajili Sasa"
 
-#, fuzzy
-#| msgid "Back to List"
 msgid "Talk to Us"
-msgstr "Rudi kwenye Orodha"
+msgstr "Zungumza Nasi"
 
 msgid "Jisajili - Farmer Registration"
 msgstr "Jisajili - Usajili wa Mkulima"
