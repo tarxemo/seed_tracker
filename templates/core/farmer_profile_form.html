@@ -1,6 +1,7 @@
 {% extends 'base.html' %}
+{% load i18n %}
 {% block title %}My Profile - Seed Tracker{% endblock %}
-{% block page_title %}My Farm Information{% endblock %}
+{% block page_title %}{% trans "My Farm Information" %}{% endblock %}
 {% block content %}
 <div class="row justify-content-center">
   <div class="col-lg-7">
@@ -10,18 +11,18 @@
       <form method="post">
         {% csrf_token %}
         <div class="row g-3">
-          <div class="col-md-6"><label class="form-label">Phone Number</label>{{ form.phone_number }}</div>
-          <div class="col-md-6"><label class="form-label">Main Crop</label>{{ form.crop_type }}</div>
-          <div class="col-md-6"><label class="form-label">Farm Location</label>{{ form.farm_location }}</div>
-          <div class="col-md-6"><label class="form-label">Farm Size (Acres)</label>{{ form.farm_size }}</div>
-          <div class="col-12"><label class="form-label">National ID</label>{{ form.national_id }}</div>
+          <div class="col-md-6"><label class="form-label">{% trans "Phone Number" %}</label>{{ form.phone_number }}</div>
+          <div class="col-md-6"><label class="form-label">{% trans "Main Crop" %}</label>{{ form.crop_type }}</div>
+          <div class="col-md-6"><label class="form-label">{% trans "Farm Location" %}</label>{{ form.farm_location }}</div>
+          <div class="col-md-6"><label class="form-label">{% trans "Farm Size (Acres)" %}</label>{{ form.farm_size }}</div>
+          <div class="col-12"><label class="form-label">{% trans "National ID" %}</label>{{ form.national_id }}</div>
         </div>
         {% if form.errors %}
         <div class="alert alert-danger mt-3">{% for field, errs in form.errors.items %}{% for e in errs %}<div>{{ e }}</div>{% endfor %}{% endfor %}</div>
         {% endif %}
         <div class="d-flex gap-2 mt-4">
-          <button type="submit" class="btn btn-primary"><i class="fas fa-save me-1"></i>Save</button>
-          <a href="{% url 'farmer_dashboard' %}" class="btn btn-outline-secondary">Cancel</a>
+          <button type="submit" class="btn btn-primary"><i class="fas fa-save me-1"></i>{% trans "Save" %}</button>
+          <a href="{% url 'farmer_dashboard' %}" class="btn btn-outline-secondary">{% trans "Cancel" %}</a>
         </div>
       </form>
     </div>

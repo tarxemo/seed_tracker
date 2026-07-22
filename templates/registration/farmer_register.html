@@ -1,5 +1,6 @@
+{% load i18n %}
 <!DOCTYPE html>
-<html lang="en">
+<html lang="{{ LANGUAGE_CODE }}">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -25,9 +26,22 @@
 <body>
 <div class="register-wrapper">
   <div class="register-card">
+    <div class="d-flex justify-content-end mb-2">
+      <form action="{% url 'set_language' %}" method="post">
+        {% csrf_token %}
+        <input type="hidden" name="next" value="{{ request.get_full_path }}">
+        <select name="language" onchange="this.form.submit()" class="form-select form-select-sm" style="font-size:12px;width:auto;">
+          {% get_current_language as CURRENT_LANGUAGE %}
+          {% get_available_languages as AVAILABLE_LANGUAGES %}
+          {% for lang_code, lang_name in AVAILABLE_LANGUAGES %}
+          <option value="{{ lang_code }}" {% if lang_code == CURRENT_LANGUAGE %}selected{% endif %}>{{ lang_name }}</option>
+          {% endfor %}
+        </select>
+      </form>
+    </div>
     <div class="register-logo"><i class="fas fa-user-plus"></i></div>
-    <h1 class="register-title">Jisajili - Farmer Registration</h1>
-    <p class="register-subtitle">Create your account to request seeds, track allocations and give feedback.</p>
+    <h1 class="register-title">{% trans "Jisajili - Farmer Registration" %}</h1>
+    <p class="register-subtitle">{% trans "Create your account to request seeds, track allocations and give feedback." %}</p>
 
     {% if form.non_field_errors %}
     <div class="alert alert-danger" style="border-radius:10px;font-size:13px;">{{ form.non_field_errors }}</div>
@@ -35,30 +49,37 @@
 
     <form method="post">
       {% csrf_token %}
-      <div class="section-label">Account</div>
+      <div class="section-label">{% trans "Account" %}</div>
       <div class="row g-3">
         <div class="col-md-6">
-          <label class="form-label">Username *</label>{{ form.username }}
+          <label class="form-label">{% trans "Username" %} *</label>{{ form.username }}
           {% for e in form.username.errors %}<div class="text-danger" style="font-size:12px">{{ e }}</div>{% endfor %}
         </div>
-        <div class="col-md-6"><label class="form-label">Phone Number *</label>{{ form.phone_number }}</div>
+        <div class="col-md-6"><label class="form-label">{% trans "Phone Number" %} *</label>{{ form.phone_number }}</div>
+        <div class="col-md-6"><label class="form-label">{{ form.email.label }}</label>{{ form.email }}</div>
         <div class="col-md-6">
-          <label class="form-label">Password *</label>{{ form.password1 }}
+          <label class="form-label">{% trans "Password" %} *</label>
+          <div class="position-relative">{{ form.password1 }}
+            <button type="button" class="btn btn-sm position-absolute top-50 end-0 translate-middle-y me-1 border-0 bg-transparent toggle-password" data-target="id_password1" tabindex="-1" style="color:#7a8494;z-index:5"><i class="fas fa-eye"></i></button>
+          </div>
         </div>
         <div class="col-md-6">
-          <label class="form-label">Confirm Password *</label>{{ form.password2 }}
+          <label class="form-label">{% trans "Confirm Password" %} *</label>
+          <div class="position-relative">{{ form.password2 }}
+            <button type="button" class="btn btn-sm position-absolute top-50 end-0 translate-middle-y me-1 border-0 bg-transparent toggle-password" data-target="id_password2" tabindex="-1" style="color:#7a8494;z-index:5"><i class="fas fa-eye"></i></button>
+          </div>
         </div>
       </div>
 
-      <div class="section-label">Your Details</div>
+      <div class="section-label">{% trans "Your Details" %}</div>
       <div class="row g-3">
-        <div class="col-md-6"><label class="form-label">First Name *</label>{{ form.first_name }}</div>
-        <div class="col-md-6"><label class="form-label">Last Name *</label>{{ form.last_name }}</div>
-        <div class="col-md-6"><label class="form-label">Village *</label>{{ form.village }}</div>
-        <div class="col-md-6"><label class="form-label">Main Crop *</label>{{ form.crop_type }}</div>
-        <div class="col-md-6"><label class="form-label">Farm Location</label>{{ form.farm_location }}</div>
-        <div class="col-md-6"><label class="form-label">Farm Size (Acres)</label>{{ form.farm_size }}</div>
-        <div class="col-12"><label class="form-label">National ID</label>{{ form.national_id }}</div>
+        <div class="col-md-6"><label class="form-label">{% trans "First Name" %} *</label>{{ form.first_name }}</div>
+        <div class="col-md-6"><label class="form-label">{% trans "Last Name" %} *</label>{{ form.last_name }}</div>
+        <div class="col-md-6"><label class="form-label">{% trans "Village" %} *</label>{{ form.village }}</div>
+        <div class="col-md-6"><label class="form-label">{% trans "Main Crop" %} *</label>{{ form.crop_type }}</div>
+        <div class="col-md-6"><label class="form-label">{% trans "Farm Location" %}</label>{{ form.farm_location }}</div>
+        <div class="col-md-6"><label class="form-label">{% trans "Farm Size (Acres)" %}</label>{{ form.farm_size }}</div>
+        <div class="col-12"><label class="form-label">{% trans "National ID" %}</label>{{ form.national_id }}</div>
       </div>
 
       {% if form.errors %}
@@ -67,12 +88,23 @@
       </div>
       {% endif %}
 
-      <button type="submit" class="btn btn-register mt-4"><i class="fas fa-check me-2"></i>Jisajili / Register</button>
+      <button type="submit" class="btn btn-register mt-4"><i class="fas fa-check me-2"></i>{% trans "Jisajili / Register" %}</button>
     </form>
     <div class="register-footer">
-      Already have an account? <a href="{% url 'login' %}" style="color:#1a6b3c;font-weight:600">Sign in</a>
+      {% trans "Already have an account?" %} <a href="{% url 'login' %}" style="color:#1a6b3c;font-weight:600">{% trans "Sign in" %}</a>
     </div>
   </div>
 </div>
+<script>
+document.querySelectorAll('.toggle-password').forEach(function(btn) {
+  btn.addEventListener('click', function() {
+    var input = document.getElementById(btn.dataset.target);
+    var icon = btn.querySelector('i');
+    if (!input) return;
+    if (input.type === 'password') { input.type = 'text'; icon.classList.remove('fa-eye'); icon.classList.add('fa-eye-slash'); }
+    else { input.type = 'password'; icon.classList.remove('fa-eye-slash'); icon.classList.add('fa-eye'); }
+  });
+});
+</script>
 </body>
 </html>

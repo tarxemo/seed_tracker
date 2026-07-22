@@ -1,30 +1,31 @@
 {% extends 'base.html' %}
+{% load i18n %}
 {% block title %}Seed Requests - Seed Tracker{% endblock %}
-{% block page_title %}Seed Requests{% endblock %}
+{% block page_title %}{% trans "Seed Requests" %}{% endblock %}
 {% block content %}
 <div class="page-header">
-  <h4><i class="fas fa-hand-holding me-2" style="color:#1a6b3c"></i>Seed Requests <small style="font-size:14px;color:#7a8494;font-weight:400">({{ page_obj.paginator.count }} total)</small></h4>
+  <h4><i class="fas fa-hand-holding me-2" style="color:#1a6b3c"></i>{% trans "Seed Requests" %} <small style="font-size:14px;color:#7a8494;font-weight:400">({{ page_obj.paginator.count }} {% trans "total" %})</small></h4>
   {% if user.role == 'farmer' or user.role == 'extension' %}
-  <a href="{% url 'seed_request_create' %}" class="btn btn-primary btn-sm"><i class="fas fa-plus me-1"></i>New Request</a>
+  <a href="{% url 'seed_request_create' %}" class="btn btn-primary btn-sm"><i class="fas fa-plus me-1"></i>{% trans "New Request" %}</a>
   {% endif %}
 </div>
 <div class="table-card">
   <div class="table-header">
     <form method="get" class="d-flex gap-2 flex-wrap">
       <select name="status" class="form-select form-select-sm" style="width:170px">
-        <option value="">All Status</option>
-        <option value="submitted" {% if status_filter == 'submitted' %}selected{% endif %}>Submitted</option>
-        <option value="verified" {% if status_filter == 'verified' %}selected{% endif %}>Verified</option>
-        <option value="rejected" {% if status_filter == 'rejected' %}selected{% endif %}>Rejected</option>
-        <option value="fulfilled" {% if status_filter == 'fulfilled' %}selected{% endif %}>Fulfilled</option>
+        <option value="">{% trans "All Status" %}</option>
+        <option value="submitted" {% if status_filter == 'submitted' %}selected{% endif %}>{% trans "Submitted" %}</option>
+        <option value="verified" {% if status_filter == 'verified' %}selected{% endif %}>{% trans "Verified" %}</option>
+        <option value="rejected" {% if status_filter == 'rejected' %}selected{% endif %}>{% trans "Rejected" %}</option>
+        <option value="fulfilled" {% if status_filter == 'fulfilled' %}selected{% endif %}>{% trans "Fulfilled" %}</option>
       </select>
       <button type="submit" class="btn btn-sm btn-primary"><i class="fas fa-search"></i></button>
-      {% if status_filter %}<a href="{% url 'seed_request_list' %}" class="btn btn-sm btn-outline-secondary">Clear</a>{% endif %}
+      {% if status_filter %}<a href="{% url 'seed_request_list' %}" class="btn btn-sm btn-outline-secondary">{% trans "Clear" %}</a>{% endif %}
     </form>
   </div>
   <div class="table-responsive">
     <table class="data-table">
-      <thead><tr><th>Farmer</th><th>Seed Type</th><th>Season</th><th>Qty Requested</th><th>Status</th><th>Submitted</th><th>Actions</th></tr></thead>
+      <thead><tr><th>{% trans "Farmer" %}</th><th>{% trans "Seed Type" %}</th><th>{% trans "Season" %}</th><th>{% trans "Qty Requested" %}</th><th>{% trans "Status" %}</th><th>{% trans "Submitted" %}</th><th>{% trans "Actions" %}</th></tr></thead>
       <tbody>
         {% for r in page_obj %}
         <tr>
@@ -42,23 +43,23 @@
           <td style="color:#7a8494">{{ r.created_at|date:"d M Y" }}</td>
           <td>
             {% if can_verify and r.status == 'submitted' %}
-            <a href="{% url 'seed_request_verify' r.pk %}" class="btn btn-sm btn-outline-success"><i class="fas fa-check-double me-1"></i>Verify</a>
+            <a href="{% url 'seed_request_verify' r.pk %}" class="btn btn-sm btn-outline-success"><i class="fas fa-check-double me-1"></i>{% trans "Verify" %}</a>
             {% elif can_fulfill and r.status == 'verified' %}
-            <a href="{% url 'seed_request_fulfill' r.pk %}" class="btn btn-sm btn-outline-primary"><i class="fas fa-boxes me-1"></i>Fulfill</a>
+            <a href="{% url 'seed_request_fulfill' r.pk %}" class="btn btn-sm btn-outline-primary"><i class="fas fa-boxes me-1"></i>{% trans "Fulfill" %}</a>
             {% else %}<span class="text-muted">-</span>{% endif %}
           </td>
         </tr>
         {% empty %}
-        <tr><td colspan="7" class="text-center text-muted py-5">No seed requests found</td></tr>
+        <tr><td colspan="7" class="text-center text-muted py-5">{% trans "No seed requests found" %}</td></tr>
         {% endfor %}
       </tbody>
     </table>
   </div>
   {% if page_obj.has_other_pages %}
   <div style="padding:16px 20px;display:flex;justify-content:center;gap:6px">
-    {% if page_obj.has_previous %}<a href="?page={{ page_obj.previous_page_number }}&status={{ status_filter }}" class="btn btn-sm btn-outline-secondary">« Prev</a>{% endif %}
+    {% if page_obj.has_previous %}<a href="?page={{ page_obj.previous_page_number }}&status={{ status_filter }}" class="btn btn-sm btn-outline-secondary">« {% trans "Prev" %}</a>{% endif %}
     <span class="btn btn-sm btn-primary disabled">{{ page_obj.number }} / {{ page_obj.paginator.num_pages }}</span>
-    {% if page_obj.has_next %}<a href="?page={{ page_obj.next_page_number }}&status={{ status_filter }}" class="btn btn-sm btn-outline-secondary">Next »</a>{% endif %}
+    {% if page_obj.has_next %}<a href="?page={{ page_obj.next_page_number }}&status={{ status_filter }}" class="btn btn-sm btn-outline-secondary">{% trans "Next" %} »</a>{% endif %}
   </div>
   {% endif %}
 </div>

@@ -1,0 +1,170 @@
+{% extends 'marketing/base.html' %}
+{% load i18n %}
+{% block title %}Mbeya Seed Tracker - {% trans "Digital Seed Distribution for Every Farmer" %}{% endblock %}
+{% block content %}
+
+<section class="mkt-hero">
+  <div class="mkt-hero-bg">
+    <i class="fas fa-seedling mkt-float mkt-float-1"></i>
+    <i class="fas fa-leaf mkt-float mkt-float-2"></i>
+    <i class="fas fa-wheat-awn mkt-float mkt-float-3"></i>
+    <i class="fas fa-cloud-sun-rain mkt-float mkt-float-4"></i>
+    <i class="fas fa-leaf mkt-float mkt-float-5"></i>
+    <i class="fas fa-seedling mkt-float mkt-float-6"></i>
+    <i class="fas fa-tractor mkt-float mkt-float-7"></i>
+    <i class="fas fa-sun mkt-float mkt-float-8"></i>
+  </div>
+  <div class="mkt-hero-content">
+    <span class="mkt-hero-badge"><i class="fas fa-map-marker-alt me-1"></i>{% trans "Mbeya Region, Tanzania" %}</span>
+    <h1 class="mkt-hero-title">
+      {% trans "From Government Store to Farmer's Hand —" %}<br>
+      <span class="mkt-hero-title-accent">{% trans "Every Seed, Tracked." %}</span>
+    </h1>
+    <p class="mkt-hero-subtitle">
+      {% blocktrans %}A digital pipeline connecting Regional Officers, District Officers, Ward Officers, Village Officers, Extension Officers and Farmers — so every seed distributed reaches the right hands, on record, every season.{% endblocktrans %}
+    </p>
+    <div class="mkt-hero-actions">
+      <a href="{% url 'farmer_register' %}" class="btn btn-mkt-primary btn-lg"><i class="fas fa-user-plus me-2"></i>{% trans "Jisajili - Register as a Farmer" %}</a>
+      <a href="{% url 'login' %}" class="btn btn-mkt-ghost btn-lg"><i class="fas fa-sign-in-alt me-2"></i>{% trans "Officer Sign In" %}</a>
+    </div>
+    <a href="#how-it-works" class="mkt-scroll-cue"><i class="fas fa-chevron-down"></i></a>
+  </div>
+</section>
+
+<section class="mkt-stats">
+  <div class="mkt-stats-inner">
+    <div class="mkt-stat">
+      <div class="mkt-stat-value" data-count="{{ stats.farmers }}">0</div>
+      <div class="mkt-stat-label"><i class="fas fa-users me-1"></i>{% trans "Farmers Registered" %}</div>
+    </div>
+    <div class="mkt-stat">
+      <div class="mkt-stat-value" data-count="{{ stats.villages }}">0</div>
+      <div class="mkt-stat-label"><i class="fas fa-map-marker-alt me-1"></i>{% trans "Villages Covered" %}</div>
+    </div>
+    <div class="mkt-stat">
+      <div class="mkt-stat-value" data-count="{{ stats.districts }}">0</div>
+      <div class="mkt-stat-label"><i class="fas fa-map me-1"></i>{% trans "Districts" %}</div>
+    </div>
+    <div class="mkt-stat">
+      <div class="mkt-stat-value" data-count="{{ stats.seed_types }}">0</div>
+      <div class="mkt-stat-label"><i class="fas fa-leaf me-1"></i>{% trans "Seed Varieties" %}</div>
+    </div>
+    <div class="mkt-stat">
+      <div class="mkt-stat-value" data-count="{{ stats.distributed|floatformat:0 }}">0</div>
+      <div class="mkt-stat-label"><i class="fas fa-truck me-1"></i>{% trans "kg Distributed" %}</div>
+    </div>
+  </div>
+</section>
+
+<section class="mkt-section" id="how-it-works">
+  <div class="mkt-section-inner">
+    <div class="mkt-section-header">
+      <span class="mkt-eyebrow">{% trans "The Journey of a Seed" %}</span>
+      <h2>{% trans "How It Works" %}</h2>
+      <p>{% trans "One clear pipeline, from request to receipt." %}</p>
+    </div>
+    <div class="mkt-steps">
+      <div class="mkt-step">
+        <div class="mkt-step-icon"><i class="fas fa-user-plus"></i></div>
+        <div class="mkt-step-num">1</div>
+        <h3>{% trans "Register" %}</h3>
+        <p>{% trans "A farmer registers themselves, or their Village Officer registers them." %}</p>
+      </div>
+      <div class="mkt-step-arrow"><i class="fas fa-arrow-right"></i></div>
+      <div class="mkt-step">
+        <div class="mkt-step-icon"><i class="fas fa-hand-holding-heart"></i></div>
+        <div class="mkt-step-num">2</div>
+        <h3>{% trans "Request" %}</h3>
+        <p>{% trans "The farmer requests a seed type for the season, straight from their own login." %}</p>
+      </div>
+      <div class="mkt-step-arrow"><i class="fas fa-arrow-right"></i></div>
+      <div class="mkt-step">
+        <div class="mkt-step-icon"><i class="fas fa-clipboard-check"></i></div>
+        <div class="mkt-step-num">3</div>
+        <h3>{% trans "Verify" %}</h3>
+        <p>{% trans "Their Extension Officer verifies the request before it moves forward." %}</p>
+      </div>
+      <div class="mkt-step-arrow"><i class="fas fa-arrow-right"></i></div>
+      <div class="mkt-step">
+        <div class="mkt-step-icon"><i class="fas fa-boxes"></i></div>
+        <div class="mkt-step-num">4</div>
+        <h3>{% trans "Receive" %}</h3>
+        <p>{% trans "The Village Officer fulfills it from real stock, and the farmer confirms receipt." %}</p>
+      </div>
+    </div>
+    <div class="text-center mt-4">
+      <a href="{% url 'how_it_works' %}" class="btn btn-mkt-outline">{% trans "See the Full Picture" %}<i class="fas fa-arrow-right ms-2"></i></a>
+    </div>
+  </div>
+</section>
+
+<section class="mkt-section mkt-section-alt">
+  <div class="mkt-section-inner">
+    <div class="mkt-section-header">
+      <span class="mkt-eyebrow">{% trans "Built for Everyone in the Chain" %}</span>
+      <h2>{% trans "One System, Every Role" %}</h2>
+    </div>
+    <div class="mkt-features">
+      <div class="mkt-feature">
+        <div class="mkt-feature-icon" style="background:#e8f5ee;color:#1a6b3c"><i class="fas fa-seedling"></i></div>
+        <h3>{% trans "Farmers" %}</h3>
+        <p>{% trans "Register, request seeds, track status, confirm receipt and give feedback - all from one account." %}</p>
+      </div>
+      <div class="mkt-feature">
+        <div class="mkt-feature-icon" style="background:#fff8e6;color:#f0a500"><i class="fas fa-user-tie"></i></div>
+        <h3>{% trans "Extension Officers" %}</h3>
+        <p>{% trans "Verify farmer requests, help farmers use the system, and resolve complaints in their ward." %}</p>
+      </div>
+      <div class="mkt-feature">
+        <div class="mkt-feature-icon" style="background:#e3f2fd;color:#1976d2"><i class="fas fa-dolly"></i></div>
+        <h3>{% trans "Village & Ward Officers" %}</h3>
+        <p>{% trans "Move real stock down the chain and fulfill farmer requests against actual balances." %}</p>
+      </div>
+      <div class="mkt-feature">
+        <div class="mkt-feature-icon" style="background:#fce4ec;color:#c62828"><i class="fas fa-chart-bar"></i></div>
+        <h3>{% trans "District & Regional Officers" %}</h3>
+        <p>{% trans "Reports scoped to your own territory, downloadable as PDF, with full audit trails." %}</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="mkt-cta">
+  <div class="mkt-cta-inner">
+    <h2>{% trans "Ready to get started?" %}</h2>
+    <p>{% trans "Join the Mbeya Seed Tracker today - it takes less than two minutes." %}</p>
+    <div class="mkt-hero-actions justify-content-center">
+      <a href="{% url 'farmer_register' %}" class="btn btn-mkt-primary btn-lg"><i class="fas fa-user-plus me-2"></i>{% trans "Jisajili Sasa" %}</a>
+      <a href="{% url 'contact' %}" class="btn btn-mkt-ghost btn-lg"><i class="fas fa-envelope me-2"></i>{% trans "Talk to Us" %}</a>
+    </div>
+  </div>
+</section>
+
+{% endblock %}
+{% block extra_js %}
+<script>
+document.querySelectorAll('.mkt-stat-value').forEach(function(el) {
+  var target = parseInt(el.dataset.count, 10) || 0;
+  var duration = 1400;
+  var started = false;
+  function animate() {
+    if (started) return;
+    started = true;
+    var startTime = null;
+    function step(ts) {
+      if (!startTime) startTime = ts;
+      var progress = Math.min((ts - startTime) / duration, 1);
+      var eased = 1 - Math.pow(1 - progress, 3);
+      el.textContent = Math.floor(eased * target).toLocaleString();
+      if (progress < 1) requestAnimationFrame(step);
+      else el.textContent = target.toLocaleString();
+    }
+    requestAnimationFrame(step);
+  }
+  var observer = new IntersectionObserver(function(entries) {
+    entries.forEach(function(entry) { if (entry.isIntersecting) animate(); });
+  }, { threshold: 0.3 });
+  observer.observe(el);
+});
+</script>
+{% endblock %}

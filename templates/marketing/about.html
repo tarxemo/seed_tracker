@@ -1,0 +1,53 @@
+{% extends 'marketing/base.html' %}
+{% load i18n %}
+{% block title %}{% trans "About" %} - Mbeya Seed Tracker{% endblock %}
+{% block content %}
+
+<section class="mkt-page-header">
+  <div class="mkt-page-header-inner">
+    <span class="mkt-eyebrow">{% trans "About the Programme" %}</span>
+    <h1>{% trans "Digitizing Seed Distribution in Mbeya" %}</h1>
+    <p>{% blocktrans %}Mbeya Seed Tracker exists to make government seed distribution transparent, accountable and fast — from the moment seed stock arrives in the region to the moment a farmer confirms it in their own hands.{% endblocktrans %}</p>
+  </div>
+</section>
+
+<section class="mkt-section">
+  <div class="mkt-section-inner mkt-narrow">
+    <h2>{% trans "Our Purpose" %}</h2>
+    <p>{% blocktrans %}Smallholder farmers depend on receiving the right seed, in the right quantity, at the right time. When distribution is tracked on paper across five organizational levels, records get lost, quantities get disputed, and farmers are left waiting without answers. This system replaces that paper trail with a single, auditable record that every level of the chain can see - scoped strictly to their own territory.{% endblocktrans %}</p>
+
+    <h2 class="mt-5">{% trans "How the System is Organized" %}</h2>
+    <p>{% trans "Every account belongs to one of these roles, each scoped to their own part of the region:" %}</p>
+    <div class="mkt-org-chain">
+      <div class="mkt-org-node"><i class="fas fa-map-marked-alt"></i><span>{% trans "Regional Officer" %}</span></div>
+      <div class="mkt-org-arrow"><i class="fas fa-chevron-right"></i></div>
+      <div class="mkt-org-node"><i class="fas fa-map"></i><span>{% trans "District Officer" %}</span></div>
+      <div class="mkt-org-arrow"><i class="fas fa-chevron-right"></i></div>
+      <div class="mkt-org-node"><i class="fas fa-map-pin"></i><span>{% trans "Ward Officer" %}</span></div>
+      <div class="mkt-org-arrow"><i class="fas fa-chevron-right"></i></div>
+      <div class="mkt-org-node"><i class="fas fa-dolly"></i><span>{% trans "Village Officer" %}</span></div>
+      <div class="mkt-org-arrow"><i class="fas fa-chevron-right"></i></div>
+      <div class="mkt-org-node"><i class="fas fa-seedling"></i><span>{% trans "Farmer" %}</span></div>
+    </div>
+    <p class="mt-3">{% blocktrans %}Alongside this chain, an Agricultural Extension Officer (Bwana Shamba) works at ward level - verifying farmer requests and helping farmers use the system, without handling bulk stock themselves.{% endblocktrans %}</p>
+
+    <h2 class="mt-5">{% trans "What the System Tracks" %}</h2>
+    <ul class="mkt-checklist">
+      <li><i class="fas fa-check-circle"></i>{% trans "Seed stock received at regional level, and every hand-off down to village level" %}</li>
+      <li><i class="fas fa-check-circle"></i>{% trans "Every farmer request, who verified it, and who fulfilled it" %}</li>
+      <li><i class="fas fa-check-circle"></i>{% trans "Actual confirmed collection by the farmer - not just a paper signature" %}</li>
+      <li><i class="fas fa-check-circle"></i>{% trans "A full activity log for accountability at every level" %}</li>
+    </ul>
+  </div>
+</section>
+
+<section class="mkt-cta">
+  <div class="mkt-cta-inner">
+    <h2>{% trans "Want to see it in action?" %}</h2>
+    <div class="mkt-hero-actions justify-content-center">
+      <a href="{% url 'how_it_works' %}" class="btn btn-mkt-primary btn-lg">{% trans "See How It Works" %}</a>
+      <a href="{% url 'contact' %}" class="btn btn-mkt-ghost btn-lg">{% trans "Contact Us" %}</a>
+    </div>
+  </div>
+</section>
+{% endblock %}

@@ -1,5 +1,6 @@
+{% load i18n %}
 <!DOCTYPE html>
-<html lang="en">
+<html lang="{{ LANGUAGE_CODE }}">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -161,82 +162,82 @@
   </div>
   <nav class="sidebar-nav">
     {% if user.role == 'farmer' %}
-    <div class="nav-section-label">Mkulima</div>
+    <div class="nav-section-label">{% trans "Farmer" %}</div>
     <a href="{% url 'farmer_dashboard' %}" class="nav-link {% if request.resolver_match.url_name == 'farmer_dashboard' %}active{% endif %}">
-      <i class="fas fa-tachometer-alt"></i> Dashboard
+      <i class="fas fa-tachometer-alt"></i> {% trans "Dashboard" %}
     </a>
     <a href="{% url 'farmer_profile_edit' %}" class="nav-link {% if 'profile' in request.resolver_match.url_name %}active{% endif %}">
-      <i class="fas fa-tractor"></i> My Farm Info
+      <i class="fas fa-tractor"></i> {% trans "My Farm Info" %}
     </a>
     <a href="{% url 'seed_request_create' %}" class="nav-link {% if request.resolver_match.url_name == 'seed_request_create' %}active{% endif %}">
-      <i class="fas fa-hand-holding-heart"></i> Omba Mbegu
+      <i class="fas fa-hand-holding-heart"></i> {% trans "Request Seeds" %}
     </a>
     <a href="{% url 'seed_request_list' %}" class="nav-link {% if request.resolver_match.url_name == 'seed_request_list' %}active{% endif %}">
-      <i class="fas fa-hand-holding"></i> My Requests
+      <i class="fas fa-hand-holding"></i> {% trans "My Requests" %}
     </a>
     <a href="{% url 'allocation_list' %}" class="nav-link {% if 'allocation' in request.resolver_match.url_name %}active{% endif %}">
-      <i class="fas fa-boxes"></i> My Allocations
+      <i class="fas fa-boxes"></i> {% trans "My Allocations" %}
     </a>
     <a href="{% url 'feedback_list' %}" class="nav-link {% if 'feedback' in request.resolver_match.url_name %}active{% endif %}">
-      <i class="fas fa-comment-dots"></i> Maoni / Feedback
+      <i class="fas fa-comment-dots"></i> {% trans "Feedback" %}
     </a>
     {% else %}
-    <div class="nav-section-label">Main</div>
+    <div class="nav-section-label">{% trans "Main" %}</div>
     <a href="{% url 'dashboard' %}" class="nav-link {% if request.resolver_match.url_name == 'dashboard' %}active{% endif %}">
-      <i class="fas fa-tachometer-alt"></i> Dashboard
+      <i class="fas fa-tachometer-alt"></i> {% trans "Dashboard" %}
     </a>
 
-    <div class="nav-section-label">Operations</div>
+    <div class="nav-section-label">{% trans "Operations" %}</div>
     <a href="{% url 'farmer_list' %}" class="nav-link {% if 'farmer' in request.resolver_match.url_name %}active{% endif %}">
-      <i class="fas fa-users"></i> Farmers
+      <i class="fas fa-users"></i> {% trans "Farmers" %}
     </a>
     {% if user.role == 'regional' or user.role == 'admin' %}
     <a href="{% url 'inventory_list' %}" class="nav-link {% if 'inventory' in request.resolver_match.url_name %}active{% endif %}">
-      <i class="fas fa-warehouse"></i> Seed Inventory
+      <i class="fas fa-warehouse"></i> {% trans "Seed Inventory" %}
     </a>
     {% endif %}
     <a href="{% url 'allocation_list' %}" class="nav-link {% if 'allocation' in request.resolver_match.url_name %}active{% endif %}">
-      <i class="fas fa-boxes"></i> Allocations
+      <i class="fas fa-boxes"></i> {% trans "Allocations" %}
     </a>
     <a href="{% url 'seed_request_list' %}" class="nav-link {% if 'seed_request' in request.resolver_match.url_name %}active{% endif %}">
-      <i class="fas fa-hand-holding"></i> Seed Requests
+      <i class="fas fa-hand-holding"></i> {% trans "Seed Requests" %}
     </a>
     <a href="{% url 'distribution_list' %}" class="nav-link {% if 'distribution' in request.resolver_match.url_name %}active{% endif %}">
-      <i class="fas fa-truck"></i> Distribution
+      <i class="fas fa-truck"></i> {% trans "Distribution" %}
     </a>
     <a href="{% url 'feedback_list' %}" class="nav-link {% if 'feedback' in request.resolver_match.url_name %}active{% endif %}">
-      <i class="fas fa-comment-dots"></i> Complaints
+      <i class="fas fa-comment-dots"></i> {% trans "Complaints" %}
     </a>
     {% if user.role != 'extension' %}
     <a href="{% url 'stock_list' %}" class="nav-link {% if 'stock' in request.resolver_match.url_name %}active{% endif %}">
-      <i class="fas fa-dolly"></i> Stock Transfers
+      <i class="fas fa-dolly"></i> {% trans "Stock Transfers" %}
     </a>
     {% endif %}
 
-    <div class="nav-section-label">Analytics</div>
+    <div class="nav-section-label">{% trans "Analytics" %}</div>
     <a href="{% url 'reports' %}" class="nav-link {% if 'report' in request.resolver_match.url_name %}active{% endif %}">
-      <i class="fas fa-chart-bar"></i> Reports
+      <i class="fas fa-chart-bar"></i> {% trans "Reports" %}
     </a>
     <a href="{% url 'sms_logs' %}" class="nav-link {% if 'sms' in request.resolver_match.url_name %}active{% endif %}">
-      <i class="fas fa-sms"></i> SMS Logs
+      <i class="fas fa-sms"></i> {% trans "SMS Logs" %}
     </a>
 
     {% if user.role == 'admin' or user.is_superuser %}
-    <div class="nav-section-label">Administration</div>
+    <div class="nav-section-label">{% trans "Administration" %}</div>
     <a href="{% url 'user_list' %}" class="nav-link {% if 'user' in request.resolver_match.url_name %}active{% endif %}">
-      <i class="fas fa-user-cog"></i> User Management
+      <i class="fas fa-user-cog"></i> {% trans "User Management" %}
     </a>
     <a href="{% url 'seed_type_list' %}" class="nav-link {% if 'seed_type' in request.resolver_match.url_name %}active{% endif %}">
-      <i class="fas fa-leaf"></i> Seed Types
+      <i class="fas fa-leaf"></i> {% trans "Seed Types" %}
     </a>
     <a href="{% url 'season_list' %}" class="nav-link {% if 'season' in request.resolver_match.url_name %}active{% endif %}">
-      <i class="fas fa-calendar-alt"></i> Seasons
+      <i class="fas fa-calendar-alt"></i> {% trans "Seasons" %}
     </a>
     <a href="{% url 'location_manage' %}" class="nav-link {% if 'location' in request.resolver_match.url_name %}active{% endif %}">
-      <i class="fas fa-map-marker-alt"></i> Locations
+      <i class="fas fa-map-marker-alt"></i> {% trans "Locations" %}
     </a>
     <a href="{% url 'activity_logs' %}" class="nav-link {% if 'activity' in request.resolver_match.url_name %}active{% endif %}">
-      <i class="fas fa-history"></i> Activity Logs
+      <i class="fas fa-history"></i> {% trans "Activity Logs" %}
     </a>
     {% endif %}
     {% endif %}
@@ -247,8 +248,8 @@
       <div class="user-name">{{ user.get_full_name|default:user.username }}</div>
       <div class="user-role">{{ user.get_role_display }}</div>
     </div>
-    <a href="{% url 'change_password' %}" title="Change Password" style="color:rgba(255,255,255,.6)"><i class="fas fa-key"></i></a>
-    <a href="{% url 'logout' %}" title="Logout" style="color:rgba(255,255,255,.6)"><i class="fas fa-sign-out-alt"></i></a>
+    <a href="{% url 'change_password' %}" title="{% trans 'Change Password' %}" style="color:rgba(255,255,255,.6)"><i class="fas fa-key"></i></a>
+    <a href="{% url 'logout' %}" title="{% trans 'Logout' %}" style="color:rgba(255,255,255,.6)"><i class="fas fa-sign-out-alt"></i></a>
   </div>
 </div>
 
@@ -257,14 +258,25 @@
     <button class="btn btn-sm d-md-none" onclick="document.getElementById('sidebar').classList.toggle('open')">
       <i class="fas fa-bars"></i>
     </button>
-    <h1 class="page-title">{% block page_title %}Dashboard{% endblock %}</h1>
+    <h1 class="page-title">{% block page_title %}{% trans "Dashboard" %}{% endblock %}</h1>
     <div class="d-flex align-items-center gap-3">
       {% if active_season %}
       <span class="badge" style="background:var(--primary-light);color:var(--primary);font-size:12px;padding:6px 12px;border-radius:20px;">
         <i class="fas fa-calendar-check me-1"></i>{{ active_season.name }}
       </span>
       {% endif %}
-      <span class="text-muted" style="font-size:12px;"><i class="fas fa-map-marker-alt me-1"></i>Mbeya Region</span>
+      <span class="text-muted" style="font-size:12px;"><i class="fas fa-map-marker-alt me-1"></i>{% trans "Mbeya Region" %}</span>
+      <form action="{% url 'set_language' %}" method="post" class="d-flex align-items-center">
+        {% csrf_token %}
+        <input type="hidden" name="next" value="{{ request.get_full_path }}">
+        <select name="language" onchange="this.form.submit()" class="form-select form-select-sm" style="font-size:12px;width:auto;">
+          {% get_current_language as CURRENT_LANGUAGE %}
+          {% get_available_languages as AVAILABLE_LANGUAGES %}
+          {% for lang_code, lang_name in AVAILABLE_LANGUAGES %}
+          <option value="{{ lang_code }}" {% if lang_code == CURRENT_LANGUAGE %}selected{% endif %}>{{ lang_name }}</option>
+          {% endfor %}
+        </select>
+      </form>
     </div>
   </div>
   <div class="content-area">
@@ -282,6 +294,17 @@
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script>
+document.querySelectorAll('.toggle-password').forEach(function(btn) {
+  btn.addEventListener('click', function() {
+    var input = document.getElementById(btn.dataset.target);
+    var icon = btn.querySelector('i');
+    if (!input) return;
+    if (input.type === 'password') { input.type = 'text'; icon.classList.remove('fa-eye'); icon.classList.add('fa-eye-slash'); }
+    else { input.type = 'password'; icon.classList.remove('fa-eye-slash'); icon.classList.add('fa-eye'); }
+  });
+});
+</script>
 {% block extra_js %}{% endblock %}
 </body>
 </html>

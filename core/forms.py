@@ -1,17 +1,18 @@
 from django import forms
 from django.contrib.auth.forms import AuthenticationForm, PasswordChangeForm as DjangoPasswordChangeForm
 from django.contrib.auth.password_validation import validate_password
+from django.utils.translation import gettext_lazy as _
 from .models import *
 
 TARGET_MODEL_BY_ROLE = {
-    'regional': (District, 'region', 'District'),
-    'district': (Ward, 'district', 'Ward'),
-    'ward': (Village, 'ward', 'Village'),
+    'regional': (District, 'region', _('District')),
+    'district': (Ward, 'district', _('Ward')),
+    'ward': (Village, 'ward', _('Village')),
 }
 
 class LoginForm(AuthenticationForm):
-    username = forms.CharField(widget=forms.TextInput(attrs={'class':'form-control','placeholder':'Username'}))
-    password = forms.CharField(widget=forms.PasswordInput(attrs={'class':'form-control','placeholder':'Password'}))
+    username = forms.CharField(label=_('Username'), widget=forms.TextInput(attrs={'class':'form-control','placeholder':'Username'}))
+    password = forms.CharField(label=_('Password'), widget=forms.PasswordInput(attrs={'class':'form-control','placeholder':'Password'}))
 
 class FarmerForm(forms.ModelForm):
     class Meta:
@@ -80,8 +81,8 @@ class DistributionForm(forms.ModelForm):
                 f.widget.attrs.setdefault('class','form-control')
 
 class UserCreateForm(forms.ModelForm):
-    password1 = forms.CharField(label='Password', widget=forms.PasswordInput(attrs={'class':'form-control'}))
-    password2 = forms.CharField(label='Confirm Password', widget=forms.PasswordInput(attrs={'class':'form-control'}))
+    password1 = forms.CharField(label=_('Password'), widget=forms.PasswordInput(attrs={'class':'form-control'}))
+    password2 = forms.CharField(label=_('Confirm Password'), widget=forms.PasswordInput(attrs={'class':'form-control'}))
     class Meta:
         model = CustomUser
         fields = ['username','first_name','last_name','email','role','phone','region','district','ward','village']
@@ -102,9 +103,9 @@ class UserCreateForm(forms.ModelForm):
         password2 = cleaned_data.get('password2')
         if not self.instance.pk:
             if not password1:
-                self.add_error('password1', 'This field is required.')
+                self.add_error('password1', _('This field is required.'))
             if password1 != password2:
-                raise forms.ValidationError("Passwords do not match.")
+                raise forms.ValidationError(_("Passwords do not match."))
             if password1:
                 temp_user = CustomUser(username=cleaned_data.get('username',''), first_name=cleaned_data.get('first_name',''),
                                         last_name=cleaned_data.get('last_name',''), email=cleaned_data.get('email',''))
@@ -117,11 +118,11 @@ class UserCreateForm(forms.ModelForm):
         ward = cleaned_data.get('ward')
         village = cleaned_data.get('village')
         if district and region and district.region_id != region.id:
-            self.add_error('district', 'This district is not in the selected region.')
+            self.add_error('district', _('This district is not in the selected region.'))
         if ward and district and ward.district_id != district.id:
-            self.add_error('ward', 'This ward is not in the selected district.')
+            self.add_error('ward', _('This ward is not in the selected district.'))
         if village and ward and village.ward_id != ward.id:
-            self.add_error('village', 'This village is not in the selected ward.')
+            self.add_error('village', _('This village is not in the selected ward.'))
         return cleaned_data
     def save(self, commit=True):
         user = super().save(commit=False)
@@ -136,6 +137,34 @@ class ChangePasswordForm(DjangoPasswordChangeForm):
         super().__init__(*args, **kwargs)
         for f in self.fields.values():
             f.widget.attrs.setdefault('class', 'form-control')
+        # Django's own labels aren't translated for Swahili - relabel explicitly so our .po covers them.
+        self.fields['old_password'].label = _('Old Password')
+        self.fields['new_password1'].label = _('New Password')
+        self.fields['new_password2'].label = _('Confirm New Password')
+
+class ForgotPasswordForm(forms.Form):
+    username_or_email = forms.CharField(label=_('Username or Email'), widget=forms.TextInput(attrs={'class':'form-control'}))
+
+class SetNewPasswordForm(forms.Form):
+    new_password1 = forms.CharField(label=_('New Password'), widget=forms.PasswordInput(attrs={'class':'form-control'}))
+    new_password2 = forms.CharField(label=_('Confirm New Password'), widget=forms.PasswordInput(attrs={'class':'form-control'}))
+
+    def __init__(self, *args, user=None, **kwargs):
+        self.user = user
+        super().__init__(*args, **kwargs)
+
+    def clean(self):
+        cleaned_data = super().clean()
+        p1 = cleaned_data.get('new_password1')
+        p2 = cleaned_data.get('new_password2')
+        if p1 != p2:
+            raise forms.ValidationError(_('Passwords do not match.'))
+        if p1:
+            try:
+                validate_password(p1, user=self.user)
+            except forms.ValidationError as e:
+                self.add_error('new_password1', e)
+        return cleaned_data
 
 class SeedTypeForm(forms.ModelForm):
     class Meta:
@@ -224,11 +253,12 @@ class StockRespondForm(forms.Form):
 
 class FarmerRegisterForm(forms.Form):
     username = forms.CharField(max_length=150, widget=forms.TextInput(attrs={'class':'form-control'}))
-    password1 = forms.CharField(label='Password', widget=forms.PasswordInput(attrs={'class':'form-control'}))
-    password2 = forms.CharField(label='Confirm Password', widget=forms.PasswordInput(attrs={'class':'form-control'}))
+    password1 = forms.CharField(label=_('Password'), widget=forms.PasswordInput(attrs={'class':'form-control'}))
+    password2 = forms.CharField(label=_('Confirm Password'), widget=forms.PasswordInput(attrs={'class':'form-control'}))
     first_name = forms.CharField(max_length=100, widget=forms.TextInput(attrs={'class':'form-control'}))
     last_name = forms.CharField(max_length=100, widget=forms.TextInput(attrs={'class':'form-control'}))
     phone_number = forms.CharField(max_length=20, widget=forms.TextInput(attrs={'class':'form-control'}))
+    email = forms.EmailField(required=False, label=_('Email (optional - needed for password reset)'), widget=forms.EmailInput(attrs={'class':'form-control'}))
     village = forms.ModelChoiceField(queryset=Village.objects.select_related('ward__district__region').order_by('name'), widget=forms.Select(attrs={'class':'form-select'}))
     farm_location = forms.CharField(max_length=200, required=False, widget=forms.TextInput(attrs={'class':'form-control'}))
     farm_size = forms.DecimalField(max_digits=8, decimal_places=2, required=False, widget=forms.NumberInput(attrs={'class':'form-control'}))
@@ -238,13 +268,13 @@ class FarmerRegisterForm(forms.Form):
     def clean_username(self):
         username = self.cleaned_data['username']
         if CustomUser.objects.filter(username=username).exists():
-            raise forms.ValidationError('This username is already taken.')
+            raise forms.ValidationError(_('This username is already taken.'))
         return username
 
     def clean_phone_number(self):
         phone_number = self.cleaned_data['phone_number']
         if Farmer.objects.filter(phone_number=phone_number).exists():
-            raise forms.ValidationError('A farmer with this phone number is already registered. If this is you, please contact your Village Officer for help accessing your account.')
+            raise forms.ValidationError(_('A farmer with this phone number is already registered. If this is you, please contact your Village Officer for help accessing your account.'))
         return phone_number
 
     def clean(self):
@@ -252,7 +282,7 @@ class FarmerRegisterForm(forms.Form):
         password1 = cleaned_data.get('password1')
         password2 = cleaned_data.get('password2')
         if password1 != password2:
-            raise forms.ValidationError('Passwords do not match.')
+            raise forms.ValidationError(_('Passwords do not match.'))
         if password1:
             temp_user = CustomUser(username=cleaned_data.get('username',''), first_name=cleaned_data.get('first_name',''),
                                     last_name=cleaned_data.get('last_name',''))
@@ -264,7 +294,7 @@ class FarmerRegisterForm(forms.Form):
 
     def save(self):
         cd = self.cleaned_data
-        user = CustomUser(username=cd['username'], first_name=cd['first_name'], last_name=cd['last_name'], phone=cd['phone_number'], role='farmer')
+        user = CustomUser(username=cd['username'], first_name=cd['first_name'], last_name=cd['last_name'], phone=cd['phone_number'], email=cd.get('email',''), role='farmer')
         user.set_password(cd['password1'])
         user.save()
         farmer = Farmer.objects.create(
@@ -311,7 +341,7 @@ class SeedRequestFulfillForm(forms.Form):
 
 class FeedbackForm(forms.Form):
     category = forms.ChoiceField(choices=Feedback.CATEGORY_CHOICES, widget=forms.Select(attrs={'class':'form-select'}))
-    related_allocation = forms.ModelChoiceField(queryset=SeedAllocation.objects.none(), required=False, label='Related Allocation (optional)', widget=forms.Select(attrs={'class':'form-select'}))
+    related_allocation = forms.ModelChoiceField(queryset=SeedAllocation.objects.none(), required=False, label=_('Related Allocation (optional)'), widget=forms.Select(attrs={'class':'form-select'}))
     message = forms.CharField(widget=forms.Textarea(attrs={'class':'form-control','rows':4}))
 
     def __init__(self, *args, farmer=None, **kwargs):
@@ -321,3 +351,12 @@ class FeedbackForm(forms.Form):
 
 class FeedbackResolveForm(forms.Form):
     response = forms.CharField(widget=forms.Textarea(attrs={'class':'form-control','rows':3}))
+
+class ContactForm(forms.ModelForm):
+    class Meta:
+        model = ContactMessage
+        fields = ['name','email','subject','message']
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        for f in self.fields.values():
+            f.widget.attrs.setdefault('class', 'form-control')

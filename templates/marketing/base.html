@@ -1,0 +1,93 @@
+{% load i18n static %}
+<!DOCTYPE html>
+<html lang="{{ LANGUAGE_CODE }}">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>{% block title %}Mbeya Seed Tracker{% endblock %}</title>
+<meta name="description" content="{% blocktrans %}Digital seed distribution and tracking for smallholder farmers in Mbeya Region, Tanzania.{% endblocktrans %}">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
+<link href="{% static 'css/marketing.css' %}" rel="stylesheet">
+{% block extra_head %}{% endblock %}
+</head>
+<body>
+
+<nav class="mkt-nav">
+  <div class="mkt-nav-inner">
+    <a href="{% url 'landing' %}" class="mkt-brand">
+      <span class="mkt-brand-icon"><i class="fas fa-seedling"></i></span>
+      <span class="mkt-brand-text">
+        <strong>Seed Tracker</strong>
+        <small>{% trans "Mbeya Region" %}</small>
+      </span>
+    </a>
+    <button class="mkt-nav-toggle d-lg-none" type="button" onclick="document.querySelector('.mkt-nav-links').classList.toggle('open')" aria-label="Menu">
+      <i class="fas fa-bars"></i>
+    </button>
+    <div class="mkt-nav-links">
+      <a href="{% url 'landing' %}" class="{% if request.resolver_match.url_name == 'landing' %}active{% endif %}">{% trans "Home" %}</a>
+      <a href="{% url 'about' %}" class="{% if request.resolver_match.url_name == 'about' %}active{% endif %}">{% trans "About" %}</a>
+      <a href="{% url 'how_it_works' %}" class="{% if request.resolver_match.url_name == 'how_it_works' %}active{% endif %}">{% trans "How It Works" %}</a>
+      <a href="{% url 'faq' %}" class="{% if request.resolver_match.url_name == 'faq' %}active{% endif %}">{% trans "FAQ" %}</a>
+      <a href="{% url 'contact' %}" class="{% if request.resolver_match.url_name == 'contact' %}active{% endif %}">{% trans "Contact" %}</a>
+      <form action="{% url 'set_language' %}" method="post" class="mkt-lang-form">
+        {% csrf_token %}
+        <input type="hidden" name="next" value="{{ request.get_full_path }}">
+        <select name="language" onchange="this.form.submit()" class="mkt-lang-select">
+          {% get_current_language as CURRENT_LANGUAGE %}
+          {% get_available_languages as AVAILABLE_LANGUAGES %}
+          {% for lang_code, lang_name in AVAILABLE_LANGUAGES %}
+          <option value="{{ lang_code }}" {% if lang_code == CURRENT_LANGUAGE %}selected{% endif %}>{{ lang_name }}</option>
+          {% endfor %}
+        </select>
+      </form>
+      {% if user.is_authenticated %}
+      <a href="{% url 'dashboard' %}" class="btn btn-mkt-primary">{% trans "Go to Dashboard" %}</a>
+      {% else %}
+      <a href="{% url 'login' %}" class="btn btn-mkt-outline">{% trans "Sign In" %}</a>
+      <a href="{% url 'farmer_register' %}" class="btn btn-mkt-primary">{% trans "Jisajili" %}</a>
+      {% endif %}
+    </div>
+  </div>
+</nav>
+
+{% for message in messages %}
+<div class="container mt-3">
+  <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+    {{ message }} <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+  </div>
+</div>
+{% endfor %}
+
+<main>
+  {% block content %}{% endblock %}
+</main>
+
+<footer class="mkt-footer">
+  <div class="mkt-footer-inner">
+    <div class="mkt-footer-brand">
+      <span class="mkt-brand-icon"><i class="fas fa-seedling"></i></span>
+      <div>
+        <strong>Mbeya Seed Tracker</strong>
+        <p>{% blocktrans %}Digitizing seed distribution from Regional Officers all the way to smallholder farmers.{% endblocktrans %}</p>
+      </div>
+    </div>
+    <div class="mkt-footer-links">
+      <a href="{% url 'landing' %}">{% trans "Home" %}</a>
+      <a href="{% url 'about' %}">{% trans "About" %}</a>
+      <a href="{% url 'how_it_works' %}">{% trans "How It Works" %}</a>
+      <a href="{% url 'faq' %}">{% trans "FAQ" %}</a>
+      <a href="{% url 'contact' %}">{% trans "Contact" %}</a>
+      <a href="{% url 'login' %}">{% trans "Sign In" %}</a>
+    </div>
+  </div>
+  <div class="mkt-footer-bottom">
+    &copy; {% now "Y" %} {% trans "Mbeya Seed Tracker. Built for the Mbeya Region agricultural community." %}
+  </div>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+{% block extra_js %}{% endblock %}
+</body>
+</html>

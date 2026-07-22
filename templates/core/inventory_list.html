@@ -1,13 +1,14 @@
 {% extends 'base.html' %}
+{% load i18n %}
 {% block title %}Inventory - Seed Tracker{% endblock %}
-{% block page_title %}Seed Inventory{% endblock %}
+{% block page_title %}{% trans "Seed Inventory" %}{% endblock %}
 {% block content %}
 <div class="page-header">
-  <h4><i class="fas fa-warehouse me-2" style="color:#1a6b3c"></i>Seed Inventory
+  <h4><i class="fas fa-warehouse me-2" style="color:#1a6b3c"></i>{% trans "Seed Inventory" %}
     {% if user.role == 'regional' %}<small style="font-size:14px;color:#7a8494;font-weight:400">({{ user.region }})</small>{% endif %}
   </h4>
   {% if user.role == 'regional' or user.role == 'admin' %}
-  <a href="{% url 'inventory_create' %}" class="btn btn-primary btn-sm"><i class="fas fa-plus me-1"></i>Add Stock</a>
+  <a href="{% url 'inventory_create' %}" class="btn btn-primary btn-sm"><i class="fas fa-plus me-1"></i>{% trans "Add Stock" %}</a>
   {% endif %}
 </div>
 <div class="row g-3 mb-4">
@@ -22,10 +23,10 @@
   {% endfor %}
 </div>
 <div class="table-card">
-  <div class="table-header"><h5>Inventory Records</h5></div>
+  <div class="table-header"><h5>{% trans "Inventory Records" %}</h5></div>
   <div class="table-responsive">
     <table class="data-table">
-      <thead><tr><th>Seed Type</th><th>Quantity</th><th>Date Received</th><th>Source</th><th>Region</th><th>Added By</th><th>Notes</th></tr></thead>
+      <thead><tr><th>{% trans "Seed Type" %}</th><th>{% trans "Quantity" %}</th><th>{% trans "Date Received" %}</th><th>{% trans "Source" %}</th><th>{% trans "Region" %}</th><th>{% trans "Added By" %}</th><th>{% trans "Notes" %}</th></tr></thead>
       <tbody>
         {% for inv in page_obj %}
         <tr>
@@ -38,16 +39,16 @@
           <td>{{ inv.notes|truncatechars:40|default:"-" }}</td>
         </tr>
         {% empty %}
-        <tr><td colspan="7" class="text-center text-muted py-5">No inventory records yet</td></tr>
+        <tr><td colspan="7" class="text-center text-muted py-5">{% trans "No inventory records yet" %}</td></tr>
         {% endfor %}
       </tbody>
     </table>
   </div>
   {% if page_obj.has_other_pages %}
   <div style="padding:16px 20px;display:flex;justify-content:center;gap:6px">
-    {% if page_obj.has_previous %}<a href="?page={{ page_obj.previous_page_number }}" class="btn btn-sm btn-outline-secondary">« Prev</a>{% endif %}
+    {% if page_obj.has_previous %}<a href="?page={{ page_obj.previous_page_number }}" class="btn btn-sm btn-outline-secondary">« {% trans "Prev" %}</a>{% endif %}
     <span class="btn btn-sm btn-primary disabled">{{ page_obj.number }} / {{ page_obj.paginator.num_pages }}</span>
-    {% if page_obj.has_next %}<a href="?page={{ page_obj.next_page_number }}" class="btn btn-sm btn-outline-secondary">Next »</a>{% endif %}
+    {% if page_obj.has_next %}<a href="?page={{ page_obj.next_page_number }}" class="btn btn-sm btn-outline-secondary">{% trans "Next" %} »</a>{% endif %}
   </div>
   {% endif %}
 </div>

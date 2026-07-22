@@ -1,22 +1,23 @@
 {% extends 'base.html' %}
+{% load i18n %}
 {% block title %}Confirm Receipt - Seed Tracker{% endblock %}
-{% block page_title %}Confirm Receipt{% endblock %}
+{% block page_title %}{% trans "Confirm Receipt" %}{% endblock %}
 {% block content %}
 <div class="row justify-content-center">
   <div class="col-lg-6">
     <div class="form-card text-center">
       <i class="fas fa-seedling mb-3" style="font-size:36px;color:#1a6b3c"></i>
       <h5 style="font-weight:700">{{ distribution.allocation.seed_type.name }}</h5>
-      <p class="text-muted">{{ distribution.quantity_distributed }} {{ distribution.allocation.seed_type.unit }} recorded as collected on {{ distribution.collection_date|date:"d M Y" }}.</p>
+      <p class="text-muted">{% blocktrans with qty=distribution.quantity_distributed unit=distribution.allocation.seed_type.unit cdate=distribution.collection_date|date:"d M Y" %}{{ qty }} {{ unit }} recorded as collected on {{ cdate }}.{% endblocktrans %}</p>
       {% if distribution.farmer_confirmed %}
-      <div class="alert alert-success">You already confirmed receipt on {{ distribution.farmer_confirmed_at|date:"d M Y H:i" }}.</div>
-      <a href="{% url 'farmer_dashboard' %}" class="btn btn-outline-secondary">Back to Dashboard</a>
+      <div class="alert alert-success">{% blocktrans with cdate=distribution.farmer_confirmed_at|date:"d M Y H:i" %}You already confirmed receipt on {{ cdate }}.{% endblocktrans %}</div>
+      <a href="{% url 'farmer_dashboard' %}" class="btn btn-outline-secondary">{% trans "Back to Dashboard" %}</a>
       {% else %}
-      <p>Please confirm that you personally received these seeds.</p>
+      <p>{% trans "Please confirm that you personally received these seeds." %}</p>
       <form method="post" class="d-flex gap-2 justify-content-center">
         {% csrf_token %}
-        <button type="submit" class="btn btn-success"><i class="fas fa-check me-1"></i>Ndiyo, Nimepokea (Yes, I Received It)</button>
-        <a href="{% url 'farmer_dashboard' %}" class="btn btn-outline-secondary">Cancel</a>
+        <button type="submit" class="btn btn-success"><i class="fas fa-check me-1"></i>{% trans "Ndiyo, Nimepokea (Yes, I Received It)" %}</button>
+        <a href="{% url 'farmer_dashboard' %}" class="btn btn-outline-secondary">{% trans "Cancel" %}</a>
       </form>
       {% endif %}
     </div>

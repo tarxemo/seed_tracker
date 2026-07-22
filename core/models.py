@@ -1,6 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser
 from django.utils import timezone
+from django.utils.translation import gettext_lazy as _
 
 class Region(models.Model):
     name = models.CharField(max_length=100, unique=True)
@@ -27,13 +28,13 @@ class Village(models.Model):
 
 class CustomUser(AbstractUser):
     ROLE_CHOICES = [
-        ('admin', 'System Administrator'),
-        ('regional', 'Regional Officer'),
-        ('district', 'District Officer'),
-        ('ward', 'Ward Officer'),
-        ('village', 'Village Officer'),
-        ('extension', 'Agricultural Extension Officer (Bwana Shamba)'),
-        ('farmer', 'Farmer (Mkulima)'),
+        ('admin', _('System Administrator')),
+        ('regional', _('Regional Officer')),
+        ('district', _('District Officer')),
+        ('ward', _('Ward Officer')),
+        ('village', _('Village Officer')),
+        ('extension', _('Agricultural Extension Officer (Bwana Shamba)')),
+        ('farmer', _('Farmer (Mkulima)')),
     ]
     role = models.CharField(max_length=20, choices=ROLE_CHOICES, default='village')
     region = models.ForeignKey(Region, on_delete=models.SET_NULL, null=True, blank=True)
@@ -78,13 +79,13 @@ class FarmingSeasons(models.Model):
     def __str__(self): return self.name
 
 CROP_CHOICES = [
-    ('maize', 'Maize'), ('rice', 'Rice'), ('beans', 'Beans'),
-    ('sunflower', 'Sunflower'), ('sorghum', 'Sorghum'), ('millet', 'Millet'),
-    ('wheat', 'Wheat'), ('cassava', 'Cassava'), ('other', 'Other'),
+    ('maize', _('Maize')), ('rice', _('Rice')), ('beans', _('Beans')),
+    ('sunflower', _('Sunflower')), ('sorghum', _('Sorghum')), ('millet', _('Millet')),
+    ('wheat', _('Wheat')), ('cassava', _('Cassava')), ('other', _('Other')),
 ]
 
 class Farmer(models.Model):
-    STATUS_CHOICES = [('active','Active'),('inactive','Inactive'),('pending','Pending')]
+    STATUS_CHOICES = [('active',_('Active')),('inactive',_('Inactive')),('pending',_('Pending'))]
     farmer_id = models.CharField(max_length=20, unique=True, blank=True)
     first_name = models.CharField(max_length=100)
     last_name = models.CharField(max_length=100)
@@ -120,10 +121,14 @@ class Farmer(models.Model):
     @property
     def region(self): return self.village.ward.district.region
 
+    @property
+    def has_unconfirmed_distribution(self):
+        return self.allocations.filter(distribution__isnull=False, distribution__farmer_confirmed=False).exists()
+
 class SeedAllocation(models.Model):
     STATUS_CHOICES = [
-        ('pending','Pending'),('approved','Approved'),
-        ('rejected','Rejected'),('distributed','Distributed'),
+        ('pending',_('Pending')),('approved',_('Approved')),
+        ('rejected',_('Rejected')),('distributed',_('Distributed')),
     ]
     farmer = models.ForeignKey(Farmer, on_delete=models.CASCADE, related_name='allocations')
     seed_type = models.ForeignKey(SeedType, on_delete=models.CASCADE)
@@ -160,8 +165,8 @@ class Distribution(models.Model):
 
 class SeedRequest(models.Model):
     STATUS_CHOICES = [
-        ('submitted','Submitted'),('verified','Verified'),
-        ('rejected','Rejected'),('fulfilled','Fulfilled'),
+        ('submitted',_('Submitted')),('verified',_('Verified')),
+        ('rejected',_('Rejected')),('fulfilled',_('Fulfilled')),
     ]
     farmer = models.ForeignKey(Farmer, on_delete=models.CASCADE, related_name='seed_requests')
     seed_type = models.ForeignKey(SeedType, on_delete=models.CASCADE)
@@ -179,8 +184,8 @@ class SeedRequest(models.Model):
     def __str__(self): return f"{self.farmer} - {self.seed_type} ({self.status})"
 
 class Feedback(models.Model):
-    CATEGORY_CHOICES = [('suggestion','Suggestion'),('complaint','Complaint'),('feedback','General Feedback')]
-    STATUS_CHOICES = [('open','Open'),('resolved','Resolved')]
+    CATEGORY_CHOICES = [('suggestion',_('Suggestion')),('complaint',_('Complaint')),('feedback',_('General Feedback'))]
+    STATUS_CHOICES = [('open',_('Open')),('resolved',_('Resolved'))]
     farmer = models.ForeignKey(Farmer, on_delete=models.CASCADE, related_name='feedback_items')
     category = models.CharField(max_length=20, choices=CATEGORY_CHOICES, default='feedback')
     message = models.TextField()
@@ -194,7 +199,7 @@ class Feedback(models.Model):
     def __str__(self): return f"{self.get_category_display()} from {self.farmer} ({self.status})"
 
 class SMSLog(models.Model):
-    STATUS_CHOICES = [('sent','Sent'),('failed','Failed'),('pending','Pending')]
+    STATUS_CHOICES = [('sent',_('Sent')),('failed',_('Failed')),('pending',_('Pending'))]
     farmer = models.ForeignKey(Farmer, on_delete=models.CASCADE, related_name='sms_logs')
     phone_number = models.CharField(max_length=20)
     message = models.TextField()
@@ -207,14 +212,14 @@ class SMSLog(models.Model):
     def __str__(self): return f"SMS to {self.phone_number} - {self.status}"
 
 TRANSFER_LEVEL_CHOICES = [
-    ('region_to_district', 'Region → District'),
-    ('district_to_ward', 'District → Ward'),
-    ('ward_to_village', 'Ward → Village'),
+    ('region_to_district', _('Region → District')),
+    ('district_to_ward', _('District → Ward')),
+    ('ward_to_village', _('Ward → Village')),
 ]
 
 class StockTransfer(models.Model):
-    KIND_CHOICES = [('distribution', 'Distribution'), ('request', 'Request')]
-    STATUS_CHOICES = [('pending', 'Pending'), ('approved', 'Approved'), ('rejected', 'Rejected')]
+    KIND_CHOICES = [('distribution', _('Distribution')), ('request', _('Request'))]
+    STATUS_CHOICES = [('pending', _('Pending')), ('approved', _('Approved')), ('rejected', _('Rejected'))]
 
     seed_type = models.ForeignKey(SeedType, on_delete=models.CASCADE, related_name='transfers')
     quantity = models.DecimalField(max_digits=12, decimal_places=2)
@@ -256,3 +261,12 @@ class ActivityLog(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self): return f"{self.user} - {self.action}"
+
+class ContactMessage(models.Model):
+    name = models.CharField(max_length=150)
+    email = models.EmailField()
+    subject = models.CharField(max_length=200)
+    message = models.TextField()
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self): return f"{self.subject} - {self.name}"

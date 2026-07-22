@@ -1,26 +1,27 @@
 {% extends 'base.html' %}
+{% load i18n %}
 {% block title %}Feedback - Seed Tracker{% endblock %}
-{% block page_title %}Give Feedback{% endblock %}
+{% block page_title %}{% trans "Give Feedback" %}{% endblock %}
 {% block content %}
 <div class="row justify-content-center">
   <div class="col-lg-7">
     <div class="form-card">
-      <h5 style="font-weight:700;margin-bottom:24px"><i class="fas fa-comment-dots me-2" style="color:#1a6b3c"></i>Toa Maoni - Suggestion / Complaint / Feedback</h5>
+      <h5 style="font-weight:700;margin-bottom:24px"><i class="fas fa-comment-dots me-2" style="color:#1a6b3c"></i>{% trans "Toa Maoni - Suggestion / Complaint / Feedback" %}</h5>
       <form method="post">
         {% csrf_token %}
         <div class="row g-3">
-          <div class="col-md-6"><label class="form-label">Category *</label>{{ form.category }}</div>
+          <div class="col-md-6"><label class="form-label">{% trans "Category" %} *</label>{{ form.category }}</div>
           <div class="col-md-6">
-            <label class="form-label">Related Allocation (optional)</label>{{ form.related_allocation }}
+            <label class="form-label">{% trans "Related Allocation (optional)" %}</label>{{ form.related_allocation }}
           </div>
-          <div class="col-12"><label class="form-label">Message *</label>{{ form.message }}</div>
+          <div class="col-12"><label class="form-label">{% trans "Message" %} *</label>{{ form.message }}</div>
         </div>
         {% if form.errors %}
         <div class="alert alert-danger mt-3">{% for field, errs in form.errors.items %}{% for e in errs %}<div>{{ e }}</div>{% endfor %}{% endfor %}</div>
         {% endif %}
         <div class="d-flex gap-2 mt-4">
-          <button type="submit" class="btn btn-primary"><i class="fas fa-paper-plane me-1"></i>Submit</button>
-          <a href="{% url 'feedback_list' %}" class="btn btn-outline-secondary">Cancel</a>
+          <button type="submit" class="btn btn-primary"><i class="fas fa-paper-plane me-1"></i>{% trans "Submit" %}</button>
+          <a href="{% url 'feedback_list' %}" class="btn btn-outline-secondary">{% trans "Cancel" %}</a>
         </div>
       </form>
     </div>

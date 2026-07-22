@@ -1,11 +1,12 @@
 {% extends 'base.html' %}
+{% load i18n %}
 {% block title %}Dashboard - Seed Tracker{% endblock %}
-{% block page_title %}Dashboard{% endblock %}
+{% block page_title %}{% trans "Dashboard" %}{% endblock %}
 {% block content %}
 {% if pending_fulfillments %}
 <div class="alert alert-warning d-flex justify-content-between align-items-center">
-  <span><i class="fas fa-hand-holding me-2"></i>You have <strong>{{ pending_fulfillments }}</strong> verified seed request{{ pending_fulfillments|pluralize }} ready to fulfill.</span>
-  <a href="{% url 'seed_request_list' %}?status=verified" class="btn btn-sm btn-warning">Fulfill Now</a>
+  <span><i class="fas fa-hand-holding me-2"></i>{% blocktrans count counter=pending_fulfillments %}You have <strong>{{ pending_fulfillments }}</strong> verified seed request ready to fulfill.{% plural %}You have <strong>{{ pending_fulfillments }}</strong> verified seed requests ready to fulfill.{% endblocktrans %}</span>
+  <a href="{% url 'seed_request_list' %}?status=verified" class="btn btn-sm btn-warning">{% trans "Fulfill Now" %}</a>
 </div>
 {% endif %}
 <div class="row g-3 mb-4">
@@ -13,15 +14,15 @@
     <div class="stat-card">
       <div class="stat-icon" style="background:#e8f5ee;color:#1a6b3c"><i class="fas fa-users"></i></div>
       <div class="stat-value">{{ total_farmers }}</div>
-      <div class="stat-label">Registered Farmers</div>
+      <div class="stat-label">{% trans "Registered Farmers" %}</div>
     </div>
   </div>
   <div class="col-sm-6 col-xl-3">
     <div class="stat-card">
       <div class="stat-icon" style="background:#fff8e6;color:#f0a500"><i class="fas fa-boxes"></i></div>
       <div class="stat-value">{{ total_allocations }}</div>
-      <div class="stat-label">Total Allocations</div>
-      <div class="stat-change"><span style="color:#1a6b3c">{{ approved_allocations }}</span> approved &bull; <span style="color:#f0a500">{{ pending_allocations }}</span> pending</div>
+      <div class="stat-label">{% trans "Total Allocations" %}</div>
+      <div class="stat-change"><span style="color:#1a6b3c">{{ approved_allocations }}</span> {% trans "approved" %} &bull; <span style="color:#f0a500">{{ pending_allocations }}</span> {% trans "pending" %}</div>
     </div>
   </div>
   <div class="col-sm-6 col-xl-3">
@@ -35,8 +36,8 @@
     <div class="stat-card">
       <div class="stat-icon" style="background:#fce4ec;color:#c62828"><i class="fas fa-truck"></i></div>
       <div class="stat-value">{{ distributed }}</div>
-      <div class="stat-label">Seeds Distributed</div>
-      <div class="stat-change" style="color:#7a8494">{{ total_seeds_distributed|floatformat:0 }} kg total</div>
+      <div class="stat-label">{% trans "Seeds Distributed" %}</div>
+      <div class="stat-change" style="color:#7a8494">{{ total_seeds_distributed|floatformat:0 }} {% trans "kg total" %}</div>
     </div>
   </div>
 </div>
@@ -44,13 +45,13 @@
 <div class="row g-3 mb-4">
   <div class="col-lg-8">
     <div class="chart-card h-100">
-      <div class="chart-title"><i class="fas fa-chart-line me-2" style="color:#1a6b3c"></i>Monthly Allocation Trend</div>
+      <div class="chart-title"><i class="fas fa-chart-line me-2" style="color:#1a6b3c"></i>{% trans "Monthly Allocation Trend" %}</div>
       <canvas id="monthChart" height="110"></canvas>
     </div>
   </div>
   <div class="col-lg-4">
     <div class="chart-card h-100">
-      <div class="chart-title"><i class="fas fa-chart-pie me-2" style="color:#f0a500"></i>Allocation Status</div>
+      <div class="chart-title"><i class="fas fa-chart-pie me-2" style="color:#f0a500"></i>{% trans "Allocation Status" %}</div>
       <canvas id="statusChart" height="170"></canvas>
     </div>
   </div>
@@ -59,13 +60,13 @@
 <div class="row g-3 mb-4">
   <div class="col-lg-6">
     <div class="chart-card">
-      <div class="chart-title"><i class="fas fa-chart-bar me-2" style="color:#1976d2"></i>Seeds by Type (kg)</div>
+      <div class="chart-title"><i class="fas fa-chart-bar me-2" style="color:#1976d2"></i>{% trans "Seeds by Type (kg)" %}</div>
       <canvas id="seedChart" height="140"></canvas>
     </div>
   </div>
   <div class="col-lg-6">
     <div class="chart-card">
-      <div class="chart-title"><i class="fas fa-chart-donut me-2" style="color:#c62828"></i>Farmers by Crop Type</div>
+      <div class="chart-title"><i class="fas fa-chart-donut me-2" style="color:#c62828"></i>{% trans "Farmers by Crop Type" %}</div>
       <canvas id="cropChart" height="140"></canvas>
     </div>
   </div>
@@ -75,12 +76,12 @@
   <div class="col-lg-7">
     <div class="table-card">
       <div class="table-header">
-        <h5><i class="fas fa-clock me-2" style="color:#1a6b3c"></i>Recent Allocations</h5>
-        <a href="{% url 'allocation_list' %}" class="btn btn-sm btn-outline-primary">View All</a>
+        <h5><i class="fas fa-clock me-2" style="color:#1a6b3c"></i>{% trans "Recent Allocations" %}</h5>
+        <a href="{% url 'allocation_list' %}" class="btn btn-sm btn-outline-primary">{% trans "View All" %}</a>
       </div>
       <div class="table-responsive">
         <table class="data-table">
-          <thead><tr><th>Farmer</th><th>Seed</th><th>Qty</th><th>Status</th><th>Date</th></tr></thead>
+          <thead><tr><th>{% trans "Farmer" %}</th><th>{% trans "Seed" %}</th><th>{% trans "Qty" %}</th><th>{% trans "Status" %}</th><th>{% trans "Date" %}</th></tr></thead>
           <tbody>
             {% for a in recent_allocations %}
             <tr>
@@ -94,7 +95,7 @@
               <td style="color:#7a8494">{{ a.created_at|date:"d M Y" }}</td>
             </tr>
             {% empty %}
-            <tr><td colspan="5" class="text-center text-muted py-4">No allocations yet</td></tr>
+            <tr><td colspan="5" class="text-center text-muted py-4">{% trans "No allocations yet" %}</td></tr>
             {% endfor %}
           </tbody>
         </table>
@@ -104,7 +105,7 @@
   <div class="col-lg-5">
     <div class="table-card">
       <div class="table-header">
-        <h5><i class="fas fa-history me-2" style="color:#f0a500"></i>Recent Activity</h5>
+        <h5><i class="fas fa-history me-2" style="color:#f0a500"></i>{% trans "Recent Activity" %}</h5>
       </div>
       <div style="padding: 4px 0;">
         {% for log in recent_activities %}
@@ -118,7 +119,7 @@
           </div>
         </div>
         {% empty %}
-        <div class="text-center text-muted py-4">No activity yet</div>
+        <div class="text-center text-muted py-4">{% trans "No activity yet" %}</div>
         {% endfor %}
       </div>
     </div>

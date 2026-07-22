@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+{% load i18n %}
 {% block title %}{{ title }} - Seed Tracker{% endblock %}
 {% block page_title %}{{ title }}{% endblock %}
 {% block content %}
@@ -9,30 +10,38 @@
       <form method="post">
         {% csrf_token %}
         <div class="row g-3">
-          <div class="col-md-6"><label class="form-label">Username *</label>{{ form.username }}</div>
-          <div class="col-md-6"><label class="form-label">Role *</label>{{ form.role }}</div>
-          <div class="col-md-6"><label class="form-label">First Name</label>{{ form.first_name }}</div>
-          <div class="col-md-6"><label class="form-label">Last Name</label>{{ form.last_name }}</div>
-          <div class="col-md-6"><label class="form-label">Email</label>{{ form.email }}</div>
-          <div class="col-md-6"><label class="form-label">Phone</label>{{ form.phone }}</div>
-          <div class="col-md-6"><label class="form-label">Region</label>{{ form.region }}</div>
-          <div class="col-md-6"><label class="form-label">District</label>{{ form.district }}</div>
-          <div class="col-md-6"><label class="form-label">Ward</label>{{ form.ward }}</div>
-          <div class="col-md-6"><label class="form-label">Village</label>{{ form.village }}</div>
+          <div class="col-md-6"><label class="form-label">{% trans "Username" %} *</label>{{ form.username }}</div>
+          <div class="col-md-6"><label class="form-label">{% trans "Role" %} *</label>{{ form.role }}</div>
+          <div class="col-md-6"><label class="form-label">{% trans "First Name" %}</label>{{ form.first_name }}</div>
+          <div class="col-md-6"><label class="form-label">{% trans "Last Name" %}</label>{{ form.last_name }}</div>
+          <div class="col-md-6"><label class="form-label">{% trans "Email" %}</label>{{ form.email }}</div>
+          <div class="col-md-6"><label class="form-label">{% trans "Phone" %}</label>{{ form.phone }}</div>
+          <div class="col-md-6"><label class="form-label">{% trans "Region" %}</label>{{ form.region }}</div>
+          <div class="col-md-6"><label class="form-label">{% trans "District" %}</label>{{ form.district }}</div>
+          <div class="col-md-6"><label class="form-label">{% trans "Ward" %}</label>{{ form.ward }}</div>
+          <div class="col-md-6"><label class="form-label">{% trans "Village" %}</label>{{ form.village }}</div>
           {% if form.password1 %}
-          <div class="col-md-6"><label class="form-label">{{ form.password1.label }}</label>{{ form.password1 }}</div>
-          <div class="col-md-6"><label class="form-label">{{ form.password2.label }}</label>{{ form.password2 }}</div>
+          <div class="col-md-6"><label class="form-label">{{ form.password1.label }}</label>
+            <div class="position-relative">{{ form.password1 }}
+              <button type="button" class="btn btn-sm position-absolute top-50 end-0 translate-middle-y me-1 border-0 bg-transparent toggle-password" data-target="id_password1" tabindex="-1" style="color:#7a8494;z-index:5"><i class="fas fa-eye"></i></button>
+            </div>
+          </div>
+          <div class="col-md-6"><label class="form-label">{{ form.password2.label }}</label>
+            <div class="position-relative">{{ form.password2 }}
+              <button type="button" class="btn btn-sm position-absolute top-50 end-0 translate-middle-y me-1 border-0 bg-transparent toggle-password" data-target="id_password2" tabindex="-1" style="color:#7a8494;z-index:5"><i class="fas fa-eye"></i></button>
+            </div>
+          </div>
           {% endif %}
         </div>
         {% if edit_user %}
-        <p class="text-muted mt-3" style="font-size:13px"><i class="fas fa-info-circle me-1"></i>Password is managed by the user themselves via "Change Password" in their sidebar. To reset a forgotten password, use the Django admin site.</p>
+        <p class="text-muted mt-3" style="font-size:13px"><i class="fas fa-info-circle me-1"></i>{% trans 'Password is managed by the user themselves via "Change Password" in their sidebar. To reset a forgotten password, use the Django admin site.' %}</p>
         {% endif %}
         {% if form.errors %}
         <div class="alert alert-danger mt-3">{% for field, errs in form.errors.items %}{% for e in errs %}<div>{{ field }}: {{ e }}</div>{% endfor %}{% endfor %}</div>
         {% endif %}
         <div class="d-flex gap-2 mt-4">
-          <button type="submit" class="btn btn-primary"><i class="fas fa-save me-1"></i>Save User</button>
-          <a href="{% url 'user_list' %}" class="btn btn-outline-secondary">Cancel</a>
+          <button type="submit" class="btn btn-primary"><i class="fas fa-save me-1"></i>{% trans "Save User" %}</button>
+          <a href="{% url 'user_list' %}" class="btn btn-outline-secondary">{% trans "Cancel" %}</a>
         </div>
       </form>
     </div>

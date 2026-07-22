@@ -1,15 +1,16 @@
 {% extends 'base.html' %}
+{% load i18n %}
 {% block title %}Seed Types - Seed Tracker{% endblock %}
-{% block page_title %}Seed Types{% endblock %}
+{% block page_title %}{% trans "Seed Types" %}{% endblock %}
 {% block content %}
 <div class="page-header">
-  <h4><i class="fas fa-leaf me-2" style="color:#1a6b3c"></i>Seed Types</h4>
-  <a href="{% url 'seed_type_create' %}" class="btn btn-primary btn-sm"><i class="fas fa-plus me-1"></i>Add Seed Type</a>
+  <h4><i class="fas fa-leaf me-2" style="color:#1a6b3c"></i>{% trans "Seed Types" %}</h4>
+  <a href="{% url 'seed_type_create' %}" class="btn btn-primary btn-sm"><i class="fas fa-plus me-1"></i>{% trans "Add Seed Type" %}</a>
 </div>
 <div class="table-card">
   <div class="table-responsive">
     <table class="data-table">
-      <thead><tr><th>Name</th><th>Unit</th><th>Description</th><th>Total Inventory</th></tr></thead>
+      <thead><tr><th>{% trans "Name" %}</th><th>{% trans "Unit" %}</th><th>{% trans "Description" %}</th><th>{% trans "Total Inventory" %}</th></tr></thead>
       <tbody>
         {% for s in seeds %}
         <tr>
@@ -19,7 +20,7 @@
           <td>{{ s.total_inv|floatformat:0|default:"0" }} {{ s.unit }}</td>
         </tr>
         {% empty %}
-        <tr><td colspan="4" class="text-center text-muted py-4">No seed types defined</td></tr>
+        <tr><td colspan="4" class="text-center text-muted py-4">{% trans "No seed types defined" %}</td></tr>
         {% endfor %}
       </tbody>
     </table>

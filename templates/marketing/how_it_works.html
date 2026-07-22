@@ -1,0 +1,73 @@
+{% extends 'marketing/base.html' %}
+{% load i18n %}
+{% block title %}{% trans "How It Works" %} - Mbeya Seed Tracker{% endblock %}
+{% block content %}
+
+<section class="mkt-page-header">
+  <div class="mkt-page-header-inner">
+    <span class="mkt-eyebrow">{% trans "The Full Picture" %}</span>
+    <h1>{% trans "How It Works" %}</h1>
+    <p>{% trans "Two flows run through the system: bulk stock moving down the chain, and individual farmer requests moving up for approval." %}</p>
+  </div>
+</section>
+
+<section class="mkt-section">
+  <div class="mkt-section-inner mkt-narrow">
+    <h2><i class="fas fa-dolly me-2" style="color:#1a6b3c"></i>{% trans "1. Stock Flows Down the Chain" %}</h2>
+    <p>{% trans "Only a Regional Officer adds new seed stock into the system. From there, each level distributes to the one directly below it, strictly within their own territory:" %}</p>
+    <div class="mkt-flow-list">
+      <div class="mkt-flow-item">
+        <div class="mkt-flow-badge">1</div>
+        <div><strong>{% trans "Regional Officer" %}</strong><p>{% trans "Adds seed stock received for their region, then distributes it to districts." %}</p></div>
+      </div>
+      <div class="mkt-flow-item">
+        <div class="mkt-flow-badge">2</div>
+        <div><strong>{% trans "District Officer" %}</strong><p>{% trans "Receives from the region, distributes to wards within their own district." %}</p></div>
+      </div>
+      <div class="mkt-flow-item">
+        <div class="mkt-flow-badge">3</div>
+        <div><strong>{% trans "Ward Officer" %}</strong><p>{% trans "Receives from the district, distributes to villages within their own ward." %}</p></div>
+      </div>
+      <div class="mkt-flow-item">
+        <div class="mkt-flow-badge">4</div>
+        <div><strong>{% trans "Village Officer" %}</strong><p>{% trans "Receives from the ward - this becomes the real stock used to fulfill farmer requests." %}</p></div>
+      </div>
+    </div>
+    <p class="text-muted">{% trans "At any level, an officer can also request stock from the level above instead of waiting - their parent officer approves or rejects it." %}</p>
+
+    <h2 class="mt-5"><i class="fas fa-seedling me-2" style="color:#1a6b3c"></i>{% trans "2. A Farmer's Request Moves Up for Approval" %}</h2>
+    <div class="mkt-flow-list">
+      <div class="mkt-flow-item">
+        <div class="mkt-flow-badge">1</div>
+        <div><strong>{% trans "Farmer requests" %}</strong><p>{% trans "The farmer logs in and requests a seed type and quantity for the current season." %}</p></div>
+      </div>
+      <div class="mkt-flow-item">
+        <div class="mkt-flow-badge">2</div>
+        <div><strong>{% trans "Extension Officer verifies" %}</strong><p>{% trans "The ward's Extension Officer reviews and verifies the request before it can proceed." %}</p></div>
+      </div>
+      <div class="mkt-flow-item">
+        <div class="mkt-flow-badge">3</div>
+        <div><strong>{% trans "Village Officer fulfills" %}</strong><p>{% trans "The Village Officer fulfills it against their real, current stock balance - never more than what's actually available." %}</p></div>
+      </div>
+      <div class="mkt-flow-item">
+        <div class="mkt-flow-badge">4</div>
+        <div><strong>{% trans "Farmer confirms receipt" %}</strong><p>{% trans "Once collected, the farmer confirms it themselves from their own account, closing the loop." %}</p></div>
+      </div>
+    </div>
+    <p class="text-muted">{% trans "A farmer can only have one active request per seed type per season, and an SMS notification is sent the moment it's ready for collection." %}</p>
+
+    <h2 class="mt-5"><i class="fas fa-comment-dots me-2" style="color:#1a6b3c"></i>{% trans "3. Feedback Loop" %}</h2>
+    <p>{% trans "At any point, a farmer can raise a suggestion or complaint - optionally tied to a specific request - and their Extension Officer resolves it directly." %}</p>
+  </div>
+</section>
+
+<section class="mkt-cta">
+  <div class="mkt-cta-inner">
+    <h2>{% trans "See it for yourself" %}</h2>
+    <div class="mkt-hero-actions justify-content-center">
+      <a href="{% url 'farmer_register' %}" class="btn btn-mkt-primary btn-lg">{% trans "Jisajili - Register as a Farmer" %}</a>
+      <a href="{% url 'faq' %}" class="btn btn-mkt-ghost btn-lg">{% trans "Read the FAQ" %}</a>
+    </div>
+  </div>
+</section>
+{% endblock %}

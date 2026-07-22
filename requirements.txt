@@ -1,3 +1,5 @@
 Django>=4.2,<5.0
 Pillow>=10.0
 africastalking>=1.2.5
+requests>=2.31
+reportlab>=4.0

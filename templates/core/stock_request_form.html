@@ -1,25 +1,26 @@
 {% extends 'base.html' %}
+{% load i18n %}
 {% block title %}Request Stock - Seed Tracker{% endblock %}
-{% block page_title %}Request Stock{% endblock %}
+{% block page_title %}{% trans "Request Stock" %}{% endblock %}
 {% block content %}
 <div class="row justify-content-center">
   <div class="col-lg-7">
     <div class="form-card">
-      <h5 style="font-weight:700;margin-bottom:4px"><i class="fas fa-hand-holding me-2" style="color:#1a6b3c"></i>Request Stock</h5>
-      <p class="text-muted" style="margin-bottom:20px">This will be sent to your immediate parent officer for approval.</p>
+      <h5 style="font-weight:700;margin-bottom:4px"><i class="fas fa-hand-holding me-2" style="color:#1a6b3c"></i>{% trans "Request Stock" %}</h5>
+      <p class="text-muted" style="margin-bottom:20px">{% trans "This will be sent to your immediate parent officer for approval." %}</p>
       <form method="post">
         {% csrf_token %}
         <div class="row g-3">
-          <div class="col-md-6"><label class="form-label">Seed Type *</label>{{ form.seed_type }}</div>
-          <div class="col-md-6"><label class="form-label">Quantity *</label>{{ form.quantity }}</div>
-          <div class="col-12"><label class="form-label">Notes</label>{{ form.notes }}</div>
+          <div class="col-md-6"><label class="form-label">{% trans "Seed Type" %} *</label>{{ form.seed_type }}</div>
+          <div class="col-md-6"><label class="form-label">{% trans "Quantity" %} *</label>{{ form.quantity }}</div>
+          <div class="col-12"><label class="form-label">{% trans "Notes" %}</label>{{ form.notes }}</div>
         </div>
         {% if form.errors %}
         <div class="alert alert-danger mt-3">{% for field, errs in form.errors.items %}{% for e in errs %}<div>{{ e }}</div>{% endfor %}{% endfor %}</div>
         {% endif %}
         <div class="d-flex gap-2 mt-4">
-          <button type="submit" class="btn btn-primary"><i class="fas fa-paper-plane me-1"></i>Submit Request</button>
-          <a href="{% url 'stock_list' %}" class="btn btn-outline-secondary">Cancel</a>
+          <button type="submit" class="btn btn-primary"><i class="fas fa-paper-plane me-1"></i>{% trans "Submit Request" %}</button>
+          <a href="{% url 'stock_list' %}" class="btn btn-outline-secondary">{% trans "Cancel" %}</a>
         </div>
       </form>
     </div>

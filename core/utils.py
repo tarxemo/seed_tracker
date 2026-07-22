@@ -1,5 +1,7 @@
 import os
+import requests
 from .models import SMSLog
+from django.conf import settings
 from django.utils import timezone
 
 AT_USERNAME = os.environ.get('AFRICASTALKING_USERNAME')
@@ -51,6 +53,26 @@ def send_sms(farmer, message, allocation=None):
         error_message=error,
     )
     return log
+
+def send_email(recipient, subject, html_body):
+    """Sends via the configured transactional Email API (settings.EMAIL_API_*). Returns True/False,
+    never raises - a failed email shouldn't break the request that triggered it (e.g. forgot-password)."""
+    if not recipient:
+        return False
+    try:
+        response = requests.post(
+            settings.EMAIL_API_URL,
+            json={'recipient': recipient, 'subject': subject, 'html_body': html_body},
+            headers={
+                'Content-Type': 'application/json',
+                'X-API-KEY': settings.EMAIL_API_KEY,
+                'X-API-SECRET': settings.EMAIL_API_SECRET,
+            },
+            timeout=10,
+        )
+        return response.status_code < 400
+    except requests.RequestException:
+        return False
 
 def send_allocation_sms(allocation):
     msg = (

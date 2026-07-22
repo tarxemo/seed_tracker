@@ -1,26 +1,27 @@
 {% extends 'base.html' %}
+{% load i18n %}
 {% block title %}Resolve Feedback - Seed Tracker{% endblock %}
-{% block page_title %}Resolve Feedback{% endblock %}
+{% block page_title %}{% trans "Resolve Feedback" %}{% endblock %}
 {% block content %}
 <div class="row justify-content-center">
   <div class="col-lg-7">
     <div class="form-card">
-      <h5 style="font-weight:700;margin-bottom:4px">{{ feedback.get_category_display }} from {{ feedback.farmer.full_name }}</h5>
+      <h5 style="font-weight:700;margin-bottom:4px">{% blocktrans with category=feedback.get_category_display name=feedback.farmer.full_name %}{{ category }} from {{ name }}{% endblocktrans %}</h5>
       <p class="text-muted" style="margin-bottom:20px">{{ feedback.farmer.village.name }} &bull; {{ feedback.created_at|date:"d M Y H:i" }}</p>
       <div style="background:#f8f9fb;border-radius:10px;padding:16px;margin-bottom:20px">{{ feedback.message }}</div>
       {% if feedback.related_allocation %}
-      <p class="text-muted" style="margin-bottom:20px">Related allocation: <a href="{% url 'allocation_detail' feedback.related_allocation.pk %}">{{ feedback.related_allocation.seed_type.name }} - {{ feedback.related_allocation.quantity_allocated }} {{ feedback.related_allocation.seed_type.unit }}</a></p>
+      <p class="text-muted" style="margin-bottom:20px">{% trans "Related allocation" %}: <a href="{% url 'allocation_detail' feedback.related_allocation.pk %}">{{ feedback.related_allocation.seed_type.name }} - {{ feedback.related_allocation.quantity_allocated }} {{ feedback.related_allocation.seed_type.unit }}</a></p>
       {% endif %}
       <form method="post">
         {% csrf_token %}
-        <label class="form-label">Response *</label>
+        <label class="form-label">{% trans "Response" %} *</label>
         {{ form.response }}
         {% if form.errors %}
         <div class="alert alert-danger mt-3">{% for field, errs in form.errors.items %}{% for e in errs %}<div>{{ e }}</div>{% endfor %}{% endfor %}</div>
         {% endif %}
         <div class="d-flex gap-2 mt-4">
-          <button type="submit" class="btn btn-success"><i class="fas fa-check me-1"></i>Mark Resolved</button>
-          <a href="{% url 'feedback_list' %}" class="btn btn-outline-secondary">Cancel</a>
+          <button type="submit" class="btn btn-success"><i class="fas fa-check me-1"></i>{% trans "Mark Resolved" %}</button>
+          <a href="{% url 'feedback_list' %}" class="btn btn-outline-secondary">{% trans "Cancel" %}</a>
         </div>
       </form>
     </div>

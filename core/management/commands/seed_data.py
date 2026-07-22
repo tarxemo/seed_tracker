@@ -53,8 +53,8 @@ class Command(BaseCommand):
             name='Long Rains 2025',
             defaults={'start_date': date(2025,2,1), 'end_date': date(2025,7,31), 'is_active': True}
         )
-        admin_user, c = CustomUser.objects.get_or_create(username='admin', defaults={
-            'first_name':'System','last_name':'Admin','role':'admin','is_staff':True,'is_superuser':True
+        admin_user, c = CustomUser.objects.get_or_create(username='rone', email="ronejaphet@gmail.com", defaults={
+            'first_name':'Rone','last_name':'Mzumbwe','role':'admin','is_staff':True,'is_superuser':True
         })
         if c: admin_user.set_password('admin123'); admin_user.save()
         reg_user, c = CustomUser.objects.get_or_create(username='regional_officer', defaults={
@@ -153,7 +153,7 @@ class Command(BaseCommand):
                     Distribution.objects.create(allocation=a, quantity_distributed=25, collection_date=date(2025,3,16), confirmed_by=vill_user)
         self.stdout.write(self.style.SUCCESS('\n✓ Demo data seeded!\n'))
         self.stdout.write('LOGIN CREDENTIALS:')
-        self.stdout.write('  admin           / admin123')
+        self.stdout.write('  rone           / admin123')
         self.stdout.write('  regional_officer / pass1234')
         self.stdout.write('  district_officer / pass1234')
         self.stdout.write('  ward_officer     / pass1234')

@@ -1,6 +1,7 @@
 {% extends 'base.html' %}
+{% load i18n %}
 {% block title %}{{ farmer.full_name }} - Seed Tracker{% endblock %}
-{% block page_title %}Farmer Profile{% endblock %}
+{% block page_title %}{% trans "Farmer Profile" %}{% endblock %}
 {% block content %}
 <div class="row g-3">
   <div class="col-lg-4">
@@ -11,7 +12,7 @@
       <h5 style="font-weight:700;margin-bottom:4px">{{ farmer.full_name }}</h5>
       <span class="farmer-id">{{ farmer.farmer_id }}</span>
       <div class="mt-3">
-        <span class="badge-status badge-{{ farmer.status }}">{{ farmer.status|title }}</span>
+        <span class="badge-status badge-{{ farmer.status }}">{{ farmer.get_status_display }}</span>
       </div>
       <hr>
       <div style="text-align:left">
@@ -19,22 +20,22 @@
         <div class="mb-2"><i class="fas fa-map-marker-alt me-2 text-muted"></i>{{ farmer.village.name }}, {{ farmer.village.ward.name }}</div>
         <div class="mb-2"><i class="fas fa-map me-2 text-muted"></i>{{ farmer.village.ward.district.name }}</div>
         <div class="mb-2"><i class="fas fa-seedling me-2 text-muted"></i>{{ farmer.get_crop_type_display }}</div>
-        {% if farmer.farm_size %}<div class="mb-2"><i class="fas fa-ruler-combined me-2 text-muted"></i>{{ farmer.farm_size }} acres</div>{% endif %}
+        {% if farmer.farm_size %}<div class="mb-2"><i class="fas fa-ruler-combined me-2 text-muted"></i>{{ farmer.farm_size }} {% trans "acres" %}</div>{% endif %}
         {% if farmer.national_id %}<div class="mb-2"><i class="fas fa-id-card me-2 text-muted"></i>{{ farmer.national_id }}</div>{% endif %}
-        <div class="mb-2"><i class="fas fa-calendar me-2 text-muted"></i>Registered {{ farmer.created_at|date:"d M Y" }}</div>
+        <div class="mb-2"><i class="fas fa-calendar me-2 text-muted"></i>{% blocktrans with regdate=farmer.created_at|date:"d M Y" %}Registered {{ regdate }}{% endblocktrans %}</div>
       </div>
       <div class="mt-3">
-        <a href="{% url 'farmer_edit' farmer.pk %}" class="btn btn-outline-primary btn-sm w-100 mb-2"><i class="fas fa-edit me-1"></i>Edit Farmer</a>
-        <a href="{% url 'allocation_create' %}?farmer={{ farmer.pk }}" class="btn btn-primary btn-sm w-100"><i class="fas fa-plus me-1"></i>New Allocation</a>
+        <a href="{% url 'farmer_edit' farmer.pk %}" class="btn btn-outline-primary btn-sm w-100 mb-2"><i class="fas fa-edit me-1"></i>{% trans "Edit Farmer" %}</a>
+        <a href="{% url 'allocation_create' %}?farmer={{ farmer.pk }}" class="btn btn-primary btn-sm w-100"><i class="fas fa-plus me-1"></i>{% trans "New Allocation" %}</a>
       </div>
     </div>
   </div>
   <div class="col-lg-8">
     <div class="table-card">
-      <div class="table-header"><h5><i class="fas fa-boxes me-2" style="color:#1a6b3c"></i>Allocation History</h5></div>
+      <div class="table-header"><h5><i class="fas fa-boxes me-2" style="color:#1a6b3c"></i>{% trans "Allocation History" %}</h5></div>
       <div class="table-responsive">
         <table class="data-table">
-          <thead><tr><th>Seed</th><th>Season</th><th>Quantity</th><th>Status</th><th>Collection</th><th>Date</th></tr></thead>
+          <thead><tr><th>{% trans "Seed" %}</th><th>{% trans "Season" %}</th><th>{% trans "Quantity" %}</th><th>{% trans "Status" %}</th><th>{% trans "Collection" %}</th><th>{% trans "Date" %}</th></tr></thead>
           <tbody>
             {% for a in allocations %}
             <tr>
@@ -46,7 +47,7 @@
               <td style="color:#7a8494">{{ a.created_at|date:"d M Y" }}</td>
             </tr>
             {% empty %}
-            <tr><td colspan="6" class="text-center text-muted py-4">No allocations yet</td></tr>
+            <tr><td colspan="6" class="text-center text-muted py-4">{% trans "No allocations yet" %}</td></tr>
             {% endfor %}
           </tbody>
         </table>

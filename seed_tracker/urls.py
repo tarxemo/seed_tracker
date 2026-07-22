@@ -1,15 +1,23 @@
 from django.contrib import admin
-from django.urls import path
+from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
-from core import views
+from core import views, marketing_views
 
 urlpatterns = [
+    path('i18n/', include('django.conf.urls.i18n')),
     path('admin/', admin.site.urls),
-    path('', views.dashboard, name='dashboard'),
+    # Public marketing site
+    path('', marketing_views.landing, name='landing'),
+    path('about/', marketing_views.about, name='about'),
+    path('how-it-works/', marketing_views.how_it_works, name='how_it_works'),
+    path('faq/', marketing_views.faq, name='faq'),
+    path('contact/', marketing_views.contact, name='contact'),
     path('login/', views.login_view, name='login'),
     path('logout/', views.logout_view, name='logout'),
     path('change-password/', views.change_password, name='change_password'),
+    path('forgot-password/', views.forgot_password, name='forgot_password'),
+    path('reset-password/<uidb64>/<token>/', views.reset_password_confirm, name='reset_password_confirm'),
     path('register/', views.farmer_register, name='farmer_register'),
     path('dashboard/', views.dashboard, name='dashboard'),
     # Farmer self-service (Mkulima)
@@ -44,6 +52,7 @@ urlpatterns = [
     path('reports/', views.reports, name='reports'),
     path('reports/export/farmers/', views.export_farmers_csv, name='export_farmers_csv'),
     path('reports/export/allocations/', views.export_allocations_csv, name='export_allocations_csv'),
+    path('reports/export/pdf/', views.reports_pdf, name='reports_pdf'),
     # Users
     path('users/', views.user_list, name='user_list'),
     path('users/new/', views.user_create, name='user_create'),

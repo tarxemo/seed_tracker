@@ -20,6 +20,7 @@ INSTALLED_APPS = [
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
+    'django.middleware.locale.LocaleMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
@@ -40,6 +41,7 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                'django.template.context_processors.i18n',
             ],
         },
     },
@@ -59,6 +61,11 @@ AUTH_PASSWORD_VALIDATORS = [
     {'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator'},
 ]
 LANGUAGE_CODE = 'en-us'
+LANGUAGES = [
+    ('en', 'English'),
+    ('sw', 'Kiswahili'),
+]
+LOCALE_PATHS = [BASE_DIR / 'locale']
 TIME_ZONE = 'Africa/Dar_es_Salaam'
 USE_I18N = True
 USE_TZ = True
@@ -73,3 +80,11 @@ LOGIN_REDIRECT_URL = '/dashboard/'
 LOGOUT_REDIRECT_URL = '/login/'
 
 AUTH_USER_MODEL = 'core.CustomUser'
+
+# Transactional email API (see core/utils.py:send_email) - set real values via env vars in production.
+EMAIL_API_URL = os.environ.get('EMAIL_API_URL', 'https://emailbackend.tarxemo.com/api/v1/send-email/')
+EMAIL_API_KEY = os.environ.get('EMAIL_API_KEY', 'eak_demoDemoDemoKey123')
+EMAIL_API_SECRET = os.environ.get('EMAIL_API_SECRET', 'demo-secret-change-me')
+
+# Where contact-form submissions are emailed to (optional - message is always saved to the DB regardless).
+CONTACT_EMAIL = os.environ.get('CONTACT_EMAIL', '')

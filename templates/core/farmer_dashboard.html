@@ -1,6 +1,7 @@
 {% extends 'base.html' %}
+{% load i18n %}
 {% block title %}My Dashboard - Seed Tracker{% endblock %}
-{% block page_title %}Karibu, {{ farmer.first_name }}{% endblock %}
+{% block page_title %}{% blocktrans with name=farmer.first_name %}Karibu, {{ name }}{% endblocktrans %}{% endblock %}
 {% block content %}
 <div class="page-header">
   <div>
@@ -8,8 +9,8 @@
     <small class="text-muted"><span class="farmer-id">{{ farmer.farmer_id }}</span> &bull; {{ farmer.village.name }}, {{ farmer.village.ward.name }}</small>
   </div>
   <div class="d-flex gap-2">
-    <a href="{% url 'seed_request_create' %}" class="btn btn-primary btn-sm"><i class="fas fa-hand-holding-heart me-1"></i>Omba Mbegu</a>
-    <a href="{% url 'farmer_profile_edit' %}" class="btn btn-outline-secondary btn-sm"><i class="fas fa-edit me-1"></i>Edit Profile</a>
+    <a href="{% url 'seed_request_create' %}" class="btn btn-primary btn-sm"><i class="fas fa-hand-holding-heart me-1"></i>{% trans "Request Seeds" %}</a>
+    <a href="{% url 'farmer_profile_edit' %}" class="btn btn-outline-secondary btn-sm"><i class="fas fa-edit me-1"></i>{% trans "Edit Profile" %}</a>
   </div>
 </div>
 
@@ -18,28 +19,28 @@
     <div class="stat-card">
       <div class="stat-icon" style="background:#fff8e6;color:#f0a500"><i class="fas fa-hourglass-half"></i></div>
       <div class="stat-value">{{ pending_requests }}</div>
-      <div class="stat-label">Pending Requests</div>
+      <div class="stat-label">{% trans "Pending Requests" %}</div>
     </div>
   </div>
   <div class="col-sm-6 col-xl-3">
     <div class="stat-card">
       <div class="stat-icon" style="background:#e8f5ee;color:#1a6b3c"><i class="fas fa-hand-holding"></i></div>
       <div class="stat-value">{{ total_requests }}</div>
-      <div class="stat-label">Total Requests</div>
+      <div class="stat-label">{% trans "Total Requests" %}</div>
     </div>
   </div>
   <div class="col-sm-6 col-xl-3">
     <div class="stat-card">
       <div class="stat-icon" style="background:#e3f2fd;color:#1976d2"><i class="fas fa-boxes"></i></div>
       <div class="stat-value">{{ total_allocations }}</div>
-      <div class="stat-label">Seed Allocations</div>
+      <div class="stat-label">{% trans "Seed Allocations" %}</div>
     </div>
   </div>
   <div class="col-sm-6 col-xl-3">
     <div class="stat-card">
       <div class="stat-icon" style="background:#fce4ec;color:#c62828"><i class="fas fa-comment-dots"></i></div>
       <div class="stat-value">{{ open_feedback }}</div>
-      <div class="stat-label">Open Feedback</div>
+      <div class="stat-label">{% trans "Open Feedback" %}</div>
     </div>
   </div>
 </div>
@@ -48,12 +49,12 @@
   <div class="col-lg-6">
     <div class="table-card">
       <div class="table-header">
-        <h5><i class="fas fa-hand-holding me-2" style="color:#1a6b3c"></i>My Seed Requests</h5>
-        <a href="{% url 'seed_request_list' %}" class="btn btn-sm btn-outline-primary">View All</a>
+        <h5><i class="fas fa-hand-holding me-2" style="color:#1a6b3c"></i>{% trans "My Seed Requests" %}</h5>
+        <a href="{% url 'seed_request_list' %}" class="btn btn-sm btn-outline-primary">{% trans "View All" %}</a>
       </div>
       <div class="table-responsive">
         <table class="data-table">
-          <thead><tr><th>Seed</th><th>Qty</th><th>Status</th><th>Date</th></tr></thead>
+          <thead><tr><th>{% trans "Seed" %}</th><th>{% trans "Qty" %}</th><th>{% trans "Status" %}</th><th>{% trans "Date" %}</th></tr></thead>
           <tbody>
             {% for r in requests %}
             <tr>
@@ -63,7 +64,7 @@
               <td style="color:#7a8494">{{ r.created_at|date:"d M Y" }}</td>
             </tr>
             {% empty %}
-            <tr><td colspan="4" class="text-center text-muted py-4">No requests yet - use "Omba Mbegu" to request seeds</td></tr>
+            <tr><td colspan="4" class="text-center text-muted py-4">{% blocktrans %}No requests yet - use "Request Seeds" above{% endblocktrans %}</td></tr>
             {% endfor %}
           </tbody>
         </table>
@@ -73,12 +74,12 @@
   <div class="col-lg-6">
     <div class="table-card">
       <div class="table-header">
-        <h5><i class="fas fa-boxes me-2" style="color:#1976d2"></i>My Seed Allocations</h5>
-        <a href="{% url 'allocation_list' %}" class="btn btn-sm btn-outline-primary">View All</a>
+        <h5><i class="fas fa-boxes me-2" style="color:#1976d2"></i>{% trans "My Seed Allocations" %}</h5>
+        <a href="{% url 'allocation_list' %}" class="btn btn-sm btn-outline-primary">{% trans "View All" %}</a>
       </div>
       <div class="table-responsive">
         <table class="data-table">
-          <thead><tr><th>Seed</th><th>Qty</th><th>Status</th><th>Action</th></tr></thead>
+          <thead><tr><th>{% trans "Seed" %}</th><th>{% trans "Qty" %}</th><th>{% trans "Status" %}</th><th>{% trans "Action" %}</th></tr></thead>
           <tbody>
             {% for a in allocations %}
             <tr>
@@ -87,14 +88,14 @@
               <td><span class="badge-status badge-{{ a.status }}">{{ a.get_status_display }}</span></td>
               <td>
                 {% if a.distribution and not a.distribution.farmer_confirmed %}
-                <a href="{% url 'farmer_confirm_receipt' a.distribution.pk %}" class="btn btn-sm btn-success">Confirm Received</a>
+                <a href="{% url 'farmer_confirm_receipt' a.distribution.pk %}" class="btn btn-sm btn-success">{% trans "Confirm Received" %}</a>
                 {% elif a.distribution.farmer_confirmed %}
-                <span class="text-success" style="font-size:12px"><i class="fas fa-check-circle me-1"></i>Confirmed</span>
+                <span class="text-success" style="font-size:12px"><i class="fas fa-check-circle me-1"></i>{% trans "Confirmed" %}</span>
                 {% else %}<span class="text-muted">-</span>{% endif %}
               </td>
             </tr>
             {% empty %}
-            <tr><td colspan="4" class="text-center text-muted py-4">No allocations yet</td></tr>
+            <tr><td colspan="4" class="text-center text-muted py-4">{% trans "No allocations yet" %}</td></tr>
             {% endfor %}
           </tbody>
         </table>
@@ -106,15 +107,15 @@
 <div class="row g-3 mt-1">
   <div class="col-lg-6">
     <div class="table-card">
-      <div class="table-header"><h5><i class="fas fa-sms me-2" style="color:#f0a500"></i>Recent SMS</h5></div>
+      <div class="table-header"><h5><i class="fas fa-sms me-2" style="color:#f0a500"></i>{% trans "Recent SMS" %}</h5></div>
       <div style="padding:4px 0">
         {% for sms in sms_logs %}
         <div style="padding:10px 20px;border-bottom:1px solid #f4f6f9">
           <div style="font-size:13px;color:#3a4252">{{ sms.message }}</div>
-          <div style="font-size:11px;color:#9aa5b4">{{ sms.created_at|timesince }} ago</div>
+          <div style="font-size:11px;color:#9aa5b4">{{ sms.created_at|timesince }} {% trans "ago" %}</div>
         </div>
         {% empty %}
-        <div class="text-center text-muted py-4">No SMS yet</div>
+        <div class="text-center text-muted py-4">{% trans "No SMS yet" %}</div>
         {% endfor %}
       </div>
     </div>
@@ -122,8 +123,8 @@
   <div class="col-lg-6">
     <div class="form-card d-flex flex-column justify-content-center align-items-center text-center h-100">
       <i class="fas fa-comment-dots mb-2" style="font-size:28px;color:#f0a500"></i>
-      <p class="text-muted mb-3">Have a suggestion, complaint or feedback about the seed programme?</p>
-      <a href="{% url 'feedback_create' %}" class="btn btn-primary btn-sm">Toa Maoni / Give Feedback</a>
+      <p class="text-muted mb-3">{% trans "Have a suggestion, complaint or feedback about the seed programme?" %}</p>
+      <a href="{% url 'feedback_create' %}" class="btn btn-primary btn-sm">{% trans "Give Feedback" %}</a>
     </div>
   </div>
 </div>

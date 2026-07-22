@@ -1,20 +1,21 @@
 {% extends 'base.html' %}
+{% load i18n %}
 {% block title %}Allocation Detail - Seed Tracker{% endblock %}
-{% block page_title %}Allocation Detail{% endblock %}
+{% block page_title %}{% trans "Allocation Detail" %}{% endblock %}
 {% block content %}
 <div class="row justify-content-center">
   <div class="col-lg-7">
     <div class="form-card">
       <div class="d-flex justify-content-between align-items-start mb-4">
         <div>
-          <h5 style="font-weight:700;margin-bottom:4px">Allocation #{{ allocation.pk }}</h5>
+          <h5 style="font-weight:700;margin-bottom:4px">{% trans "Allocation" %} #{{ allocation.pk }}</h5>
           <span class="badge-status badge-{{ allocation.status }}">{{ allocation.get_status_display }}</span>
         </div>
       </div>
       <div class="row g-3">
         <div class="col-md-6">
           <div style="background:#f8f9fb;border-radius:10px;padding:14px">
-            <div style="font-size:11px;color:#7a8494;text-transform:uppercase;font-weight:600;margin-bottom:4px">Farmer</div>
+            <div style="font-size:11px;color:#7a8494;text-transform:uppercase;font-weight:600;margin-bottom:4px">{% trans "Farmer" %}</div>
             <div style="font-weight:700">{{ allocation.farmer.full_name }}</div>
             <div style="color:#7a8494;font-size:13px">{{ allocation.farmer.farmer_id }} &bull; {{ allocation.farmer.phone_number }}</div>
             <div style="color:#7a8494;font-size:13px">{{ allocation.farmer.village.name }}, {{ allocation.farmer.village.ward.district.name }}</div>
@@ -22,16 +23,16 @@
         </div>
         <div class="col-md-6">
           <div style="background:#f8f9fb;border-radius:10px;padding:14px">
-            <div style="font-size:11px;color:#7a8494;text-transform:uppercase;font-weight:600;margin-bottom:4px">Seed Details</div>
+            <div style="font-size:11px;color:#7a8494;text-transform:uppercase;font-weight:600;margin-bottom:4px">{% trans "Seed Details" %}</div>
             <div style="font-weight:700">{{ allocation.seed_type.name }}</div>
             <div style="font-size:20px;font-weight:800;color:#1a6b3c">{{ allocation.quantity_allocated }} {{ allocation.seed_type.unit }}</div>
-            <div style="color:#7a8494;font-size:13px">Season: {{ allocation.season.name }}</div>
+            <div style="color:#7a8494;font-size:13px">{% trans "Season" %}: {{ allocation.season.name }}</div>
           </div>
         </div>
         {% if allocation.collection_date %}
         <div class="col-md-6">
           <div style="background:#e8f5ee;border-radius:10px;padding:14px">
-            <div style="font-size:11px;color:#7a8494;text-transform:uppercase;font-weight:600;margin-bottom:4px">Collection</div>
+            <div style="font-size:11px;color:#7a8494;text-transform:uppercase;font-weight:600;margin-bottom:4px">{% trans "Collection" %}</div>
             <div style="font-weight:700">{{ allocation.collection_date|date:"d M Y" }}</div>
             <div style="color:#7a8494;font-size:13px">{{ allocation.collection_location }}</div>
           </div>
@@ -39,26 +40,26 @@
         {% endif %}
         <div class="col-md-6">
           <div style="background:#f8f9fb;border-radius:10px;padding:14px">
-            <div style="font-size:11px;color:#7a8494;text-transform:uppercase;font-weight:600;margin-bottom:4px">Tracking</div>
-            <div style="font-size:13px">Requested by: {{ allocation.requested_by|default:"-" }}</div>
-            {% if allocation.approved_by %}<div style="font-size:13px">Approved by: {{ allocation.approved_by }}</div>{% endif %}
-            <div style="font-size:13px">SMS Sent: {% if allocation.sms_sent %}<span style="color:green">Yes</span>{% else %}No{% endif %}</div>
+            <div style="font-size:11px;color:#7a8494;text-transform:uppercase;font-weight:600;margin-bottom:4px">{% trans "Tracking" %}</div>
+            <div style="font-size:13px">{% trans "Requested by" %}: {{ allocation.requested_by|default:"-" }}</div>
+            {% if allocation.approved_by %}<div style="font-size:13px">{% trans "Approved by" %}: {{ allocation.approved_by }}</div>{% endif %}
+            <div style="font-size:13px">{% trans "SMS Sent" %}: {% if allocation.sms_sent %}<span style="color:green">{% trans "Yes" %}</span>{% else %}{% trans "No" %}{% endif %}</div>
             <div style="font-size:12px;color:#7a8494">{{ allocation.created_at|date:"d M Y H:i" }}</div>
           </div>
         </div>
         {% if allocation.rejection_reason %}
         <div class="col-12">
           <div style="background:#f8d7da;border-radius:10px;padding:14px">
-            <strong style="color:#842029">Rejection Reason:</strong> {{ allocation.rejection_reason }}
+            <strong style="color:#842029">{% trans "Rejection Reason" %}:</strong> {{ allocation.rejection_reason }}
           </div>
         </div>
         {% endif %}
       </div>
       <div class="mt-4">
         {% if allocation.status == 'approved' and not allocation.distribution and user.role == 'village' %}
-        <a href="{% url 'distribution_record' allocation.pk %}" class="btn btn-primary me-2"><i class="fas fa-truck me-1"></i>Record Distribution</a>
+        <a href="{% url 'distribution_record' allocation.pk %}" class="btn btn-primary me-2"><i class="fas fa-truck me-1"></i>{% trans "Record Distribution" %}</a>
         {% endif %}
-        <a href="{% url 'allocation_list' %}" class="btn btn-outline-secondary">Back to List</a>
+        <a href="{% url 'allocation_list' %}" class="btn btn-outline-secondary">{% trans "Back to List" %}</a>
       </div>
     </div>
   </div>

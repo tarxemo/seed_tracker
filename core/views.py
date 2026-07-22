@@ -7,12 +7,17 @@ from django.http import JsonResponse, HttpResponse
 from django.utils import timezone
 from django.core.paginator import Paginator
 from django.db import transaction
+from django.contrib.auth.tokens import default_token_generator
+from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
+from django.utils.encoding import force_bytes, force_str
+from django.urls import reverse
+from django.utils.translation import gettext as _
 import json, csv
 from datetime import timedelta
 from .models import *
 from .forms import *
 from .decorators import role_required, user_can_access_farmer, farmer_required
-from .utils import send_allocation_sms
+from .utils import send_allocation_sms, send_email
 from .stock import balance_for_user, location_for_user, village_balance, total_balance_for_user, total_received_for_user, lock_user_location
 
 def login_view(request):
@@ -39,9 +44,51 @@ def change_password(request):
         user = form.save()
         update_session_auth_hash(request, user)
         ActivityLog.objects.create(user=user, action='Changed their own password')
-        messages.success(request, 'Your password has been changed.')
+        messages.success(request, _('Your password has been changed.'))
         return redirect('dashboard')
     return render(request, 'registration/change_password.html', {'form': form})
+
+def forgot_password(request):
+    form = ForgotPasswordForm(request.POST or None)
+    if request.method == 'POST' and form.is_valid():
+        identifier = form.cleaned_data['username_or_email']
+        user = CustomUser.objects.filter(Q(username=identifier) | Q(email=identifier)).first()
+        if user and user.email:
+            uid = urlsafe_base64_encode(force_bytes(user.pk))
+            token = default_token_generator.make_token(user)
+            reset_url = request.build_absolute_uri(reverse('reset_password_confirm', args=[uid, token]))
+            html_body = (
+                f"<p>Hello {user.get_full_name() or user.username},</p>"
+                f"<p>Click the link below to reset your Mbeya Seed Tracker password. "
+                f"This link can only be used once and expires soon.</p>"
+                f'<p><a href="{reset_url}">{reset_url}</a></p>'
+                f"<p>If you didn't request this, you can safely ignore this email.</p>"
+            )
+            send_email(user.email, 'Reset your Mbeya Seed Tracker password', html_body)
+        # Same message regardless of whether a match was found - don't leak account existence.
+        messages.success(request, _('If an account with that username/email exists, a password reset link has been sent.'))
+        return redirect('login')
+    return render(request, 'registration/forgot_password.html', {'form': form})
+
+def reset_password_confirm(request, uidb64, token):
+    try:
+        uid = force_str(urlsafe_base64_decode(uidb64))
+        user = CustomUser.objects.get(pk=uid)
+    except (TypeError, ValueError, OverflowError, CustomUser.DoesNotExist):
+        user = None
+
+    valid = user is not None and default_token_generator.check_token(user, token)
+    if not valid:
+        return render(request, 'registration/reset_password_confirm.html', {'valid': False})
+
+    form = SetNewPasswordForm(request.POST or None, user=user)
+    if request.method == 'POST' and form.is_valid():
+        user.set_password(form.cleaned_data['new_password1'])
+        user.save()
+        ActivityLog.objects.create(user=user, action='Reset their password via forgot-password link')
+        messages.success(request, _('Your password has been reset. You can now sign in.'))
+        return redirect('login')
+    return render(request, 'registration/reset_password_confirm.html', {'valid': True, 'form': form})
 
 @login_required
 def dashboard(request):
@@ -81,13 +128,13 @@ def dashboard(request):
     ctx['distributed'] = dist_qs.count()
     if user.role in ('district', 'ward', 'village'):
         ctx['total_seeds_received'] = total_balance_for_user(user)
-        ctx['stock_label'] = 'Current Stock Balance (kg)'
+        ctx['stock_label'] = _('Current Stock Balance (kg)')
     elif user.role == 'extension':
         ctx['total_seeds_received'] = SeedRequest.objects.filter(farmer__village__ward=user.ward, status='submitted').count()
-        ctx['stock_label'] = 'Pending Seed Requests'
+        ctx['stock_label'] = _('Pending Seed Requests')
     else:
         ctx['total_seeds_received'] = inv_qs.aggregate(t=Sum('quantity'))['t'] or 0
-        ctx['stock_label'] = 'Total Seeds Received (kg)'
+        ctx['stock_label'] = _('Total Seeds Received (kg)')
     ctx['total_seeds_distributed'] = dist_qs.aggregate(t=Sum('quantity_distributed'))['t'] or 0
 
     # Chart: allocations by seed type
@@ -149,7 +196,7 @@ def farmer_list(request):
 def farmer_create(request):
     user = request.user
     if user.role not in ['admin','village','ward','district']:
-        messages.error(request, 'No permission.')
+        messages.error(request, _('No permission.'))
         return redirect('farmer_list')
     form = FarmerForm(request.POST or None, user=user)
     if request.method == 'POST' and form.is_valid():
@@ -157,29 +204,29 @@ def farmer_create(request):
         f.registered_by = user
         f.save()
         ActivityLog.objects.create(user=user, action=f'Registered farmer {f.full_name}', model_name='Farmer', object_id=f.id)
-        messages.success(request, f'Farmer {f.full_name} registered successfully.')
+        messages.success(request, _('Farmer %(name)s registered successfully.') % {'name': f.full_name})
         return redirect('farmer_list')
-    return render(request, 'core/farmer_form.html', {'form': form, 'title': 'Register Farmer'})
+    return render(request, 'core/farmer_form.html', {'form': form, 'title': _('Register Farmer')})
 
 @login_required
 def farmer_edit(request, pk):
     farmer = get_object_or_404(Farmer, pk=pk)
     user = request.user
     if user.role not in ['admin','village','ward','district'] or not user_can_access_farmer(user, farmer):
-        messages.error(request, 'You do not have permission to edit this farmer.')
+        messages.error(request, _('You do not have permission to edit this farmer.'))
         return redirect('farmer_list')
     form = FarmerForm(request.POST or None, instance=farmer, user=user)
     if request.method == 'POST' and form.is_valid():
         form.save()
-        messages.success(request, 'Farmer updated.')
+        messages.success(request, _('Farmer updated.'))
         return redirect('farmer_list')
-    return render(request, 'core/farmer_form.html', {'form': form, 'title': 'Edit Farmer', 'farmer': farmer})
+    return render(request, 'core/farmer_form.html', {'form': form, 'title': _('Edit Farmer'), 'farmer': farmer})
 
 @login_required
 def farmer_detail(request, pk):
     farmer = get_object_or_404(Farmer, pk=pk)
     if not user_can_access_farmer(request.user, farmer):
-        messages.error(request, 'You do not have permission to view this farmer.')
+        messages.error(request, _('You do not have permission to view this farmer.'))
         return redirect('farmer_list')
     allocs = farmer.allocations.select_related('seed_type','season').order_by('-created_at')
     return render(request, 'core/farmer_detail.html', {'farmer': farmer, 'allocations': allocs})
@@ -209,9 +256,9 @@ def inventory_create(request):
         inv.added_by = request.user
         inv.save()
         ActivityLog.objects.create(user=request.user, action=f'Added inventory: {inv}')
-        messages.success(request, 'Inventory added.')
+        messages.success(request, _('Inventory added.'))
         return redirect('inventory_list')
-    return render(request, 'core/inventory_form.html', {'form': form, 'title': 'Add Seed Inventory'})
+    return render(request, 'core/inventory_form.html', {'form': form, 'title': _('Add Seed Inventory')})
 
 # =================== ALLOCATIONS ===================
 def create_farmer_allocation(farmer, seed_type, season, quantity, collection_date, collection_location, notes, actor):
@@ -220,10 +267,10 @@ def create_farmer_allocation(farmer, seed_type, season, quantity, collection_dat
     with transaction.atomic():
         Village.objects.select_for_update().get(pk=farmer.village_id)
         if SeedAllocation.objects.filter(farmer=farmer, seed_type=seed_type, season=season).exists():
-            return None, 'This farmer already has an allocation for this seed type in this season.'
+            return None, _('This farmer already has an allocation for this seed type in this season.')
         available = village_balance(seed_type, farmer.village)
         if quantity > available:
-            return None, f'Insufficient village stock for {seed_type.name}. Available: {available} {seed_type.unit}. Request more stock from your Ward Officer.'
+            return None, _('Insufficient village stock for %(name)s. Available: %(qty)s %(unit)s. Request more stock from your Ward Officer.') % {'name': seed_type.name, 'qty': available, 'unit': seed_type.unit}
         a = SeedAllocation.objects.create(
             farmer=farmer, seed_type=seed_type, season=season, quantity_allocated=quantity,
             collection_date=collection_date, collection_location=collection_location, notes=notes,
@@ -266,16 +313,16 @@ def allocation_create(request):
         )
         if error:
             messages.error(request, error)
-            return render(request, 'core/allocation_form.html', {'form': form, 'title': 'New Seed Allocation'})
-        messages.success(request, f'Allocation recorded and SMS sent to {a.farmer.phone_number}.')
+            return render(request, 'core/allocation_form.html', {'form': form, 'title': _('New Seed Allocation')})
+        messages.success(request, _('Allocation recorded and SMS sent to %(phone)s.') % {'phone': a.farmer.phone_number})
         return redirect('allocation_list')
-    return render(request, 'core/allocation_form.html', {'form': form, 'title': 'New Seed Allocation'})
+    return render(request, 'core/allocation_form.html', {'form': form, 'title': _('New Seed Allocation')})
 
 @login_required
 def allocation_detail(request, pk):
     allocation = get_object_or_404(SeedAllocation, pk=pk)
     if not user_can_access_farmer(request.user, allocation.farmer):
-        messages.error(request, 'You do not have permission to view this allocation.')
+        messages.error(request, _('You do not have permission to view this allocation.'))
         return redirect('allocation_list')
     return render(request, 'core/allocation_detail.html', {'allocation': allocation})
 
@@ -298,10 +345,10 @@ def distribution_list(request):
 def distribution_record(request, allocation_pk):
     allocation = get_object_or_404(SeedAllocation, pk=allocation_pk, status='approved')
     if not user_can_access_farmer(request.user, allocation.farmer):
-        messages.error(request, 'You can only record distributions for farmers in your own village.')
+        messages.error(request, _('You can only record distributions for farmers in your own village.'))
         return redirect('distribution_list')
     if hasattr(allocation, 'distribution'):
-        messages.warning(request, 'Distribution already recorded.')
+        messages.warning(request, _('Distribution already recorded.'))
         return redirect('distribution_list')
     form = DistributionForm(request.POST or None)
     if request.method == 'POST' and form.is_valid():
@@ -313,21 +360,20 @@ def distribution_record(request, allocation_pk):
         allocation.status = 'distributed'
         allocation.save()
         ActivityLog.objects.create(user=request.user, action=f'Recorded distribution for {allocation.farmer}')
-        messages.success(request, 'Distribution recorded.')
+        messages.success(request, _('Distribution recorded.'))
         return redirect('distribution_list')
     return render(request, 'core/distribution_form.html', {'form': form, 'allocation': allocation})
 
 # =================== REPORTS ===================
 REPORT_BREAKDOWN_BY_ROLE = {
-    'admin': ('farmer__village__ward__district__region__name', 'Region'),
-    'regional': ('farmer__village__ward__district__name', 'District'),
-    'district': ('farmer__village__ward__name', 'Ward'),
-    'ward': ('farmer__village__name', 'Village'),
-    'extension': ('farmer__village__name', 'Village'),
+    'admin': ('farmer__village__ward__district__region__name', _('Region')),
+    'regional': ('farmer__village__ward__district__name', _('District')),
+    'district': ('farmer__village__ward__name', _('Ward')),
+    'ward': ('farmer__village__name', _('Village')),
+    'extension': ('farmer__village__name', _('Village')),
 }
 
-@login_required
-def reports(request):
+def build_report_context(request):
     user = request.user
     inv_qs = SeedInventory.objects.all()
     dist_qs = Distribution.objects.all()
@@ -360,19 +406,19 @@ def reports(request):
     if user.role in ('district','ward','village'):
         total_received = total_received_for_user(user)
         remaining_stock = total_balance_for_user(user)
-        received_label = 'Total Seeds Received via Transfers (kg)'
-        remaining_label = 'Remaining Stock (kg)'
+        received_label = _('Total Seeds Received via Transfers (kg)')
+        remaining_label = _('Remaining Stock (kg)')
     elif user.role == 'extension':
         ward_requests = SeedRequest.objects.filter(farmer__village__ward=user.ward)
         total_received = ward_requests.filter(status='submitted').count()
         remaining_stock = ward_requests.filter(status='verified').count()
-        received_label = 'Seed Requests Submitted'
-        remaining_label = 'Awaiting Fulfillment'
+        received_label = _('Seed Requests Submitted')
+        remaining_label = _('Awaiting Fulfillment')
     else:
         total_received = inv_qs.aggregate(t=Sum('quantity'))['t'] or 0
         remaining_stock = total_received - (dist_qs.aggregate(t=Sum('quantity_distributed'))['t'] or 0)
-        received_label = 'Total Seeds Received (kg)'
-        remaining_label = 'Remaining Stock (kg)'
+        received_label = _('Total Seeds Received (kg)')
+        remaining_label = _('Remaining Stock (kg)')
 
     completed_qs = alloc_qs.filter(status__in=['approved','distributed'])
 
@@ -393,7 +439,7 @@ def reports(request):
 
     # Breakdown one organizational level below the viewer (village officers see per-farmer)
     if user.role == 'village':
-        breakdown_label = 'Farmer'
+        breakdown_label = _('Farmer')
         raw = completed_qs.values('farmer__farmer_id','farmer__first_name','farmer__last_name').annotate(cnt=Count('id'), qty=Sum('quantity_allocated')).order_by('-qty')
         breakdown = [{'label': f"{r['farmer__first_name']} {r['farmer__last_name']} ({r['farmer__farmer_id']})", 'cnt': r['cnt'], 'qty': r['qty']} for r in raw]
     else:
@@ -406,7 +452,24 @@ def reports(request):
     ctx['chart_labels'] = json.dumps([b['label'] for b in breakdown[:8]])
     ctx['chart_data'] = json.dumps([float(b['qty'] or 0) for b in breakdown[:8]])
 
-    return render(request, 'core/reports.html', ctx)
+    if user.role == 'regional': org_context = f'Region: {user.region}'
+    elif user.role == 'district': org_context = f'District: {user.district}'
+    elif user.role in ('ward','extension'): org_context = f'Ward: {user.ward}'
+    elif user.role == 'village': org_context = f'Village: {user.village}'
+    else: org_context = 'All Regions (System-wide)'
+    ctx['org_context'] = org_context
+    ctx['role_display'] = user.get_role_display()
+
+    return ctx
+
+@login_required
+def reports(request):
+    return render(request, 'core/reports.html', build_report_context(request))
+
+@login_required
+def reports_pdf(request):
+    from .pdf import render_report_pdf
+    return render_report_pdf(request.user, build_report_context(request))
 
 @login_required
 def export_farmers_csv(request):
@@ -452,9 +515,9 @@ def user_create(request):
     if request.method == 'POST' and form.is_valid():
         user = form.save()
         ActivityLog.objects.create(user=request.user, action=f'Created user {user.username}')
-        messages.success(request, f'User {user.username} created.')
+        messages.success(request, _('User %(username)s created.') % {'username': user.username})
         return redirect('user_list')
-    return render(request, 'core/user_form.html', {'form': form, 'title': 'Create User', 'location_tree': location_tree_json()})
+    return render(request, 'core/user_form.html', {'form': form, 'title': _('Create User'), 'location_tree': location_tree_json()})
 
 @login_required
 @role_required('admin')
@@ -463,9 +526,9 @@ def user_edit(request, pk):
     form = UserCreateForm(request.POST or None, instance=u)
     if request.method == 'POST' and form.is_valid():
         form.save()
-        messages.success(request, 'User updated.')
+        messages.success(request, _('User updated.'))
         return redirect('user_list')
-    return render(request, 'core/user_form.html', {'form': form, 'title': 'Edit User', 'edit_user': u, 'location_tree': location_tree_json()})
+    return render(request, 'core/user_form.html', {'form': form, 'title': _('Edit User'), 'edit_user': u, 'location_tree': location_tree_json()})
 
 # =================== SETTINGS / ADMIN ===================
 @login_required
@@ -480,9 +543,9 @@ def seed_type_create(request):
     form = SeedTypeForm(request.POST or None)
     if request.method == 'POST' and form.is_valid():
         form.save()
-        messages.success(request, 'Seed type added.')
+        messages.success(request, _('Seed type added.'))
         return redirect('seed_type_list')
-    return render(request, 'core/seed_type_form.html', {'form': form, 'title': 'Add Seed Type'})
+    return render(request, 'core/seed_type_form.html', {'form': form, 'title': _('Add Seed Type')})
 
 @login_required
 @role_required('admin')
@@ -498,9 +561,9 @@ def season_create(request):
         season = form.save()
         if season.is_active:
             FarmingSeasons.objects.exclude(pk=season.pk).update(is_active=False)
-        messages.success(request, 'Season created.')
+        messages.success(request, _('Season created.'))
         return redirect('season_list')
-    return render(request, 'core/season_form.html', {'form': form, 'title': 'Add Season'})
+    return render(request, 'core/season_form.html', {'form': form, 'title': _('Add Season')})
 
 @login_required
 @role_required('admin')
@@ -517,25 +580,25 @@ def location_manage(request):
             region_form = RegionForm(request.POST, prefix='region')
             if region_form.is_valid():
                 region_form.save()
-                messages.success(request, 'Region added.')
+                messages.success(request, _('Region added.'))
                 return redirect('location_manage')
         elif action == 'add_district':
             district_form = DistrictForm(request.POST, prefix='district')
             if district_form.is_valid():
                 district_form.save()
-                messages.success(request, 'District added.')
+                messages.success(request, _('District added.'))
                 return redirect('location_manage')
         elif action == 'add_ward':
             ward_form = WardForm(request.POST, prefix='ward')
             if ward_form.is_valid():
                 ward_form.save()
-                messages.success(request, 'Ward added.')
+                messages.success(request, _('Ward added.'))
                 return redirect('location_manage')
         elif action == 'add_village':
             village_form = VillageForm(request.POST, prefix='village')
             if village_form.is_valid():
                 village_form.save()
-                messages.success(request, 'Village added.')
+                messages.success(request, _('Village added.'))
                 return redirect('location_manage')
 
     return render(request, 'core/location_manage.html', {
@@ -637,7 +700,7 @@ def stock_distribute(request):
                 transfer.save()
         if transfer is not None:
             ActivityLog.objects.create(user=user, action=f'Distributed {quantity} {seed_type.unit} of {seed_type.name} to {target}')
-            messages.success(request, f'{quantity} {seed_type.unit} of {seed_type.name} distributed to {target}.')
+            messages.success(request, _('%(qty)s %(unit)s of %(name)s distributed to %(target)s.') % {'qty': quantity, 'unit': seed_type.unit, 'name': seed_type.name, 'target': target})
             return redirect('stock_list')
     return render(request, 'core/stock_distribute_form.html', {'form': form})
 
@@ -661,7 +724,7 @@ def stock_request_create(request):
             transfer.level = 'ward_to_village'; transfer.from_ward = user.ward; transfer.to_village = user.village
         transfer.save()
         ActivityLog.objects.create(user=user, action=f'Requested {quantity} {seed_type.unit} of {seed_type.name}')
-        messages.success(request, 'Stock request submitted.')
+        messages.success(request, _('Stock request submitted.'))
         return redirect('stock_list')
     return render(request, 'core/stock_request_form.html', {'form': form})
 
@@ -676,7 +739,7 @@ def stock_request_respond(request, pk):
         (user.role == 'ward' and transfer.level == 'ward_to_village' and transfer.from_ward_id == user.ward_id)
     )
     if not authorized:
-        messages.error(request, 'You are not authorized to respond to this request.')
+        messages.error(request, _('You are not authorized to respond to this request.'))
         return redirect('stock_list')
     form = StockRespondForm(request.POST or None)
     available = balance_for_user(transfer.seed_type, user)
@@ -686,7 +749,7 @@ def stock_request_respond(request, pk):
                 lock_user_location(user)
                 current_available = balance_for_user(transfer.seed_type, user)
                 if transfer.quantity > current_available:
-                    messages.error(request, f'Insufficient balance to approve. Available: {current_available} {transfer.seed_type.unit}.')
+                    messages.error(request, _('Insufficient balance to approve. Available: %(qty)s %(unit)s.') % {'qty': current_available, 'unit': transfer.seed_type.unit})
                     approved = False
                 else:
                     transfer.status = 'approved'
@@ -695,7 +758,7 @@ def stock_request_respond(request, pk):
                     approved = True
             if approved:
                 ActivityLog.objects.create(user=user, action=f'Approved stock request from {transfer.initiated_by}')
-                messages.success(request, 'Request approved and stock transferred.')
+                messages.success(request, _('Request approved and stock transferred.'))
                 return redirect('stock_list')
         elif 'reject' in request.POST and form.is_valid():
             transfer.status = 'rejected'
@@ -703,7 +766,7 @@ def stock_request_respond(request, pk):
             transfer.rejection_reason = form.cleaned_data.get('rejection_reason','')
             transfer.save()
             ActivityLog.objects.create(user=user, action=f'Rejected stock request from {transfer.initiated_by}')
-            messages.warning(request, 'Request rejected.')
+            messages.warning(request, _('Request rejected.'))
             return redirect('stock_list')
     return render(request, 'core/stock_request_respond.html', {'transfer': transfer, 'form': form, 'available': available})
 
@@ -716,7 +779,7 @@ def farmer_register(request):
         user, farmer = form.save()
         login(request, user)
         ActivityLog.objects.create(user=user, action=f'Farmer self-registered: {farmer.full_name}', model_name='Farmer', object_id=farmer.id)
-        messages.success(request, f'Welcome, {farmer.full_name}! Your farmer ID is {farmer.farmer_id}.')
+        messages.success(request, _('Welcome, %(name)s! Your farmer ID is %(farmer_id)s.') % {'name': farmer.full_name, 'farmer_id': farmer.farmer_id})
         return redirect('farmer_dashboard')
     return render(request, 'registration/farmer_register.html', {'form': form})
 
@@ -743,7 +806,7 @@ def farmer_profile_edit(request):
     form = FarmerSelfUpdateForm(request.POST or None, instance=farmer)
     if request.method == 'POST' and form.is_valid():
         form.save()
-        messages.success(request, 'Your farm information has been updated.')
+        messages.success(request, _('Your farm information has been updated.'))
         return redirect('farmer_dashboard')
     return render(request, 'core/farmer_profile_form.html', {'form': form, 'farmer': farmer})
 
@@ -755,7 +818,7 @@ def farmer_confirm_receipt(request, pk):
         distribution.farmer_confirmed = True
         distribution.farmer_confirmed_at = timezone.now()
         distribution.save()
-        messages.success(request, 'Thank you for confirming receipt of your seeds.')
+        messages.success(request, _('Thank you for confirming receipt of your seeds.'))
         return redirect('farmer_dashboard')
     return render(request, 'core/farmer_confirm_receipt.html', {'distribution': distribution})
 
@@ -764,18 +827,18 @@ def farmer_confirm_receipt(request, pk):
 def seed_request_create(request):
     user = request.user
     if user.role not in ('farmer', 'extension'):
-        messages.error(request, 'You do not have permission to submit seed requests.')
+        messages.error(request, _('You do not have permission to submit seed requests.'))
         return redirect('dashboard')
     if user.role == 'farmer' and not hasattr(user, 'farmer_profile'):
-        messages.error(request, 'No farmer profile found for this account.')
+        messages.error(request, _('No farmer profile found for this account.'))
         return redirect('dashboard')
     form = SeedRequestForm(request.POST or None, user=user)
     if request.method == 'POST' and form.is_valid():
         farmer = user.farmer_profile if user.role == 'farmer' else form.cleaned_data['farmer']
         seed_type = form.cleaned_data['seed_type']
         season = form.cleaned_data['season']
-        if SeedRequest.objects.filter(farmer=farmer, seed_type=seed_type, season=season, status__in=['submitted','verified']).exists():
-            messages.error(request, 'There is already an open request for this farmer, seed type and season.')
+        if SeedRequest.objects.filter(farmer=farmer, seed_type=seed_type, season=season, status__in=['submitted','verified','fulfilled']).exists():
+            messages.error(request, _('This farmer already has a request (or fulfilled allocation) for this seed type this season.'))
         else:
             SeedRequest.objects.create(
                 farmer=farmer, seed_type=seed_type, season=season,
@@ -783,7 +846,7 @@ def seed_request_create(request):
                 notes=form.cleaned_data.get('notes',''), submitted_by=user,
             )
             ActivityLog.objects.create(user=user, action=f'Submitted seed request for {farmer.full_name} ({seed_type.name})')
-            messages.success(request, 'Seed request submitted.')
+            messages.success(request, _('Seed request submitted.'))
             return redirect('seed_request_list')
     redirect_target = 'farmer_dashboard' if user.role == 'farmer' else 'seed_request_list'
     return render(request, 'core/seed_request_form.html', {'form': form, 'redirect_target': redirect_target})
@@ -796,7 +859,7 @@ def seed_request_list(request):
     can_verify = False
     if user.role == 'farmer':
         if not hasattr(user, 'farmer_profile'):
-            messages.error(request, 'No farmer profile found for this account.')
+            messages.error(request, _('No farmer profile found for this account.'))
             return redirect('dashboard')
         qs = qs.filter(farmer=user.farmer_profile)
     elif user.role == 'extension':
@@ -827,16 +890,20 @@ def seed_request_verify(request, pk):
     user = request.user
     sr = get_object_or_404(SeedRequest, pk=pk, status='submitted')
     if sr.farmer.village.ward_id != user.ward_id:
-        messages.error(request, 'You can only verify requests from farmers in your own ward.')
+        messages.error(request, _('You can only verify requests from farmers in your own ward.'))
         return redirect('seed_request_list')
     form = SeedRequestVerifyForm(request.POST or None)
+    blocked = sr.farmer.has_unconfirmed_distribution
     if request.method == 'POST':
         if 'verify' in request.POST:
+            if blocked:
+                messages.error(request, _('%(name)s has not yet confirmed receipt of a previous seed distribution. They must confirm it (via their own login) before a new request can be verified.') % {'name': sr.farmer.full_name})
+                return redirect('seed_request_list')
             sr.status = 'verified'
             sr.verified_by = user
             sr.save()
             ActivityLog.objects.create(user=user, action=f'Verified seed request for {sr.farmer.full_name}')
-            messages.success(request, 'Request verified and forwarded to the Village Officer.')
+            messages.success(request, _('Request verified and forwarded to the Village Officer.'))
             return redirect('seed_request_list')
         elif 'reject' in request.POST and form.is_valid():
             sr.status = 'rejected'
@@ -844,9 +911,9 @@ def seed_request_verify(request, pk):
             sr.rejection_reason = form.cleaned_data.get('rejection_reason','')
             sr.save()
             ActivityLog.objects.create(user=user, action=f'Rejected seed request for {sr.farmer.full_name}')
-            messages.warning(request, 'Request rejected.')
+            messages.warning(request, _('Request rejected.'))
             return redirect('seed_request_list')
-    return render(request, 'core/seed_request_verify.html', {'request_obj': sr, 'form': form})
+    return render(request, 'core/seed_request_verify.html', {'request_obj': sr, 'form': form, 'blocked': blocked})
 
 @login_required
 @role_required('village')
@@ -854,7 +921,7 @@ def seed_request_fulfill(request, pk):
     user = request.user
     sr = get_object_or_404(SeedRequest, pk=pk, status='verified')
     if sr.farmer.village_id != user.village_id:
-        messages.error(request, 'You can only fulfill requests for farmers in your own village.')
+        messages.error(request, _('You can only fulfill requests for farmers in your own village.'))
         return redirect('seed_request_list')
     form = SeedRequestFulfillForm(request.POST or None)
     if request.method == 'POST' and form.is_valid():
@@ -870,7 +937,7 @@ def seed_request_fulfill(request, pk):
             sr.status = 'fulfilled'
             sr.resulting_allocation = a
             sr.save()
-            messages.success(request, f'Request fulfilled and SMS sent to {a.farmer.phone_number}.')
+            messages.success(request, _('Request fulfilled and SMS sent to %(phone)s.') % {'phone': a.farmer.phone_number})
             return redirect('seed_request_list')
     return render(request, 'core/seed_request_fulfill.html', {'request_obj': sr, 'form': form})
 
@@ -884,7 +951,7 @@ def feedback_create(request):
             farmer=farmer, category=form.cleaned_data['category'],
             message=form.cleaned_data['message'], related_allocation=form.cleaned_data.get('related_allocation'),
         )
-        messages.success(request, 'Thank you - your feedback has been submitted.')
+        messages.success(request, _('Thank you - your feedback has been submitted.'))
         return redirect('feedback_list')
     return render(request, 'core/feedback_form.html', {'form': form})
 
@@ -895,7 +962,7 @@ def feedback_list(request):
     can_resolve = False
     if user.role == 'farmer':
         if not hasattr(user, 'farmer_profile'):
-            messages.error(request, 'No farmer profile found for this account.')
+            messages.error(request, _('No farmer profile found for this account.'))
             return redirect('dashboard')
         qs = qs.filter(farmer=user.farmer_profile)
     elif user.role == 'extension':
@@ -923,7 +990,7 @@ def feedback_resolve(request, pk):
     user = request.user
     fb = get_object_or_404(Feedback, pk=pk, status='open')
     if fb.farmer.village.ward_id != user.ward_id:
-        messages.error(request, 'You can only resolve feedback from farmers in your own ward.')
+        messages.error(request, _('You can only resolve feedback from farmers in your own ward.'))
         return redirect('feedback_list')
     form = FeedbackResolveForm(request.POST or None)
     if request.method == 'POST' and form.is_valid():
@@ -933,6 +1000,6 @@ def feedback_resolve(request, pk):
         fb.resolved_at = timezone.now()
         fb.save()
         ActivityLog.objects.create(user=user, action=f'Resolved feedback from {fb.farmer.full_name}')
-        messages.success(request, 'Feedback resolved.')
+        messages.success(request, _('Feedback resolved.'))
         return redirect('feedback_list')
     return render(request, 'core/feedback_resolve.html', {'feedback': fb, 'form': form})

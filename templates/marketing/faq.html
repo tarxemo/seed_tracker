@@ -1,0 +1,118 @@
+{% extends 'marketing/base.html' %}
+{% load i18n %}
+{% block title %}{% trans "FAQ" %} - Mbeya Seed Tracker{% endblock %}
+{% block content %}
+
+<section class="mkt-page-header">
+  <div class="mkt-page-header-inner">
+    <span class="mkt-eyebrow">{% trans "Frequently Asked Questions" %}</span>
+    <h1>{% trans "FAQ" %}</h1>
+    <p>{% trans "Everything you need to know to get started." %}</p>
+  </div>
+</section>
+
+<section class="mkt-section">
+  <div class="mkt-section-inner mkt-narrow">
+    <div class="accordion mkt-accordion" id="faqAccordion">
+
+      <div class="accordion-item">
+        <h2 class="accordion-header">
+          <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#faq1">
+            {% trans "How do I register as a farmer?" %}
+          </button>
+        </h2>
+        <div id="faq1" class="accordion-collapse collapse show" data-bs-parent="#faqAccordion">
+          <div class="accordion-body">{% blocktrans %}Click "Jisajili" on the home page or login screen. You'll choose a username and password, enter your details and your village, and you're in - no officer visit required.{% endblocktrans %}</div>
+        </div>
+      </div>
+
+      <div class="accordion-item">
+        <h2 class="accordion-header">
+          <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq2">
+            {% trans "How do I request seeds?" %}
+          </button>
+        </h2>
+        <div id="faq2" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+          <div class="accordion-body">{% trans "Once logged in, use \"Request Seeds\" on your dashboard. Choose the seed type, season and quantity. Your ward's Extension Officer will verify it, then your Village Officer will fulfill it." %}</div>
+        </div>
+      </div>
+
+      <div class="accordion-item">
+        <h2 class="accordion-header">
+          <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq3">
+            {% trans "Why hasn't my request been verified yet?" %}
+          </button>
+        </h2>
+        <div id="faq3" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+          <div class="accordion-body">{% trans "If you have an earlier seed delivery you haven't confirmed receiving yet, new requests are held until you confirm it. Check \"My Allocations\" on your dashboard for anything awaiting your confirmation." %}</div>
+        </div>
+      </div>
+
+      <div class="accordion-item">
+        <h2 class="accordion-header">
+          <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq4">
+            {% trans "Can I request the same seed type twice in one season?" %}
+          </button>
+        </h2>
+        <div id="faq4" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+          <div class="accordion-body">{% trans "No - one active or fulfilled request per seed type per season. If an earlier request was rejected, you're free to submit a new one." %}</div>
+        </div>
+      </div>
+
+      <div class="accordion-item">
+        <h2 class="accordion-header">
+          <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq5">
+            {% trans "I forgot my password. What do I do?" %}
+          </button>
+        </h2>
+        <div id="faq5" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+          <div class="accordion-body">{% blocktrans %}Use "Forgot password?" on the sign-in page. If you added an email when you registered, you'll receive a reset link. No email on file? Contact your Village Officer for help.{% endblocktrans %}</div>
+        </div>
+      </div>
+
+      <div class="accordion-item">
+        <h2 class="accordion-header">
+          <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq6">
+            {% trans "Can I use the system in Swahili?" %}
+          </button>
+        </h2>
+        <div id="faq6" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+          <div class="accordion-body">{% trans "Yes - use the language switcher in the top menu to change between English and Kiswahili at any time." %}</div>
+        </div>
+      </div>
+
+      <div class="accordion-item">
+        <h2 class="accordion-header">
+          <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq7">
+            {% trans "How do I report a problem or give feedback?" %}
+          </button>
+        </h2>
+        <div id="faq7" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+          <div class="accordion-body">{% trans "Farmers can submit a suggestion or complaint from their dashboard, optionally linked to a specific request. Your Extension Officer will follow up directly." %}</div>
+        </div>
+      </div>
+
+      <div class="accordion-item">
+        <h2 class="accordion-header">
+          <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq8">
+            {% trans "I'm an officer, not a farmer - how do I get an account?" %}
+          </button>
+        </h2>
+        <div id="faq8" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+          <div class="accordion-body">{% trans "Officer accounts (Regional, District, Ward, Village, Extension) are created by a System Administrator. Use the Contact page below to get in touch." %}</div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<section class="mkt-cta">
+  <div class="mkt-cta-inner">
+    <h2>{% trans "Still have a question?" %}</h2>
+    <div class="mkt-hero-actions justify-content-center">
+      <a href="{% url 'contact' %}" class="btn btn-mkt-primary btn-lg">{% trans "Contact Us" %}</a>
+    </div>
+  </div>
+</section>
+{% endblock %}

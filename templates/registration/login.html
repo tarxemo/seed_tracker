@@ -1,5 +1,6 @@
+{% load i18n %}
 <!DOCTYPE html>
-<html lang="en">
+<html lang="{{ LANGUAGE_CODE }}">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -26,42 +27,73 @@
 <body>
 <div class="login-wrapper">
   <div class="login-card">
+    <div class="d-flex justify-content-end mb-2">
+      <form action="{% url 'set_language' %}" method="post">
+        {% csrf_token %}
+        <input type="hidden" name="next" value="{{ request.get_full_path }}">
+        <select name="language" onchange="this.form.submit()" class="form-select form-select-sm" style="font-size:12px;width:auto;">
+          {% get_current_language as CURRENT_LANGUAGE %}
+          {% get_available_languages as AVAILABLE_LANGUAGES %}
+          {% for lang_code, lang_name in AVAILABLE_LANGUAGES %}
+          <option value="{{ lang_code }}" {% if lang_code == CURRENT_LANGUAGE %}selected{% endif %}>{{ lang_name }}</option>
+          {% endfor %}
+        </select>
+      </form>
+    </div>
     <div class="login-logo"><i class="fas fa-seedling"></i></div>
     <h1 class="login-title">Mbeya Seed Tracker</h1>
-    <p class="login-subtitle">Government Seed Allocation & Tracking System<br>Mbeya Region, Tanzania</p>
+    <p class="login-subtitle">{% trans "Government Seed Allocation & Tracking System" %}<br>{% trans "Mbeya Region, Tanzania" %}</p>
+    {% for message in messages %}
+    <div class="alert alert-{{ message.tags }}" style="border-radius:10px;font-size:13px;">{{ message }}</div>
+    {% endfor %}
     {% if form.errors %}
     <div class="alert alert-danger alert-sm" style="border-radius:10px;font-size:13px;">
-      <i class="fas fa-exclamation-circle me-1"></i> Invalid username or password.
+      <i class="fas fa-exclamation-circle me-1"></i> {% trans "Invalid username or password." %}
     </div>
     {% endif %}
     <form method="post">
       {% csrf_token %}
       <div class="mb-3">
-        <label class="form-label">Username</label>
+        <label class="form-label">{% trans "Username" %}</label>
         <div class="input-group">
           <span class="input-group-text"><i class="fas fa-user text-muted"></i></span>
           {{ form.username }}
         </div>
       </div>
       <div class="mb-4">
-        <label class="form-label">Password</label>
+        <label class="form-label">{% trans "Password" %}</label>
         <div class="input-group">
           <span class="input-group-text"><i class="fas fa-lock text-muted"></i></span>
           {{ form.password }}
+          <button type="button" class="btn btn-outline-secondary toggle-password" data-target="id_password" tabindex="-1" style="border-radius:0 10px 10px 0;border-left:none"><i class="fas fa-eye"></i></button>
         </div>
       </div>
       <button type="submit" class="btn btn-login">
-        <i class="fas fa-sign-in-alt me-2"></i>Sign In
+        <i class="fas fa-sign-in-alt me-2"></i>{% trans "Sign In" %}
       </button>
     </form>
     <div class="login-footer">
-      <a href="{% url 'farmer_register' %}" style="color:#1a6b3c;font-weight:600"><i class="fas fa-user-plus me-1"></i>Jisajili - Register as a Farmer</a>
+      <a href="{% url 'forgot_password' %}" style="color:#7a8494"><i class="fas fa-key me-1"></i>{% trans "Forgot password?" %}</a>
     </div>
     <div class="login-footer">
-      <i class="fas fa-shield-alt me-1"></i>Secured System &mdash; Authorized Users Only<br>
-      Ministry of Agriculture, Mbeya Region
+      <a href="{% url 'farmer_register' %}" style="color:#1a6b3c;font-weight:600"><i class="fas fa-user-plus me-1"></i>{% trans "Jisajili - Register as a Farmer" %}</a>
+    </div>
+    <div class="login-footer">
+      <i class="fas fa-shield-alt me-1"></i>{% trans "Secured System" %} &mdash; {% trans "Authorized Users Only" %}<br>
+      {% trans "Ministry of Agriculture, Mbeya Region" %}
     </div>
   </div>
 </div>
+<script>
+document.querySelectorAll('.toggle-password').forEach(function(btn) {
+  btn.addEventListener('click', function() {
+    var input = document.getElementById(btn.dataset.target);
+    var icon = btn.querySelector('i');
+    if (!input) return;
+    if (input.type === 'password') { input.type = 'text'; icon.classList.remove('fa-eye'); icon.classList.add('fa-eye-slash'); }
+    else { input.type = 'password'; icon.classList.remove('fa-eye-slash'); icon.classList.add('fa-eye'); }
+  });
+});
+</script>
 </body>
 </html>

@@ -1,11 +1,16 @@
 from datetime import date
 from decimal import Decimal
+from unittest.mock import patch
 
 from django.test import TestCase, Client
+from django.utils import timezone
+from django.contrib.auth.tokens import default_token_generator
+from django.utils.http import urlsafe_base64_encode
+from django.utils.encoding import force_bytes
 
 from core.models import (
     Region, District, Ward, Village, CustomUser, SeedType, SeedInventory,
-    FarmingSeasons, Farmer, SeedAllocation, StockTransfer, SeedRequest,
+    FarmingSeasons, Farmer, SeedAllocation, StockTransfer, SeedRequest, Distribution,
 )
 from core.decorators import user_can_access_farmer
 from core.stock import region_balance, district_balance, ward_balance, village_balance
@@ -215,3 +220,98 @@ class FarmerRegistrationTests(SeedTrackerTestCase):
             'village': self.village.id, 'crop_type': 'maize', 'farm_location': '', 'farm_size': '', 'national_id': '',
         })
         self.assertFalse(CustomUser.objects.filter(username='weak_t').exists())
+
+
+class SeedRequestDuplicateTests(SeedTrackerTestCase):
+    def test_fulfilled_request_blocks_new_request_same_season(self):
+        SeedRequest.objects.create(farmer=self.farmer, seed_type=self.seed_type, season=self.season,
+                                    quantity_requested=Decimal('10'), status='fulfilled')
+        farmer_user = CustomUser.objects.create_user('farmer_dup_t', password='Pass1234!', role='farmer')
+        self.farmer.user = farmer_user
+        self.farmer.save(update_fields=['user'])
+
+        client = Client()
+        client.login(username='farmer_dup_t', password='Pass1234!')
+        client.post('/requests/new/', {'seed_type': self.seed_type.id, 'season': self.season.id, 'quantity_requested': '5', 'notes': ''})
+        self.assertEqual(SeedRequest.objects.filter(farmer=self.farmer, seed_type=self.seed_type, season=self.season).count(), 1)
+
+    def test_rejected_request_does_not_block_resubmission(self):
+        SeedRequest.objects.create(farmer=self.farmer, seed_type=self.seed_type, season=self.season,
+                                    quantity_requested=Decimal('10'), status='rejected')
+        farmer_user = CustomUser.objects.create_user('farmer_retry_t', password='Pass1234!', role='farmer')
+        self.farmer.user = farmer_user
+        self.farmer.save(update_fields=['user'])
+
+        client = Client()
+        client.login(username='farmer_retry_t', password='Pass1234!')
+        client.post('/requests/new/', {'seed_type': self.seed_type.id, 'season': self.season.id, 'quantity_requested': '5', 'notes': ''})
+        self.assertEqual(SeedRequest.objects.filter(farmer=self.farmer, seed_type=self.seed_type, season=self.season).count(), 2)
+
+
+class ConfirmBeforeVerifyTests(SeedTrackerTestCase):
+    def _create_unconfirmed_distribution(self, confirmed):
+        allocation = SeedAllocation.objects.create(
+            farmer=self.farmer, seed_type=self.seed_type, season=self.season,
+            quantity_allocated=Decimal('20'), status='distributed',
+            requested_by=self.village_officer, approved_by=self.village_officer,
+        )
+        Distribution.objects.create(
+            allocation=allocation, quantity_distributed=Decimal('20'), confirmed_by=self.village_officer,
+            farmer_confirmed=confirmed, farmer_confirmed_at=timezone.now() if confirmed else None,
+        )
+
+    def test_blocks_verify_when_farmer_has_unconfirmed_distribution(self):
+        self._create_unconfirmed_distribution(confirmed=False)
+        self.assertTrue(self.farmer.has_unconfirmed_distribution)
+        other_seed = SeedType.objects.create(name='Rice Supa', unit='kg')
+        sr = SeedRequest.objects.create(farmer=self.farmer, seed_type=other_seed, season=self.season, quantity_requested=Decimal('5'))
+
+        client = Client()
+        client.login(username='extension_t', password='Pass1234!')
+        client.post(f'/requests/{sr.pk}/verify/', {'verify': '1'})
+        sr.refresh_from_db()
+        self.assertEqual(sr.status, 'submitted')  # still blocked
+
+    def test_allows_verify_once_farmer_confirms(self):
+        self._create_unconfirmed_distribution(confirmed=True)
+        self.assertFalse(self.farmer.has_unconfirmed_distribution)
+        other_seed = SeedType.objects.create(name='Rice Supa', unit='kg')
+        sr = SeedRequest.objects.create(farmer=self.farmer, seed_type=other_seed, season=self.season, quantity_requested=Decimal('5'))
+
+        client = Client()
+        client.login(username='extension_t', password='Pass1234!')
+        client.post(f'/requests/{sr.pk}/verify/', {'verify': '1'})
+        sr.refresh_from_db()
+        self.assertEqual(sr.status, 'verified')
+
+
+class ForgotPasswordTests(SeedTrackerTestCase):
+    @patch('core.views.send_email')
+    def test_valid_token_resets_password(self, mock_send_email):
+        mock_send_email.return_value = True
+        self.village_officer.email = 'village@test.com'
+        self.village_officer.save()
+
+        client = Client()
+        client.post('/forgot-password/', {'username_or_email': 'village_t'})
+        self.assertTrue(mock_send_email.called)
+
+        uid = urlsafe_base64_encode(force_bytes(self.village_officer.pk))
+        token = default_token_generator.make_token(self.village_officer)
+        client.post(f'/reset-password/{uid}/{token}/', {'new_password1': 'BrandNewPass99!', 'new_password2': 'BrandNewPass99!'})
+        self.assertTrue(Client().login(username='village_t', password='BrandNewPass99!'))
+
+    @patch('core.views.send_email')
+    def test_unknown_identifier_gives_same_generic_message_and_sends_nothing(self, mock_send_email):
+        client = Client()
+        resp = client.post('/forgot-password/', {'username_or_email': 'nobody_here'}, follow=True)
+        self.assertFalse(mock_send_email.called)
+        self.assertContains(resp, 'password reset link has been sent')
+
+    def test_tampered_token_rejected(self):
+        uid = urlsafe_base64_encode(force_bytes(self.village_officer.pk))
+        client = Client()
+        resp = client.get(f'/reset-password/{uid}/bad-token-xyz/')
+        self.assertContains(resp, 'Invalid or Expired')
+        resp2 = client.post(f'/reset-password/{uid}/bad-token-xyz/', {'new_password1': 'X', 'new_password2': 'X'})
+        self.assertFalse(Client().login(username='village_t', password='X'))

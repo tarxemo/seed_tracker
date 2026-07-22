@@ -1,0 +1,1761 @@
+# Swahili translations for Mbeya Seed Tracker.
+msgid ""
+msgstr ""
+"Project-Id-Version: seed-tracker 1.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-07-22 16:42+0300\n"
+"PO-Revision-Date: 2026-07-22 14:52+0300\n"
+"Last-Translator: Mbeya Seed Tracker\n"
+"Language-Team: Kiswahili\n"
+"Language: sw\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+msgid "District"
+msgstr "Wilaya"
+
+msgid "Ward"
+msgstr "Kata"
+
+msgid "Village"
+msgstr "Kijiji"
+
+msgid "Username"
+msgstr "Jina la Mtumiaji"
+
+msgid "Password"
+msgstr "Nywila"
+
+msgid "Confirm Password"
+msgstr "Thibitisha Nywila"
+
+msgid "This field is required."
+msgstr "Sehemu hii inahitajika."
+
+msgid "Passwords do not match."
+msgstr "Nywila hazifanani."
+
+msgid "This district is not in the selected region."
+msgstr "Wilaya hii haipo katika mkoa uliochaguliwa."
+
+msgid "This ward is not in the selected district."
+msgstr "Kata hii haipo katika wilaya iliyochaguliwa."
+
+msgid "This village is not in the selected ward."
+msgstr "Kijiji hiki hakipo katika kata iliyochaguliwa."
+
+msgid "Old Password"
+msgstr "Nywila ya Zamani"
+
+msgid "New Password"
+msgstr "Nywila Mpya"
+
+msgid "Confirm New Password"
+msgstr "Thibitisha Nywila Mpya"
+
+msgid "Username or Email"
+msgstr "Jina la Mtumiaji au Barua Pepe"
+
+msgid "Email (optional - needed for password reset)"
+msgstr "Barua Pepe (hiari - inahitajika kuweka upya nywila)"
+
+msgid "This username is already taken."
+msgstr "Jina hili la mtumiaji tayari limetumika."
+
+msgid ""
+"A farmer with this phone number is already registered. If this is you, "
+"please contact your Village Officer for help accessing your account."
+msgstr ""
+"Kuna mkulima aliyesajiliwa tayari kwa namba hii ya simu. Kama ni wewe, "
+"wasiliana na Afisa wa Kijiji chako kwa msaada wa kufikia akaunti yako."
+
+msgid "Related Allocation (optional)"
+msgstr "Mgao Unaohusiana (hiari)"
+
+#, fuzzy
+#| msgid "Thank you - your feedback has been submitted."
+msgid "Thank you - your message has been sent. We will respond soon."
+msgstr "Asante - maoni yako yamewasilishwa."
+
+msgid "System Administrator"
+msgstr "Msimamizi wa Mfumo"
+
+msgid "Regional Officer"
+msgstr "Afisa wa Mkoa"
+
+msgid "District Officer"
+msgstr "Afisa wa Wilaya"
+
+msgid "Ward Officer"
+msgstr "Afisa wa Kata"
+
+msgid "Village Officer"
+msgstr "Afisa wa Kijiji"
+
+msgid "Agricultural Extension Officer (Bwana Shamba)"
+msgstr "Afisa Ugani wa Kilimo (Bwana Shamba)"
+
+msgid "Farmer (Mkulima)"
+msgstr "Mkulima"
+
+msgid "Maize"
+msgstr "Mahindi"
+
+msgid "Rice"
+msgstr "Mchele"
+
+msgid "Beans"
+msgstr "Maharage"
+
+msgid "Sunflower"
+msgstr "Alizeti"
+
+msgid "Sorghum"
+msgstr "Mtama"
+
+msgid "Millet"
+msgstr "Ulezi"
+
+msgid "Wheat"
+msgstr "Ngano"
+
+msgid "Cassava"
+msgstr "Muhogo"
+
+msgid "Other"
+msgstr "Nyingine"
+
+msgid "Active"
+msgstr "Amilifu"
+
+msgid "Inactive"
+msgstr "Haitumiki"
+
+msgid "Pending"
+msgstr "Inasubiri"
+
+msgid "Approved"
+msgstr "Imeidhinishwa"
+
+msgid "Rejected"
+msgstr "Imekataliwa"
+
+msgid "Distributed"
+msgstr "Imesambazwa"
+
+msgid "Submitted"
+msgstr "Imewasilishwa"
+
+msgid "Verified"
+msgstr "Imethibitishwa"
+
+msgid "Fulfilled"
+msgstr "Imetimizwa"
+
+msgid "Suggestion"
+msgstr "Wazo"
+
+msgid "Complaint"
+msgstr "Malalamiko"
+
+msgid "General Feedback"
+msgstr "Maoni ya Jumla"
+
+msgid "Open"
+msgstr "Wazi"
+
+msgid "Resolved"
+msgstr "Imetatuliwa"
+
+msgid "Sent"
+msgstr "Imetumwa"
+
+msgid "Failed"
+msgstr "Imeshindwa"
+
+msgid "Region → District"
+msgstr "Mkoa → Wilaya"
+
+msgid "District → Ward"
+msgstr "Wilaya → Kata"
+
+msgid "Ward → Village"
+msgstr "Kata → Kijiji"
+
+msgid "Distribution"
+msgstr "Usambazaji"
+
+msgid "Request"
+msgstr "Ombi"
+
+msgid "Region"
+msgstr "Mkoa"
+
+msgid "Your password has been changed."
+msgstr "Nywila yako imebadilishwa."
+
+msgid ""
+"If an account with that username/email exists, a password reset link has "
+"been sent."
+msgstr ""
+"Iwapo akaunti yenye jina la mtumiaji/barua pepe hiyo ipo, kiungo cha kuweka "
+"upya nywila kimetumwa."
+
+msgid "Your password has been reset. You can now sign in."
+msgstr "Nywila yako imewekwa upya. Sasa unaweza kuingia."
+
+msgid "Current Stock Balance (kg)"
+msgstr "Kiasi cha Hifadhi Kilichopo (kilo)"
+
+msgid "Pending Seed Requests"
+msgstr "Maombi ya Mbegu Yanayosubiri"
+
+msgid "Total Seeds Received (kg)"
+msgstr "Jumla ya Mbegu Zilizopokelewa (kilo)"
+
+msgid "No permission."
+msgstr "Huna ruhusa."
+
+#, python-format
+msgid "Farmer %(name)s registered successfully."
+msgstr "Mkulima %(name)s amesajiliwa kikamilifu."
+
+msgid "Register Farmer"
+msgstr "Sajili Mkulima"
+
+msgid "You do not have permission to edit this farmer."
+msgstr "Huna ruhusa ya kuhariri mkulima huyu."
+
+msgid "Farmer updated."
+msgstr "Taarifa za mkulima zimesasishwa."
+
+msgid "Edit Farmer"
+msgstr "Hariri Mkulima"
+
+msgid "You do not have permission to view this farmer."
+msgstr "Huna ruhusa ya kuona mkulima huyu."
+
+msgid "Inventory added."
+msgstr "Hifadhi imeongezwa."
+
+msgid "Add Seed Inventory"
+msgstr "Ongeza Hifadhi ya Mbegu"
+
+msgid ""
+"This farmer already has an allocation for this seed type in this season."
+msgstr "Mkulima huyu tayari ana mgao wa aina hii ya mbegu kwa msimu huu."
+
+#, python-format
+msgid ""
+"Insufficient village stock for %(name)s. Available: %(qty)s %(unit)s. "
+"Request more stock from your Ward Officer."
+msgstr ""
+"Hifadhi ya kijiji haitoshi kwa %(name)s. Iliyopo: %(qty)s %(unit)s. Omba "
+"hifadhi zaidi kutoka kwa Afisa wa Kata."
+
+msgid "New Seed Allocation"
+msgstr "Mgao Mpya wa Mbegu"
+
+#, python-format
+msgid "Allocation recorded and SMS sent to %(phone)s."
+msgstr "Mgao umerekodiwa na SMS imetumwa kwa %(phone)s."
+
+msgid "You do not have permission to view this allocation."
+msgstr "Huna ruhusa ya kuona mgao huu."
+
+msgid "You can only record distributions for farmers in your own village."
+msgstr "Unaweza kurekodi usambazaji kwa wakulima wa kijiji chako pekee."
+
+msgid "Distribution already recorded."
+msgstr "Usambazaji tayari umerekodiwa."
+
+msgid "Distribution recorded."
+msgstr "Usambazaji umerekodiwa."
+
+msgid "Total Seeds Received via Transfers (kg)"
+msgstr "Jumla ya Mbegu Zilizopokelewa kwa Uhamishaji (kilo)"
+
+msgid "Remaining Stock (kg)"
+msgstr "Hifadhi Iliyobaki (kilo)"
+
+msgid "Seed Requests Submitted"
+msgstr "Maombi ya Mbegu Yaliyowasilishwa"
+
+msgid "Awaiting Fulfillment"
+msgstr "Yanasubiri Kutimizwa"
+
+msgid "Farmer"
+msgstr "Mkulima"
+
+#, python-format
+msgid "User %(username)s created."
+msgstr "Mtumiaji %(username)s ameongezwa."
+
+msgid "Create User"
+msgstr "Ongeza Mtumiaji"
+
+msgid "User updated."
+msgstr "Mtumiaji amesasishwa."
+
+msgid "Edit User"
+msgstr "Hariri Mtumiaji"
+
+msgid "Seed type added."
+msgstr "Aina ya mbegu imeongezwa."
+
+msgid "Add Seed Type"
+msgstr "Ongeza Aina ya Mbegu"
+
+msgid "Season created."
+msgstr "Msimu umeongezwa."
+
+msgid "Add Season"
+msgstr "Ongeza Msimu"
+
+msgid "Region added."
+msgstr "Mkoa umeongezwa."
+
+msgid "District added."
+msgstr "Wilaya imeongezwa."
+
+msgid "Ward added."
+msgstr "Kata imeongezwa."
+
+msgid "Village added."
+msgstr "Kijiji kimeongezwa."
+
+#, python-format
+msgid "%(qty)s %(unit)s of %(name)s distributed to %(target)s."
+msgstr "%(qty)s %(unit)s ya %(name)s zimesambazwa kwa %(target)s."
+
+msgid "Stock request submitted."
+msgstr "Ombi la hifadhi limewasilishwa."
+
+msgid "You are not authorized to respond to this request."
+msgstr "Huna ruhusa ya kujibu ombi hili."
+
+#, python-format
+msgid "Insufficient balance to approve. Available: %(qty)s %(unit)s."
+msgstr "Kiasi hakitoshi kuidhinisha. Kilichopo: %(qty)s %(unit)s."
+
+msgid "Request approved and stock transferred."
+msgstr "Ombi limeidhinishwa na hifadhi imehamishwa."
+
+msgid "Request rejected."
+msgstr "Ombi limekataliwa."
+
+#, python-format
+msgid "Welcome, %(name)s! Your farmer ID is %(farmer_id)s."
+msgstr "Karibu, %(name)s! Kitambulisho chako cha mkulima ni %(farmer_id)s."
+
+msgid "Your farm information has been updated."
+msgstr "Taarifa za shamba lako zimesasishwa."
+
+msgid "Thank you for confirming receipt of your seeds."
+msgstr "Asante kwa kuthibitisha kupokea mbegu zako."
+
+msgid "You do not have permission to submit seed requests."
+msgstr "Huna ruhusa ya kuwasilisha maombi ya mbegu."
+
+msgid "No farmer profile found for this account."
+msgstr "Hakuna wasifu wa mkulima uliopatikana kwa akaunti hii."
+
+msgid ""
+"This farmer already has a request (or fulfilled allocation) for this seed "
+"type this season."
+msgstr ""
+"Mkulima huyu tayari ana ombi (au mgao uliotimizwa) kwa aina hii ya mbegu "
+"msimu huu."
+
+msgid "Seed request submitted."
+msgstr "Ombi la mbegu limewasilishwa."
+
+msgid "You can only verify requests from farmers in your own ward."
+msgstr "Unaweza kuthibitisha maombi ya wakulima wa kata yako pekee."
+
+#, python-format
+msgid ""
+"%(name)s has not yet confirmed receipt of a previous seed distribution. They "
+"must confirm it (via their own login) before a new request can be verified."
+msgstr ""
+"%(name)s bado hajathibitisha kupokea usambazaji wa awali wa mbegu. Lazima "
+"athibitishe (kupitia akaunti yake) kabla ombi jipya kuthibitishwa."
+
+msgid "Request verified and forwarded to the Village Officer."
+msgstr "Ombi limethibitishwa na kutumwa kwa Afisa wa Kijiji."
+
+msgid "You can only fulfill requests for farmers in your own village."
+msgstr "Unaweza kutimiza maombi ya wakulima wa kijiji chako pekee."
+
+#, python-format
+msgid "Request fulfilled and SMS sent to %(phone)s."
+msgstr "Ombi limetimizwa na SMS imetumwa kwa %(phone)s."
+
+msgid "Thank you - your feedback has been submitted."
+msgstr "Asante - maoni yako yamewasilishwa."
+
+msgid "You can only resolve feedback from farmers in your own ward."
+msgstr "Unaweza kutatua maoni ya wakulima wa kata yako pekee."
+
+msgid "Feedback resolved."
+msgstr "Maoni yametatuliwa."
+
+msgid "Dashboard"
+msgstr "Dashibodi"
+
+msgid "My Farm Info"
+msgstr "Taarifa za Shamba Langu"
+
+msgid "Request Seeds"
+msgstr "Omba Mbegu"
+
+msgid "My Requests"
+msgstr "Maombi Yangu"
+
+msgid "My Allocations"
+msgstr "Mgao Wangu"
+
+msgid "Feedback"
+msgstr "Maoni"
+
+msgid "Main"
+msgstr "Kuu"
+
+msgid "Operations"
+msgstr "Shughuli"
+
+msgid "Farmers"
+msgstr "Wakulima"
+
+msgid "Seed Inventory"
+msgstr "Hifadhi ya Mbegu"
+
+msgid "Allocations"
+msgstr "Mgao"
+
+msgid "Seed Requests"
+msgstr "Maombi ya Mbegu"
+
+msgid "Complaints"
+msgstr "Malalamiko"
+
+msgid "Stock Transfers"
+msgstr "Uhamishaji wa Hifadhi"
+
+msgid "Analytics"
+msgstr "Uchambuzi"
+
+msgid "Reports"
+msgstr "Ripoti"
+
+msgid "SMS Logs"
+msgstr "Kumbukumbu za SMS"
+
+msgid "Administration"
+msgstr "Utawala"
+
+msgid "User Management"
+msgstr "Usimamizi wa Watumiaji"
+
+msgid "Seed Types"
+msgstr "Aina za Mbegu"
+
+msgid "Seasons"
+msgstr "Misimu"
+
+msgid "Locations"
+msgstr "Maeneo"
+
+msgid "Activity Logs"
+msgstr "Kumbukumbu za Shughuli"
+
+msgid "Change Password"
+msgstr "Badilisha Nywila"
+
+msgid "Logout"
+msgstr "Toka"
+
+msgid "Mbeya Region"
+msgstr "Mkoa wa Mbeya"
+
+msgid "System Activity Logs"
+msgstr "Kumbukumbu za Shughuli za Mfumo"
+
+msgid "User"
+msgstr "Mtumiaji"
+
+msgid "Action"
+msgstr "Kitendo"
+
+msgid "Model"
+msgstr "Muundo"
+
+msgid "IP Address"
+msgstr "Anwani ya IP"
+
+msgid "Timestamp"
+msgstr "Muda"
+
+msgid "System"
+msgstr "Mfumo"
+
+msgid "No activity logs"
+msgstr "Hakuna kumbukumbu za shughuli"
+
+msgid "Prev"
+msgstr "Nyuma"
+
+msgid "Next"
+msgstr "Mbele"
+
+msgid "Allocation Detail"
+msgstr "Maelezo ya Mgao"
+
+msgid "Allocation"
+msgstr "Mgao"
+
+msgid "Seed Details"
+msgstr "Maelezo ya Mbegu"
+
+msgid "Season"
+msgstr "Msimu"
+
+msgid "Collection"
+msgstr "Ukusanyaji"
+
+msgid "Tracking"
+msgstr "Ufuatiliaji"
+
+msgid "Requested by"
+msgstr "Iliombwa na"
+
+msgid "Approved by"
+msgstr "Iliidhinishwa na"
+
+msgid "SMS Sent"
+msgstr "SMS Imetumwa"
+
+msgid "Yes"
+msgstr "Ndiyo"
+
+msgid "No"
+msgstr "Hapana"
+
+msgid "Rejection Reason"
+msgstr "Sababu ya Kukataa"
+
+msgid "Record Distribution"
+msgstr "Rekodi Usambazaji"
+
+msgid "Back to List"
+msgstr "Rudi kwenye Orodha"
+
+msgid "Seed Type"
+msgstr "Aina ya Mbegu"
+
+msgid "Farming Season"
+msgstr "Msimu wa Kilimo"
+
+msgid "Quantity Allocated"
+msgstr "Kiasi Kilichogawiwa"
+
+msgid "Collection Date"
+msgstr "Tarehe ya Ukusanyaji"
+
+msgid "Collection Location"
+msgstr "Mahali pa Ukusanyaji"
+
+msgid "Notes"
+msgstr "Maelezo"
+
+msgid "Submit Allocation"
+msgstr "Wasilisha Mgao"
+
+msgid "Cancel"
+msgstr "Ghairi"
+
+msgid "Seed Allocations"
+msgstr "Mgao wa Mbegu"
+
+msgid "total"
+msgstr "jumla"
+
+msgid "New Allocation"
+msgstr "Mgao Mpya"
+
+msgid "Search farmer..."
+msgstr "Tafuta mkulima..."
+
+msgid "All Status"
+msgstr "Hali Zote"
+
+msgid "Clear"
+msgstr "Futa"
+
+msgid "Qty"
+msgstr "Kiasi"
+
+msgid "Status"
+msgstr "Hali"
+
+msgid "SMS"
+msgstr "SMS"
+
+msgid "Actions"
+msgstr "Vitendo"
+
+msgid "No allocations found"
+msgstr "Hakuna mgao uliopatikana"
+
+#, python-format
+msgid ""
+"You have <strong>%(pending_fulfillments)s</strong> verified seed request "
+"ready to fulfill."
+msgid_plural ""
+"You have <strong>%(pending_fulfillments)s</strong> verified seed requests "
+"ready to fulfill."
+msgstr[0] ""
+"Una ombi <strong>%(pending_fulfillments)s</strong> la mbegu "
+"lililothibitishwa tayari kutimizwa.Una ombi "
+"<strong>%(pending_fulfillments)s</strong> la mbegu lililothibitishwa tayari "
+"kutimizwa."
+msgstr[1] ""
+"Una maombi <strong>%(pending_fulfillments)s</strong> ya mbegu "
+"yaliyothibitishwa tayari kutimizwa.Una maombi "
+"<strong>%(pending_fulfillments)s</strong> ya mbegu yaliyothibitishwa tayari "
+"kutimizwa."
+
+msgid "Fulfill Now"
+msgstr "Timiza Sasa"
+
+msgid "Registered Farmers"
+msgstr "Wakulima Waliosajiliwa"
+
+msgid "Total Allocations"
+msgstr "Jumla ya Mgao"
+
+msgid "approved"
+msgstr "imeidhinishwa"
+
+msgid "pending"
+msgstr "inasubiri"
+
+msgid "Seeds Distributed"
+msgstr "Mbegu Zilizosambazwa"
+
+msgid "kg total"
+msgstr "kilo jumla"
+
+msgid "Monthly Allocation Trend"
+msgstr "Mwenendo wa Mgao wa Kila Mwezi"
+
+msgid "Allocation Status"
+msgstr "Hali ya Mgao"
+
+msgid "Seeds by Type (kg)"
+msgstr "Mbegu kwa Aina (kilo)"
+
+msgid "Farmers by Crop Type"
+msgstr "Wakulima kwa Aina ya Zao"
+
+msgid "Recent Allocations"
+msgstr "Mgao wa Hivi Karibuni"
+
+msgid "View All"
+msgstr "Angalia Zote"
+
+msgid "Seed"
+msgstr "Mbegu"
+
+msgid "Date"
+msgstr "Tarehe"
+
+msgid "No allocations yet"
+msgstr "Hakuna mgao bado"
+
+msgid "Recent Activity"
+msgstr "Shughuli za Hivi Karibuni"
+
+msgid "No activity yet"
+msgstr "Hakuna shughuli bado"
+
+msgid "Record Seed Distribution"
+msgstr "Rekodi Usambazaji wa Mbegu"
+
+#, python-format
+msgid "%(qty)s %(unit)s of %(name)s"
+msgstr "%(qty)s %(unit)s ya %(name)s"
+
+msgid "Quantity Distributed"
+msgstr "Kiasi Kilichosambazwa"
+
+msgid "Confirm Distribution"
+msgstr "Thibitisha Usambazaji"
+
+msgid "Distribution Records"
+msgstr "Rekodi za Usambazaji"
+
+msgid "Record from Allocations"
+msgstr "Rekodi kutoka Mgao"
+
+msgid "Qty Distributed"
+msgstr "Kiasi Kilichosambazwa"
+
+msgid "Confirmed By"
+msgstr "Ilithibitishwa na"
+
+msgid "Date Recorded"
+msgstr "Tarehe ya Kurekodiwa"
+
+msgid "No distribution records yet"
+msgstr "Hakuna rekodi za usambazaji bado"
+
+msgid "Confirm Receipt"
+msgstr "Thibitisha Kupokea"
+
+#, python-format
+msgid "%(qty)s %(unit)s recorded as collected on %(cdate)s."
+msgstr "%(qty)s %(unit)s zimerekodiwa kama zilizokusanywa tarehe %(cdate)s."
+
+#, python-format
+msgid "You already confirmed receipt on %(cdate)s."
+msgstr "Tayari ulithibitisha kupokea tarehe %(cdate)s."
+
+msgid "Back to Dashboard"
+msgstr "Rudi kwenye Dashibodi"
+
+msgid "Please confirm that you personally received these seeds."
+msgstr "Tafadhali thibitisha kuwa wewe binafsi umepokea mbegu hizi."
+
+msgid "Ndiyo, Nimepokea (Yes, I Received It)"
+msgstr "Ndiyo, Nimepokea"
+
+#, python-format
+msgid "Karibu, %(name)s"
+msgstr "Karibu, %(name)s"
+
+msgid "Edit Profile"
+msgstr "Hariri Wasifu"
+
+msgid "Pending Requests"
+msgstr "Maombi Yanayosubiri"
+
+msgid "Total Requests"
+msgstr "Jumla ya Maombi"
+
+msgid "Open Feedback"
+msgstr "Maoni Yaliyo Wazi"
+
+msgid "My Seed Requests"
+msgstr "Maombi Yangu ya Mbegu"
+
+msgid "No requests yet - use \"Request Seeds\" above"
+msgstr "Hakuna maombi bado - tumia \"Omba Mbegu\" hapo juu"
+
+msgid "My Seed Allocations"
+msgstr "Mgao Wangu wa Mbegu"
+
+msgid "Confirm Received"
+msgstr "Thibitisha Umepokea"
+
+msgid "Confirmed"
+msgstr "Imethibitishwa"
+
+msgid "Recent SMS"
+msgstr "SMS za Hivi Karibuni"
+
+msgid "ago"
+msgstr "iliyopita"
+
+msgid "No SMS yet"
+msgstr "Hakuna SMS bado"
+
+msgid "Have a suggestion, complaint or feedback about the seed programme?"
+msgstr "Una wazo, malalamiko au maoni kuhusu mpango wa mbegu?"
+
+msgid "Give Feedback"
+msgstr "Toa Maoni"
+
+msgid "Farmer Profile"
+msgstr "Wasifu wa Mkulima"
+
+msgid "acres"
+msgstr "ekari"
+
+#, python-format
+msgid "Registered %(regdate)s"
+msgstr "Alisajiliwa %(regdate)s"
+
+msgid "Allocation History"
+msgstr "Historia ya Mgao"
+
+msgid "Quantity"
+msgstr "Kiasi"
+
+msgid "First Name"
+msgstr "Jina la Kwanza"
+
+msgid "Last Name"
+msgstr "Jina la Ukoo"
+
+msgid "Phone Number"
+msgstr "Namba ya Simu"
+
+msgid "National ID"
+msgstr "Kitambulisho cha Taifa"
+
+msgid "Crop Type"
+msgstr "Aina ya Zao"
+
+msgid "Farm Location"
+msgstr "Mahali pa Shamba"
+
+msgid "Farm Size (Acres)"
+msgstr "Ukubwa wa Shamba (Ekari)"
+
+msgid "Save Farmer"
+msgstr "Hifadhi Mkulima"
+
+msgid "Farmer Registry"
+msgstr "Orodha ya Wakulima"
+
+#, python-format
+msgid "%(counter)s registered farmer"
+msgid_plural "%(counter)s registered farmers"
+msgstr[0] "%(counter)s mkulima aliyesajiliwa"
+msgstr[1] "%(counter)s wakulima waliosajiliwa"
+
+msgid "Export CSV"
+msgstr "Pakua CSV"
+
+msgid "Search name, ID, phone..."
+msgstr "Tafuta jina, kitambulisho, simu..."
+
+msgid "All Crops"
+msgstr "Mazao Yote"
+
+msgid "Farmer ID"
+msgstr "Kitambulisho cha Mkulima"
+
+msgid "Name"
+msgstr "Jina"
+
+msgid "Phone"
+msgstr "Simu"
+
+msgid "Village / Ward"
+msgstr "Kijiji / Kata"
+
+msgid "Crop"
+msgstr "Zao"
+
+msgid "Registered"
+msgstr "Amesajiliwa"
+
+msgid "No farmers found"
+msgstr "Hakuna wakulima waliopatikana"
+
+msgid "My Farm Information"
+msgstr "Taarifa za Shamba Langu"
+
+msgid "Main Crop"
+msgstr "Zao Kuu"
+
+msgid "Save"
+msgstr "Hifadhi"
+
+msgid "Toa Maoni - Suggestion / Complaint / Feedback"
+msgstr "Toa Maoni - Wazo / Malalamiko / Maoni"
+
+msgid "Category"
+msgstr "Aina"
+
+msgid "Message"
+msgstr "Ujumbe"
+
+msgid "Submit"
+msgstr "Wasilisha"
+
+msgid "Complaints & Feedback"
+msgstr "Malalamiko na Maoni"
+
+msgid "New Feedback"
+msgstr "Maoni Mapya"
+
+msgid "Related"
+msgstr "Inayohusiana"
+
+msgid "Response"
+msgstr "Jibu"
+
+msgid "Resolve"
+msgstr "Tatua"
+
+msgid "No feedback found"
+msgstr "Hakuna maoni yaliyopatikana"
+
+msgid "Resolve Feedback"
+msgstr "Tatua Maoni"
+
+#, python-format
+msgid "%(category)s from %(name)s"
+msgstr "%(category)s kutoka kwa %(name)s"
+
+msgid "Related allocation"
+msgstr "Mgao unaohusiana"
+
+msgid "Mark Resolved"
+msgstr "Weka Kama Imetatuliwa"
+
+msgid "Date Received"
+msgstr "Tarehe ya Kupokelewa"
+
+msgid "Source"
+msgstr "Chanzo"
+
+msgid "Add Stock"
+msgstr "Ongeza Hifadhi"
+
+msgid "Inventory Records"
+msgstr "Rekodi za Hifadhi"
+
+msgid "Added By"
+msgstr "Iliongezwa na"
+
+msgid "No inventory records yet"
+msgstr "Hakuna rekodi za hifadhi bado"
+
+msgid "Location Management"
+msgstr "Usimamizi wa Maeneo"
+
+msgid "Add Region"
+msgstr "Ongeza Mkoa"
+
+msgid "Add District"
+msgstr "Ongeza Wilaya"
+
+msgid "Add Ward"
+msgstr "Ongeza Kata"
+
+msgid "Add Village"
+msgstr "Ongeza Kijiji"
+
+msgid "Location Hierarchy"
+msgstr "Muundo wa Maeneo"
+
+msgid "Villages"
+msgstr "Vijiji"
+
+msgid "No wards"
+msgstr "Hakuna kata"
+
+msgid "No districts"
+msgstr "Hakuna wilaya"
+
+msgid "No locations configured"
+msgstr "Hakuna maeneo yaliyowekwa"
+
+msgid "Reports & Analytics"
+msgstr "Ripoti na Uchambuzi"
+
+msgid "All Seasons"
+msgstr "Misimu Yote"
+
+msgid "Filter"
+msgstr "Chuja"
+
+msgid "Farmers CSV"
+msgstr "CSV ya Wakulima"
+
+msgid "Allocations CSV"
+msgstr "CSV ya Mgao"
+
+msgid "Download PDF"
+msgstr "Pakua PDF"
+
+msgid "Total Distributed (kg)"
+msgstr "Jumla Iliyosambazwa (kilo)"
+
+msgid "Total Beneficiaries"
+msgstr "Jumla ya Wanufaika"
+
+#, python-format
+msgid "Distribution by %(breakdown_label)s"
+msgstr "Usambazaji kwa %(breakdown_label)s"
+
+msgid "Seed Allocation Summary"
+msgstr "Muhtasari wa Mgao wa Mbegu"
+
+msgid "Total Qty"
+msgstr "Jumla ya Kiasi"
+
+msgid "No data"
+msgstr "Hakuna data"
+
+#, python-format
+msgid "By %(breakdown_label)s"
+msgstr "Kwa %(breakdown_label)s"
+
+msgid "Total Qty (kg)"
+msgstr "Jumla ya Kiasi (kilo)"
+
+msgid "Season Name"
+msgstr "Jina la Msimu"
+
+msgid "Start Date"
+msgstr "Tarehe ya Kuanza"
+
+msgid "End Date"
+msgstr "Tarehe ya Kumaliza"
+
+msgid "Set as Active Season"
+msgstr "Weka Kama Msimu Amilifu"
+
+msgid "Save Season"
+msgstr "Hifadhi Msimu"
+
+msgid "Farming Seasons"
+msgstr "Misimu ya Kilimo"
+
+msgid "No seasons defined"
+msgstr "Hakuna misimu iliyowekwa"
+
+msgid "Submit Request on Behalf of a Farmer"
+msgstr "Wasilisha Ombi kwa Niaba ya Mkulima"
+
+msgid "Quantity Requested"
+msgstr "Kiasi Kinachoombwa"
+
+msgid "Submit Request"
+msgstr "Wasilisha Ombi"
+
+msgid "Fulfill Seed Request"
+msgstr "Timiza Ombi la Mbegu"
+
+msgid "Verified Request"
+msgstr "Ombi Lililothibitishwa"
+
+msgid "Verified by"
+msgstr "Ilithibitishwa na"
+
+msgid "Fulfill & Send SMS"
+msgstr "Timiza na Tuma SMS"
+
+msgid "New Request"
+msgstr "Ombi Jipya"
+
+msgid "Qty Requested"
+msgstr "Kiasi Kilichoombwa"
+
+msgid "Verify"
+msgstr "Thibitisha"
+
+msgid "Fulfill"
+msgstr "Timiza"
+
+msgid "No seed requests found"
+msgstr "Hakuna maombi ya mbegu yaliyopatikana"
+
+msgid "Verify Seed Request"
+msgstr "Thibitisha Ombi la Mbegu"
+
+msgid "Seed Request"
+msgstr "Ombi la Mbegu"
+
+#, python-format
+msgid ""
+"<strong>%(name)s</strong> has not yet confirmed receipt of a previous seed "
+"distribution.\n"
+"        They must confirm it via their own login before this request can be "
+"verified. You may still reject it."
+msgstr ""
+"<strong>%(name)s</strong> bado hajathibitisha kupokea usambazaji wa awali wa "
+"mbegu.\n"
+"        Lazima athibitishe kupitia akaunti yake kabla ombi hili "
+"kuthibitishwa. Bado unaweza kulikataa."
+
+msgid "Rejection Reason (if rejecting)"
+msgstr "Sababu ya Kukataa (ikiwa unakataa)"
+
+msgid "Blocked until farmer confirms prior receipt"
+msgstr "Imezuiwa hadi mkulima athibitishe upokeaji wa awali"
+
+msgid "Verify & Forward to Village Officer"
+msgstr "Thibitisha na Tuma kwa Afisa wa Kijiji"
+
+msgid "Reject this request?"
+msgstr "Kataa ombi hili?"
+
+msgid "Reject"
+msgstr "Kataa"
+
+msgid "Unit"
+msgstr "Kipimo"
+
+msgid "Description"
+msgstr "Maelezo"
+
+msgid "Total Inventory"
+msgstr "Jumla ya Hifadhi"
+
+msgid "No seed types defined"
+msgstr "Hakuna aina za mbegu zilizowekwa"
+
+msgid "SMS Notifications Log"
+msgstr "Kumbukumbu za Arifa za SMS"
+
+msgid "messages"
+msgstr "jumbe"
+
+msgid "Sent At"
+msgstr "Ilitumwa Saa"
+
+msgid "No SMS logs"
+msgstr "Hakuna kumbukumbu za SMS"
+
+msgid "Distribute Stock"
+msgstr "Sambaza Hifadhi"
+
+#, python-format
+msgid "Distribute Stock to %(target)s"
+msgstr "Sambaza Hifadhi kwa %(target)s"
+
+msgid "Distribute"
+msgstr "Sambaza"
+
+msgid "Request Stock"
+msgstr "Omba Hifadhi"
+
+#, python-format
+msgid "%(name)s (%(unit)s) in stock"
+msgstr "%(name)s (%(unit)s) zilizopo hifadhini"
+
+#, python-format
+msgid "No stock currently held at your %(loc)s."
+msgstr "Hakuna hifadhi iliyopo kwa sasa katika %(loc)s yako."
+
+msgid "Use \"Request Stock\" above to ask your parent officer."
+msgstr "Tumia \"Omba Hifadhi\" hapo juu kumwomba afisa wako mkuu."
+
+msgid "Requests From Your Team"
+msgstr "Maombi Kutoka kwa Timu Yako"
+
+msgid "Requested By"
+msgstr "Iliombwa na"
+
+msgid "Respond"
+msgstr "Jibu"
+
+msgid "Distributed by You"
+msgstr "Umezisambaza"
+
+msgid "To"
+msgstr "Kwa"
+
+msgid "No distributions yet"
+msgstr "Hakuna usambazaji bado"
+
+msgid "Received"
+msgstr "Zilizopokelewa"
+
+msgid "From"
+msgstr "Kutoka"
+
+msgid "Nothing received yet"
+msgstr "Hakuna kilichopokelewa bado"
+
+msgid "Your Requests"
+msgstr "Maombi Yako"
+
+msgid "No requests yet"
+msgstr "Hakuna maombi bado"
+
+msgid "This will be sent to your immediate parent officer for approval."
+msgstr "Hii itatumwa kwa afisa wako wa karibu kwa idhini."
+
+msgid "Respond to Stock Request"
+msgstr "Jibu Ombi la Hifadhi"
+
+msgid "Stock Request"
+msgstr "Ombi la Hifadhi"
+
+#, python-format
+msgid ""
+"Your current available stock of <strong>%(name)s</strong>: <strong>%(qty)s "
+"%(unit)s</strong>"
+msgstr ""
+"Hifadhi yako iliyopo ya <strong>%(name)s</strong>: <strong>%(qty)s %(unit)s</"
+"strong>"
+
+msgid "Approve & Transfer"
+msgstr "Idhinisha na Hamisha"
+
+msgid "Role"
+msgstr "Wadhifa"
+
+msgid "Email"
+msgstr "Barua Pepe"
+
+msgid ""
+"Password is managed by the user themselves via \"Change Password\" in their "
+"sidebar. To reset a forgotten password, use the Django admin site."
+msgstr ""
+"Nywila inasimamiwa na mtumiaji mwenyewe kupitia \"Badilisha Nywila\" kwenye "
+"menyu yake. Kuweka upya nywila iliyosahaulika, tumia tovuti ya usimamizi ya "
+"Django."
+
+msgid "Save User"
+msgstr "Hifadhi Mtumiaji"
+
+msgid "System Users"
+msgstr "Watumiaji wa Mfumo"
+
+msgid "Add User"
+msgstr "Ongeza Mtumiaji"
+
+msgid "Full Name"
+msgstr "Jina Kamili"
+
+msgid "Assigned Area"
+msgstr "Eneo Ulilopangiwa"
+
+msgid "Last Login"
+msgstr "Kuingia Mara ya Mwisho"
+
+msgid "Never"
+msgstr "Kamwe"
+
+msgid "About"
+msgstr ""
+
+msgid "About the Programme"
+msgstr ""
+
+msgid "Digitizing Seed Distribution in Mbeya"
+msgstr ""
+
+msgid ""
+"Mbeya Seed Tracker exists to make government seed distribution transparent, "
+"accountable and fast — from the moment seed stock arrives in the region to "
+"the moment a farmer confirms it in their own hands."
+msgstr ""
+
+msgid "Our Purpose"
+msgstr ""
+
+msgid ""
+"Smallholder farmers depend on receiving the right seed, in the right "
+"quantity, at the right time. When distribution is tracked on paper across "
+"five organizational levels, records get lost, quantities get disputed, and "
+"farmers are left waiting without answers. This system replaces that paper "
+"trail with a single, auditable record that every level of the chain can see "
+"- scoped strictly to their own territory."
+msgstr ""
+
+msgid "How the System is Organized"
+msgstr ""
+
+msgid ""
+"Every account belongs to one of these roles, each scoped to their own part "
+"of the region:"
+msgstr ""
+
+msgid ""
+"Alongside this chain, an Agricultural Extension Officer (Bwana Shamba) works "
+"at ward level - verifying farmer requests and helping farmers use the "
+"system, without handling bulk stock themselves."
+msgstr ""
+
+msgid "What the System Tracks"
+msgstr ""
+
+msgid ""
+"Seed stock received at regional level, and every hand-off down to village "
+"level"
+msgstr ""
+
+msgid "Every farmer request, who verified it, and who fulfilled it"
+msgstr ""
+
+msgid "Actual confirmed collection by the farmer - not just a paper signature"
+msgstr ""
+
+msgid "A full activity log for accountability at every level"
+msgstr ""
+
+msgid "Want to see it in action?"
+msgstr ""
+
+msgid "See How It Works"
+msgstr ""
+
+msgid "Contact Us"
+msgstr ""
+
+msgid ""
+"Digital seed distribution and tracking for smallholder farmers in Mbeya "
+"Region, Tanzania."
+msgstr ""
+
+msgid "Home"
+msgstr ""
+
+msgid "How It Works"
+msgstr ""
+
+msgid "FAQ"
+msgstr ""
+
+msgid "Contact"
+msgstr ""
+
+#, fuzzy
+#| msgid "Back to Dashboard"
+msgid "Go to Dashboard"
+msgstr "Rudi kwenye Dashibodi"
+
+msgid "Sign In"
+msgstr "Ingia"
+
+msgid "Jisajili"
+msgstr ""
+
+msgid ""
+"Digitizing seed distribution from Regional Officers all the way to "
+"smallholder farmers."
+msgstr ""
+
+msgid "Mbeya Seed Tracker. Built for the Mbeya Region agricultural community."
+msgstr ""
+
+msgid "Get in Touch"
+msgstr ""
+
+msgid ""
+"Questions, feedback, or need an officer account? Send us a message below."
+msgstr ""
+
+#, fuzzy
+#| msgid "Reject"
+msgid "Subject"
+msgstr "Kataa"
+
+#, fuzzy
+#| msgid "Message"
+msgid "Send Message"
+msgstr "Ujumbe"
+
+msgid "Already have an account?"
+msgstr "Una akaunti tayari?"
+
+msgid ""
+"Farmers can submit feedback or complaints directly from their dashboard for "
+"a faster response from their Extension Officer."
+msgstr ""
+
+msgid "Have a quick question?"
+msgstr ""
+
+msgid ""
+"Check the FAQ - it covers registration, requests, passwords and language "
+"settings."
+msgstr ""
+
+#, fuzzy
+#| msgid "View All"
+msgid "View FAQ"
+msgstr "Angalia Zote"
+
+msgid "Frequently Asked Questions"
+msgstr ""
+
+msgid "Everything you need to know to get started."
+msgstr ""
+
+#, fuzzy
+#| msgid "Jisajili - Register as a Farmer"
+msgid "How do I register as a farmer?"
+msgstr "Jisajili - Sajili kama Mkulima"
+
+msgid ""
+"Click \"Jisajili\" on the home page or login screen. You'll choose a "
+"username and password, enter your details and your village, and you're in - "
+"no officer visit required."
+msgstr ""
+
+#, fuzzy
+#| msgid "Request Seeds"
+msgid "How do I request seeds?"
+msgstr "Omba Mbegu"
+
+msgid "Once logged in, use \\"
+msgstr ""
+
+msgid "Why hasn't my request been verified yet?"
+msgstr ""
+
+msgid ""
+"If you have an earlier seed delivery you haven't confirmed receiving yet, "
+"new requests are held until you confirm it. Check \\"
+msgstr ""
+
+msgid "Can I request the same seed type twice in one season?"
+msgstr ""
+
+msgid ""
+"No - one active or fulfilled request per seed type per season. If an earlier "
+"request was rejected, you're free to submit a new one."
+msgstr ""
+
+msgid "I forgot my password. What do I do?"
+msgstr ""
+
+msgid ""
+"Use \"Forgot password?\" on the sign-in page. If you added an email when you "
+"registered, you'll receive a reset link. No email on file? Contact your "
+"Village Officer for help."
+msgstr ""
+
+msgid "Can I use the system in Swahili?"
+msgstr ""
+
+msgid ""
+"Yes - use the language switcher in the top menu to change between English "
+"and Kiswahili at any time."
+msgstr ""
+
+msgid "How do I report a problem or give feedback?"
+msgstr ""
+
+msgid ""
+"Farmers can submit a suggestion or complaint from their dashboard, "
+"optionally linked to a specific request. Your Extension Officer will follow "
+"up directly."
+msgstr ""
+
+msgid "I'm an officer, not a farmer - how do I get an account?"
+msgstr ""
+
+msgid ""
+"Officer accounts (Regional, District, Ward, Village, Extension) are created "
+"by a System Administrator. Use the Contact page below to get in touch."
+msgstr ""
+
+msgid "Still have a question?"
+msgstr ""
+
+msgid "The Full Picture"
+msgstr ""
+
+msgid ""
+"Two flows run through the system: bulk stock moving down the chain, and "
+"individual farmer requests moving up for approval."
+msgstr ""
+
+msgid "1. Stock Flows Down the Chain"
+msgstr ""
+
+msgid ""
+"Only a Regional Officer adds new seed stock into the system. From there, "
+"each level distributes to the one directly below it, strictly within their "
+"own territory:"
+msgstr ""
+
+msgid ""
+"Adds seed stock received for their region, then distributes it to districts."
+msgstr ""
+
+msgid ""
+"Receives from the region, distributes to wards within their own district."
+msgstr ""
+
+msgid ""
+"Receives from the district, distributes to villages within their own ward."
+msgstr ""
+
+msgid ""
+"Receives from the ward - this becomes the real stock used to fulfill farmer "
+"requests."
+msgstr ""
+
+msgid ""
+"At any level, an officer can also request stock from the level above instead "
+"of waiting - their parent officer approves or rejects it."
+msgstr ""
+
+msgid "2. A Farmer's Request Moves Up for Approval"
+msgstr ""
+
+#, fuzzy
+#| msgid "Farmer Registry"
+msgid "Farmer requests"
+msgstr "Orodha ya Wakulima"
+
+msgid ""
+"The farmer logs in and requests a seed type and quantity for the current "
+"season."
+msgstr ""
+
+msgid "Extension Officer verifies"
+msgstr ""
+
+msgid ""
+"The ward's Extension Officer reviews and verifies the request before it can "
+"proceed."
+msgstr ""
+
+#, fuzzy
+#| msgid "Village Officer"
+msgid "Village Officer fulfills"
+msgstr "Afisa wa Kijiji"
+
+msgid ""
+"The Village Officer fulfills it against their real, current stock balance - "
+"never more than what's actually available."
+msgstr ""
+
+#, fuzzy
+#| msgid "Confirm Receipt"
+msgid "Farmer confirms receipt"
+msgstr "Thibitisha Kupokea"
+
+msgid ""
+"Once collected, the farmer confirms it themselves from their own account, "
+"closing the loop."
+msgstr ""
+
+msgid ""
+"A farmer can only have one active request per seed type per season, and an "
+"SMS notification is sent the moment it's ready for collection."
+msgstr ""
+
+#, fuzzy
+#| msgid "Feedback"
+msgid "3. Feedback Loop"
+msgstr "Maoni"
+
+msgid ""
+"At any point, a farmer can raise a suggestion or complaint - optionally tied "
+"to a specific request - and their Extension Officer resolves it directly."
+msgstr ""
+
+msgid "See it for yourself"
+msgstr ""
+
+msgid "Jisajili - Register as a Farmer"
+msgstr "Jisajili - Sajili kama Mkulima"
+
+msgid "Read the FAQ"
+msgstr ""
+
+msgid "Digital Seed Distribution for Every Farmer"
+msgstr ""
+
+msgid "Mbeya Region, Tanzania"
+msgstr "Mkoa wa Mbeya, Tanzania"
+
+msgid "From Government Store to Farmer's Hand —"
+msgstr ""
+
+msgid "Every Seed, Tracked."
+msgstr ""
+
+msgid ""
+"A digital pipeline connecting Regional Officers, District Officers, Ward "
+"Officers, Village Officers, Extension Officers and Farmers — so every seed "
+"distributed reaches the right hands, on record, every season."
+msgstr ""
+
+#, fuzzy
+#| msgid "Sign In"
+msgid "Officer Sign In"
+msgstr "Ingia"
+
+#, fuzzy
+#| msgid "Farmer Registry"
+msgid "Farmers Registered"
+msgstr "Orodha ya Wakulima"
+
+#, fuzzy
+#| msgid "Villages"
+msgid "Villages Covered"
+msgstr "Vijiji"
+
+#, fuzzy
+#| msgid "District"
+msgid "Districts"
+msgstr "Wilaya"
+
+#, fuzzy
+#| msgid "Seed Details"
+msgid "Seed Varieties"
+msgstr "Maelezo ya Mbegu"
+
+#, fuzzy
+#| msgid "Distributed"
+msgid "kg Distributed"
+msgstr "Imesambazwa"
+
+msgid "The Journey of a Seed"
+msgstr ""
+
+msgid "One clear pipeline, from request to receipt."
+msgstr ""
+
+#, fuzzy
+#| msgid "Registered"
+msgid "Register"
+msgstr "Amesajiliwa"
+
+msgid "A farmer registers themselves, or their Village Officer registers them."
+msgstr ""
+
+msgid ""
+"The farmer requests a seed type for the season, straight from their own "
+"login."
+msgstr ""
+
+msgid "Their Extension Officer verifies the request before it moves forward."
+msgstr ""
+
+#, fuzzy
+#| msgid "Received"
+msgid "Receive"
+msgstr "Zilizopokelewa"
+
+msgid ""
+"The Village Officer fulfills it from real stock, and the farmer confirms "
+"receipt."
+msgstr ""
+
+msgid "See the Full Picture"
+msgstr ""
+
+msgid "Built for Everyone in the Chain"
+msgstr ""
+
+msgid "One System, Every Role"
+msgstr ""
+
+msgid ""
+"Register, request seeds, track status, confirm receipt and give feedback - "
+"all from one account."
+msgstr ""
+
+#, fuzzy
+#| msgid "Regional Officer"
+msgid "Extension Officers"
+msgstr "Afisa wa Mkoa"
+
+msgid ""
+"Verify farmer requests, help farmers use the system, and resolve complaints "
+"in their ward."
+msgstr ""
+
+#, fuzzy
+#| msgid "Village Officer"
+msgid "Village & Ward Officers"
+msgstr "Afisa wa Kijiji"
+
+msgid ""
+"Move real stock down the chain and fulfill farmer requests against actual "
+"balances."
+msgstr ""
+
+#, fuzzy
+#| msgid "Regional Officer"
+msgid "District & Regional Officers"
+msgstr "Afisa wa Mkoa"
+
+msgid ""
+"Reports scoped to your own territory, downloadable as PDF, with full audit "
+"trails."
+msgstr ""
+
+msgid "Ready to get started?"
+msgstr ""
+
+msgid "Join the Mbeya Seed Tracker today - it takes less than two minutes."
+msgstr ""
+
+#, fuzzy
+#| msgid "Jisajili / Register"
+msgid "Jisajili Sasa"
+msgstr "Jisajili"
+
+#, fuzzy
+#| msgid "Back to List"
+msgid "Talk to Us"
+msgstr "Rudi kwenye Orodha"
+
+msgid "Jisajili - Farmer Registration"
+msgstr "Jisajili - Usajili wa Mkulima"
+
+msgid ""
+"Create your account to request seeds, track allocations and give feedback."
+msgstr "Fungua akaunti yako ili kuomba mbegu, kufuatilia mgao na kutoa maoni."
+
+msgid "Account"
+msgstr "Akaunti"
+
+msgid "Your Details"
+msgstr "Taarifa Zako"
+
+msgid "Jisajili / Register"
+msgstr "Jisajili"
+
+msgid "Sign in"
+msgstr "Ingia"
+
+msgid "Forgot Password"
+msgstr "Umesahau Nywila"
+
+msgid "Enter your username or email and we'll send you a reset link."
+msgstr ""
+"Weka jina lako la mtumiaji au barua pepe nasi tutakutumia kiungo cha kuweka "
+"upya."
+
+msgid "Send Reset Link"
+msgstr "Tuma Kiungo cha Kuweka Upya"
+
+msgid "Back to Sign In"
+msgstr "Rudi Kuingia"
+
+msgid "Government Seed Allocation & Tracking System"
+msgstr "Mfumo wa Serikali wa Ugawaji na Ufuatiliaji wa Mbegu"
+
+msgid "Invalid username or password."
+msgstr "Jina la mtumiaji au nywila si sahihi."
+
+msgid "Forgot password?"
+msgstr "Umesahau nywila?"
+
+msgid "Secured System"
+msgstr "Mfumo Salama"
+
+msgid "Authorized Users Only"
+msgstr "Watumiaji Walioidhinishwa Pekee"
+
+msgid "Ministry of Agriculture, Mbeya Region"
+msgstr "Wizara ya Kilimo, Mkoa wa Mbeya"
+
+msgid "Link Invalid or Expired"
+msgstr "Kiungo Hakisahihi au Kimeisha Muda"
+
+msgid "This password reset link is no longer valid. Request a new one below."
+msgstr ""
+"Kiungo hiki cha kuweka upya nywila si sahihi tena. Omba kingine hapa chini."
+
+msgid "Request New Link"
+msgstr "Omba Kiungo Kipya"
+
+msgid "Set New Password"
+msgstr "Weka Nywila Mpya"
+
+msgid "Choose a new password for your account."
+msgstr "Chagua nywila mpya kwa akaunti yako."
+
+msgid "Reset Password"
+msgstr "Weka Upya Nywila"

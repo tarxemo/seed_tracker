@@ -1,5 +1,6 @@
 from decimal import Decimal
 from django.db.models import Sum
+from django.utils.translation import gettext_lazy as _
 from .models import SeedInventory, StockTransfer, SeedAllocation, SeedType
 
 ALLOCATION_RESERVED_STATUSES = ('pending', 'approved', 'distributed')
@@ -95,10 +96,10 @@ def total_received_for_user(user):
 
 
 LOCATION_LABEL_BY_ROLE = {
-    'regional': ('Region', 'region'),
-    'district': ('District', 'district'),
-    'ward': ('Ward', 'ward'),
-    'village': ('Village', 'village'),
+    'regional': (_('Region'), 'region'),
+    'district': (_('District'), 'district'),
+    'ward': (_('Ward'), 'ward'),
+    'village': (_('Village'), 'village'),
 }
 
 

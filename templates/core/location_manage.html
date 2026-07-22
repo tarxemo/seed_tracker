@@ -1,52 +1,53 @@
 {% extends 'base.html' %}
+{% load i18n %}
 {% block title %}Location Management - Seed Tracker{% endblock %}
-{% block page_title %}Location Management{% endblock %}
+{% block page_title %}{% trans "Location Management" %}{% endblock %}
 {% block content %}
 <div class="row g-3 mb-4">
   <div class="col-md-6 col-xl-3">
     <div class="form-card">
-      <h6 style="font-weight:700;margin-bottom:16px;color:#1a6b3c"><i class="fas fa-globe-africa me-2"></i>Add Region</h6>
+      <h6 style="font-weight:700;margin-bottom:16px;color:#1a6b3c"><i class="fas fa-globe-africa me-2"></i>{% trans "Add Region" %}</h6>
       <form method="post">{% csrf_token %}<input type="hidden" name="action" value="add_region">
         {% for f in region_form %}
         <div class="mb-2"><label class="form-label">{{ f.label }}</label>{{ f }}</div>
         {% endfor %}
-        <button type="submit" class="btn btn-primary btn-sm w-100">Add Region</button>
+        <button type="submit" class="btn btn-primary btn-sm w-100">{% trans "Add Region" %}</button>
       </form>
     </div>
   </div>
   <div class="col-md-6 col-xl-3">
     <div class="form-card">
-      <h6 style="font-weight:700;margin-bottom:16px;color:#1a6b3c"><i class="fas fa-map me-2"></i>Add District</h6>
+      <h6 style="font-weight:700;margin-bottom:16px;color:#1a6b3c"><i class="fas fa-map me-2"></i>{% trans "Add District" %}</h6>
       <form method="post">{% csrf_token %}<input type="hidden" name="action" value="add_district">
         {% for f in district_form %}<div class="mb-2"><label class="form-label">{{ f.label }}</label>{{ f }}</div>{% endfor %}
-        <button type="submit" class="btn btn-primary btn-sm w-100">Add District</button>
+        <button type="submit" class="btn btn-primary btn-sm w-100">{% trans "Add District" %}</button>
       </form>
     </div>
   </div>
   <div class="col-md-6 col-xl-3">
     <div class="form-card">
-      <h6 style="font-weight:700;margin-bottom:16px;color:#1a6b3c"><i class="fas fa-map-pin me-2"></i>Add Ward</h6>
+      <h6 style="font-weight:700;margin-bottom:16px;color:#1a6b3c"><i class="fas fa-map-pin me-2"></i>{% trans "Add Ward" %}</h6>
       <form method="post">{% csrf_token %}<input type="hidden" name="action" value="add_ward">
         {% for f in ward_form %}<div class="mb-2"><label class="form-label">{{ f.label }}</label>{{ f }}</div>{% endfor %}
-        <button type="submit" class="btn btn-primary btn-sm w-100">Add Ward</button>
+        <button type="submit" class="btn btn-primary btn-sm w-100">{% trans "Add Ward" %}</button>
       </form>
     </div>
   </div>
   <div class="col-md-6 col-xl-3">
     <div class="form-card">
-      <h6 style="font-weight:700;margin-bottom:16px;color:#1a6b3c"><i class="fas fa-home me-2"></i>Add Village</h6>
+      <h6 style="font-weight:700;margin-bottom:16px;color:#1a6b3c"><i class="fas fa-home me-2"></i>{% trans "Add Village" %}</h6>
       <form method="post">{% csrf_token %}<input type="hidden" name="action" value="add_village">
         {% for f in village_form %}<div class="mb-2"><label class="form-label">{{ f.label }}</label>{{ f }}</div>{% endfor %}
-        <button type="submit" class="btn btn-primary btn-sm w-100">Add Village</button>
+        <button type="submit" class="btn btn-primary btn-sm w-100">{% trans "Add Village" %}</button>
       </form>
     </div>
   </div>
 </div>
 <div class="table-card">
-  <div class="table-header"><h5>Location Hierarchy</h5></div>
+  <div class="table-header"><h5>{% trans "Location Hierarchy" %}</h5></div>
   <div class="table-responsive">
     <table class="data-table">
-      <thead><tr><th>Region</th><th>District</th><th>Ward</th><th>Villages</th></tr></thead>
+      <thead><tr><th>{% trans "Region" %}</th><th>{% trans "District" %}</th><th>{% trans "Ward" %}</th><th>{% trans "Villages" %}</th></tr></thead>
       <tbody>
         {% for region in regions %}
           {% for district in region.districts.all %}
@@ -61,17 +62,17 @@
             <tr>
               <td style="font-weight:700">{{ region.name }}</td>
               <td>{{ district.name }}</td>
-              <td colspan="2" class="text-muted">No wards</td>
+              <td colspan="2" class="text-muted">{% trans "No wards" %}</td>
             </tr>
             {% endfor %}
           {% empty %}
           <tr>
             <td style="font-weight:700">{{ region.name }}</td>
-            <td colspan="3" class="text-muted">No districts</td>
+            <td colspan="3" class="text-muted">{% trans "No districts" %}</td>
           </tr>
           {% endfor %}
         {% empty %}
-        <tr><td colspan="4" class="text-center text-muted py-4">No locations configured</td></tr>
+        <tr><td colspan="4" class="text-center text-muted py-4">{% trans "No locations configured" %}</td></tr>
         {% endfor %}
       </tbody>
     </table>

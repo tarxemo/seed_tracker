@@ -1,20 +1,22 @@
 {% extends 'base.html' %}
+{% load i18n %}
 {% block title %}Reports - Seed Tracker{% endblock %}
-{% block page_title %}Reports & Analytics{% endblock %}
+{% block page_title %}{% trans "Reports & Analytics" %}{% endblock %}
 {% block extra_head %}{% endblock %}
 {% block content %}
 <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
-  <h4 style="margin:0"><i class="fas fa-chart-bar me-2" style="color:#1a6b3c"></i>Reports</h4>
+  <h4 style="margin:0"><i class="fas fa-chart-bar me-2" style="color:#1a6b3c"></i>{% trans "Reports" %}</h4>
   <div class="d-flex gap-2 flex-wrap">
     <form method="get" class="d-flex gap-2">
       <select name="season" class="form-select form-select-sm" style="width:200px">
-        <option value="">All Seasons</option>
+        <option value="">{% trans "All Seasons" %}</option>
         {% for s in seasons %}<option value="{{ s.pk }}" {% if selected_season == s.pk|stringformat:"s" %}selected{% endif %}>{{ s.name }}</option>{% endfor %}
       </select>
-      <button type="submit" class="btn btn-sm btn-primary">Filter</button>
+      <button type="submit" class="btn btn-sm btn-primary">{% trans "Filter" %}</button>
     </form>
-    <a href="{% url 'export_farmers_csv' %}" class="btn btn-sm btn-outline-success"><i class="fas fa-download me-1"></i>Farmers CSV</a>
-    <a href="{% url 'export_allocations_csv' %}" class="btn btn-sm btn-outline-success"><i class="fas fa-download me-1"></i>Allocations CSV</a>
+    <a href="{% url 'export_farmers_csv' %}" class="btn btn-sm btn-outline-success"><i class="fas fa-download me-1"></i>{% trans "Farmers CSV" %}</a>
+    <a href="{% url 'export_allocations_csv' %}" class="btn btn-sm btn-outline-success"><i class="fas fa-download me-1"></i>{% trans "Allocations CSV" %}</a>
+    <a href="{% url 'reports_pdf' %}?season={{ selected_season }}" class="btn btn-sm btn-outline-danger"><i class="fas fa-file-pdf me-1"></i>{% trans "Download PDF" %}</a>
   </div>
 </div>
 
@@ -30,7 +32,7 @@
     <div class="stat-card">
       <div class="stat-icon" style="background:#fff8e6;color:#f0a500"><i class="fas fa-truck"></i></div>
       <div class="stat-value">{{ total_distributed|floatformat:0 }}</div>
-      <div class="stat-label">Total Distributed (kg)</div>
+      <div class="stat-label">{% trans "Total Distributed (kg)" %}</div>
     </div>
   </div>
   <div class="col-sm-6 col-xl-3">
@@ -44,7 +46,7 @@
     <div class="stat-card">
       <div class="stat-icon" style="background:#fce4ec;color:#c62828"><i class="fas fa-users"></i></div>
       <div class="stat-value">{{ total_farmers }}</div>
-      <div class="stat-label">Total Beneficiaries</div>
+      <div class="stat-label">{% trans "Total Beneficiaries" %}</div>
     </div>
   </div>
 </div>
@@ -52,15 +54,15 @@
 <div class="row g-3 mb-4">
   <div class="col-lg-7">
     <div class="chart-card">
-      <div class="chart-title">Distribution by {{ breakdown_label }}</div>
+      <div class="chart-title">{% blocktrans %}Distribution by {{ breakdown_label }}{% endblocktrans %}</div>
       <canvas id="breakdownChart" height="130"></canvas>
     </div>
   </div>
   <div class="col-lg-5">
     <div class="chart-card">
-      <div class="chart-title">Seed Allocation Summary</div>
+      <div class="chart-title">{% trans "Seed Allocation Summary" %}</div>
       <table class="data-table">
-        <thead><tr><th>Seed Type</th><th>Allocations</th><th>Total Qty</th></tr></thead>
+        <thead><tr><th>{% trans "Seed Type" %}</th><th>{% trans "Allocations" %}</th><th>{% trans "Total Qty" %}</th></tr></thead>
         <tbody>
           {% for s in seed_summary %}
           <tr>
@@ -69,7 +71,7 @@
             <td>{{ s.qty|floatformat:0 }} {{ s.seed_type__unit }}</td>
           </tr>
           {% empty %}
-          <tr><td colspan="3" class="text-muted text-center">No data</td></tr>
+          <tr><td colspan="3" class="text-muted text-center">{% trans "No data" %}</td></tr>
           {% endfor %}
         </tbody>
       </table>
@@ -80,9 +82,9 @@
 <div class="row g-3">
   <div class="col-lg-12">
     <div class="table-card">
-      <div class="table-header"><h5>By {{ breakdown_label }}</h5></div>
+      <div class="table-header"><h5>{% blocktrans %}By {{ breakdown_label }}{% endblocktrans %}</h5></div>
       <table class="data-table">
-        <thead><tr><th>{{ breakdown_label }}</th><th>Allocations</th><th>Total Qty (kg)</th></tr></thead>
+        <thead><tr><th>{{ breakdown_label }}</th><th>{% trans "Allocations" %}</th><th>{% trans "Total Qty (kg)" %}</th></tr></thead>
         <tbody>
           {% for b in breakdown %}
           <tr>
@@ -91,7 +93,7 @@
             <td>{{ b.qty|floatformat:0 }}</td>
           </tr>
           {% empty %}
-          <tr><td colspan="3" class="text-muted text-center">No data</td></tr>
+          <tr><td colspan="3" class="text-muted text-center">{% trans "No data" %}</td></tr>
           {% endfor %}
         </tbody>
       </table>

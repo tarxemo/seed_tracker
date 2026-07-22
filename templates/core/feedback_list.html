@@ -1,56 +1,57 @@
 {% extends 'base.html' %}
+{% load i18n %}
 {% block title %}Complaints & Feedback - Seed Tracker{% endblock %}
-{% block page_title %}Complaints & Feedback{% endblock %}
+{% block page_title %}{% trans "Complaints & Feedback" %}{% endblock %}
 {% block content %}
 <div class="page-header">
-  <h4><i class="fas fa-comment-dots me-2" style="color:#1a6b3c"></i>Complaints & Feedback <small style="font-size:14px;color:#7a8494;font-weight:400">({{ page_obj.paginator.count }} total)</small></h4>
+  <h4><i class="fas fa-comment-dots me-2" style="color:#1a6b3c"></i>{% trans "Complaints & Feedback" %} <small style="font-size:14px;color:#7a8494;font-weight:400">({{ page_obj.paginator.count }} {% trans "total" %})</small></h4>
   {% if user.role == 'farmer' %}
-  <a href="{% url 'feedback_create' %}" class="btn btn-primary btn-sm"><i class="fas fa-plus me-1"></i>New Feedback</a>
+  <a href="{% url 'feedback_create' %}" class="btn btn-primary btn-sm"><i class="fas fa-plus me-1"></i>{% trans "New Feedback" %}</a>
   {% endif %}
 </div>
 <div class="table-card">
   <div class="table-header">
     <form method="get" class="d-flex gap-2 flex-wrap">
       <select name="status" class="form-select form-select-sm" style="width:150px">
-        <option value="">All Status</option>
-        <option value="open" {% if status_filter == 'open' %}selected{% endif %}>Open</option>
-        <option value="resolved" {% if status_filter == 'resolved' %}selected{% endif %}>Resolved</option>
+        <option value="">{% trans "All Status" %}</option>
+        <option value="open" {% if status_filter == 'open' %}selected{% endif %}>{% trans "Open" %}</option>
+        <option value="resolved" {% if status_filter == 'resolved' %}selected{% endif %}>{% trans "Resolved" %}</option>
       </select>
       <button type="submit" class="btn btn-sm btn-primary"><i class="fas fa-search"></i></button>
-      {% if status_filter %}<a href="{% url 'feedback_list' %}" class="btn btn-sm btn-outline-secondary">Clear</a>{% endif %}
+      {% if status_filter %}<a href="{% url 'feedback_list' %}" class="btn btn-sm btn-outline-secondary">{% trans "Clear" %}</a>{% endif %}
     </form>
   </div>
   <div class="table-responsive">
     <table class="data-table">
-      <thead><tr><th>Farmer</th><th>Category</th><th>Message</th><th>Related</th><th>Status</th><th>Date</th><th>Actions</th></tr></thead>
+      <thead><tr><th>{% trans "Farmer" %}</th><th>{% trans "Category" %}</th><th>{% trans "Message" %}</th><th>{% trans "Related" %}</th><th>{% trans "Status" %}</th><th>{% trans "Date" %}</th><th>{% trans "Actions" %}</th></tr></thead>
       <tbody>
         {% for f in page_obj %}
         <tr>
           <td><span style="font-weight:600">{{ f.farmer.full_name }}</span><br><span class="farmer-id">{{ f.farmer.farmer_id }}</span></td>
           <td style="text-transform:capitalize">{{ f.get_category_display }}</td>
           <td>{{ f.message|truncatechars:60 }}
-            {% if f.status == 'resolved' and f.response %}<br><span class="text-muted" style="font-size:11px"><strong>Response:</strong> {{ f.response|truncatechars:60 }}</span>{% endif %}
+            {% if f.status == 'resolved' and f.response %}<br><span class="text-muted" style="font-size:11px"><strong>{% trans "Response" %}:</strong> {{ f.response|truncatechars:60 }}</span>{% endif %}
           </td>
           <td>{% if f.related_allocation %}<a href="{% url 'allocation_detail' f.related_allocation.pk %}">{{ f.related_allocation.seed_type.name }}</a>{% else %}<span class="text-muted">-</span>{% endif %}</td>
           <td><span class="badge-status badge-{{ f.status }}">{{ f.get_status_display }}</span></td>
           <td style="color:#7a8494">{{ f.created_at|date:"d M Y" }}</td>
           <td>
             {% if can_resolve and f.status == 'open' %}
-            <a href="{% url 'feedback_resolve' f.pk %}" class="btn btn-sm btn-outline-success"><i class="fas fa-check me-1"></i>Resolve</a>
+            <a href="{% url 'feedback_resolve' f.pk %}" class="btn btn-sm btn-outline-success"><i class="fas fa-check me-1"></i>{% trans "Resolve" %}</a>
             {% else %}<span class="text-muted">-</span>{% endif %}
           </td>
         </tr>
         {% empty %}
-        <tr><td colspan="7" class="text-center text-muted py-5">No feedback found</td></tr>
+        <tr><td colspan="7" class="text-center text-muted py-5">{% trans "No feedback found" %}</td></tr>
         {% endfor %}
       </tbody>
     </table>
   </div>
   {% if page_obj.has_other_pages %}
   <div style="padding:16px 20px;display:flex;justify-content:center;gap:6px">
-    {% if page_obj.has_previous %}<a href="?page={{ page_obj.previous_page_number }}&status={{ status_filter }}" class="btn btn-sm btn-outline-secondary">« Prev</a>{% endif %}
+    {% if page_obj.has_previous %}<a href="?page={{ page_obj.previous_page_number }}&status={{ status_filter }}" class="btn btn-sm btn-outline-secondary">« {% trans "Prev" %}</a>{% endif %}
     <span class="btn btn-sm btn-primary disabled">{{ page_obj.number }} / {{ page_obj.paginator.num_pages }}</span>
-    {% if page_obj.has_next %}<a href="?page={{ page_obj.next_page_number }}&status={{ status_filter }}" class="btn btn-sm btn-outline-secondary">Next »</a>{% endif %}
+    {% if page_obj.has_next %}<a href="?page={{ page_obj.next_page_number }}&status={{ status_filter }}" class="btn btn-sm btn-outline-secondary">{% trans "Next" %} »</a>{% endif %}
   </div>
   {% endif %}
 </div>
